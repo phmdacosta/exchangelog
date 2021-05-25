@@ -4,7 +4,7 @@ import com.pedrocosta.exchangelog.models.BatchJobParameter;
 import com.pedrocosta.exchangelog.models.ScheduledJob;
 import com.pedrocosta.exchangelog.services.ServiceFactory;
 import com.pedrocosta.exchangelog.utils.Log;
-import com.pedrocosta.exchangelog.utils.MessageProperties;
+import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import com.sun.istack.NotNull;
 import org.springframework.batch.core.*;
@@ -280,7 +280,7 @@ public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcesso
         SimpleJobBuilder jobBuilder = jobBuilderFactory.get(getJobName())
                 .start(getStep());
         Job job = jobBuilder.build();
-        Log.info(this, MessageProperties.get("task.start", getJobName()));
+        Log.info(this, Messages.get("task.start", getJobName()));
         Log.info(this, this.toString());
         return launcher.run(job, parameters);
     }

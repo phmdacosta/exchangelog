@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.pedrocosta.exchangelog.adapters.AdapterFactory;
-import com.pedrocosta.exchangelog.adapters.AdapterModel;
 import org.springframework.stereotype.Component;
 
 import java.security.InvalidParameterException;
@@ -53,7 +52,7 @@ public class GsonUtils {
     private <T> Gson createGson(Class<T> classOfT, TypeAdapter adapter, String type) throws NullPointerException, InvalidParameterException {
         if (adapter == null) {
             if (adapterFactory == null) {
-                throw new NullPointerException(MessageProperties.get(
+                throw new NullPointerException(Messages.get(
                         "error.adapter.not.set"));
             }
 
@@ -68,7 +67,7 @@ public class GsonUtils {
             gson = builder.create();
         } else {
             throw new InvalidParameterException(
-                    MessageProperties.get("error.adapter.not.found",
+                    Messages.get("error.adapter.not.found",
                             classOfT.getSimpleName(), type));
         }
 

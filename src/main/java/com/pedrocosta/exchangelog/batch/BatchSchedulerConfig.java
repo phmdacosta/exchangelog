@@ -4,7 +4,7 @@ import com.pedrocosta.exchangelog.models.ScheduledJob;
 import com.pedrocosta.exchangelog.services.ScheduledBatchJobService;
 import com.pedrocosta.exchangelog.services.ServiceFactory;
 import com.pedrocosta.exchangelog.utils.Log;
-import com.pedrocosta.exchangelog.utils.MessageProperties;
+import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import com.sun.istack.NotNull;
 import org.springframework.batch.core.*;
@@ -82,7 +82,7 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
                     });
                 });
             } catch (NoSuchJobException e) {
-                Log.warn(this, MessageProperties.get(
+                Log.warn(this, Messages.get(
                         "task.execution.not.canceled", jobName));
                 Log.error(this, e);
             }
@@ -113,13 +113,13 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
                 continue;
             }
 
-            Log.info(this, MessageProperties.get(
+            Log.info(this, Messages.get(
                     "task.config.execution", batchJob.getName()));
 
             String jobCron = buildCron(batchJob, context.getEnvironment());
             // Ignore jobs with invalid cron
             if (!isValidCron(jobCron)) {
-                Log.warn(this, MessageProperties.get(
+                Log.warn(this, Messages.get(
                         "task.cron.invalid", batchJob.getName()));
                 continue;
             }
@@ -131,7 +131,7 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
                                     service.findScheduledChain(jobName);
 
                             if (taskChain == null || taskChain.isEmpty()) {
-                                throw new NullPointerException(MessageProperties.get(
+                                throw new NullPointerException(Messages.get(
                                         "task.job.not.found", jobName));
                             }
 

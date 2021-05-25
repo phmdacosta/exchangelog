@@ -9,7 +9,7 @@ import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.ApiTypes;
 import com.pedrocosta.exchangelog.utils.DateUtils;
 import com.pedrocosta.exchangelog.utils.Log;
-import com.pedrocosta.exchangelog.utils.MessageProperties;
+import com.pedrocosta.exchangelog.utils.Messages;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -69,7 +69,7 @@ public class FixerService implements BusinessService {
             } else {
                 Log.error(this, getErrorMsg(response));
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(MessageProperties.get("api.ccy.not.found", code, API_NAME));
+                result.setMessage(Messages.get("api.ccy.not.found", code, API_NAME));
             }
         }
 
@@ -107,7 +107,7 @@ public class FixerService implements BusinessService {
         } else {
             Log.error(this, getErrorMsg(response));
             result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(MessageProperties.get("api.no.ccy.found", API_NAME));
+            result.setMessage(Messages.get("api.no.ccy.found", API_NAME));
         }
 
         return result;
@@ -173,7 +173,7 @@ public class FixerService implements BusinessService {
             } else {
                 Log.error(this, getErrorMsg(response));
                 result = new ServiceResponse(HttpStatus.NOT_FOUND);
-                result.setMessage(MessageProperties.get("api.no.exchange.found", API_NAME));
+                result.setMessage(Messages.get("api.no.exchange.found", API_NAME));
             }
         } catch (JSONException e) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);

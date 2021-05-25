@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog.services;
 
 import com.pedrocosta.exchangelog.utils.Log;
-import com.pedrocosta.exchangelog.utils.MessageProperties;
+import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PackageUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
@@ -67,7 +67,7 @@ public class ServiceFactory {
         }
 
         if (service == null)
-            Log.error(this, MessageProperties.get("service.not.found", type));
+            Log.error(this, Messages.get("service.not.found", type));
 
         return  service;
     }

@@ -4,7 +4,7 @@ import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.utils.Defaults;
 import com.pedrocosta.exchangelog.utils.Log;
-import com.pedrocosta.exchangelog.utils.MessageProperties;
+import com.pedrocosta.exchangelog.utils.Messages;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.core.env.Environment;
@@ -24,8 +24,8 @@ public class BackOfficeService extends BaseService {
 
 
     public BackOfficeService(ServiceFactory factory, Environment env,
-                             MessageProperties messageProperties) {
-        super(factory, env, messageProperties);
+                             Messages messages) {
+        super(factory, env, messages);
     }
 
     /**
@@ -92,7 +92,7 @@ public class BackOfficeService extends BaseService {
             }
         } catch (JSONException | CloneNotSupportedException e) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);
-            result.setMessage(messageProperties.get("could.not.update",
+            result.setMessage(messages.get("could.not.update",
                     "quote values"));
         }
 
@@ -119,7 +119,7 @@ public class BackOfficeService extends BaseService {
         if (exchange.getId() <= 0) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);
             String arg = "exchange".concat(ccy1.getCode()).concat("/").concat(ccy2.getCode());
-            result.setMessage(messageProperties.get("could.not.update",
+            result.setMessage(messages.get("could.not.update",
                     arg));
         }
 

@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog.services;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
-import com.pedrocosta.exchangelog.utils.MessageProperties;
+import com.pedrocosta.exchangelog.utils.Messages;
 import com.sun.istack.NotNull;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -16,8 +16,8 @@ import java.util.List;
 public class WebService extends BaseService {
 
     public WebService(ServiceFactory factory, Environment env,
-                      MessageProperties messageProperties) {
-        super(factory, env, messageProperties);
+                      Messages messages) {
+        super(factory, env, messages);
     }
 
     public ServiceResponse<List<Exchange>> getQuoteRate(@NotNull String baseCcy, String[] quoteCcy) {
@@ -39,7 +39,7 @@ public class WebService extends BaseService {
         // Check arguments
         if (baseCode == null) {
             result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(messageProperties.get("bad.request"));
+            result.setMessage(messages.get("bad.request"));
             result.setException(new IllegalArgumentException());
         }
 
@@ -59,7 +59,7 @@ public class WebService extends BaseService {
 
                 if (exchange == null) {
                     result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                    result.setMessage(messageProperties.get("could.not.find",
+                    result.setMessage(messages.get("could.not.find",
                             "quote value"));
                     return result;
                 }
