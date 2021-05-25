@@ -2,6 +2,7 @@ package com.pedrocosta.exchangelog.services;
 
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.persistence.CurrencyRepository;
+import com.pedrocosta.exchangelog.utils.MessageProperties;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import org.codehaus.jettison.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,17 @@ public abstract class BaseService implements BusinessService {
 
     protected ServiceFactory factory;
     protected Environment env;
+    protected MessageProperties messageProperties;
 //    @Autowired
 //    protected FixerService fixerService;
     @Autowired
     protected CurrencyRepository currencyRepo;
 
-    public BaseService(ServiceFactory factory, Environment env) {
+    public BaseService(ServiceFactory factory, Environment env,
+                       MessageProperties messageProperties) {
         this.factory = factory;
         this.env = env;
+        this.messageProperties = messageProperties;
     }
 
     protected String getProjectEngine() {
