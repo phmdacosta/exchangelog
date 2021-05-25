@@ -1,10 +1,7 @@
 package com.pedrocosta.exchangelog;
 
-import com.pedrocosta.exchangelog.utils.MessageProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.ResourceBundleMessageSource;
 
 //@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 @SpringBootApplication
@@ -15,16 +12,6 @@ public class ExchangelogApplication {
 	
 	public static void main(String[] args) {
 		SpringApplication.run(ExchangelogApplication.class, args);
-	}
-
-	@Bean
-	public static MessageProperties messageSource() {
-		var source = new ResourceBundleMessageSource();
-		source.setBasenames("label/messages");
-		source.setUseCodeAsDefaultMessage(true);
-		MessageProperties properties = new MessageProperties();
-		properties.setSource(source);
-		return properties;
 	}
 	
 //	@Bean
