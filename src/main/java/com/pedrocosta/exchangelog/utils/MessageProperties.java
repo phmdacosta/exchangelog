@@ -14,7 +14,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 public class MessageProperties {
 
     private MessageSource source;
-    private static final String MSG_BEAN_NAME = "messageSource";
+    private static final String MSG_BEAN_NAME = "messageProperties";
 
     public MessageProperties setSource(MessageSource source) {
         this.source = source;
