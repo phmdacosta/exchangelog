@@ -4,6 +4,7 @@ import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.utils.Defaults;
 import com.pedrocosta.exchangelog.utils.Log;
+import com.pedrocosta.exchangelog.utils.MessageProperties;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.core.env.Environment;
@@ -21,8 +22,10 @@ import java.util.*;
 @Service
 public class BackOfficeService extends BaseService {
 
-    public BackOfficeService(ServiceFactory factory, Environment env) {
-        super(factory, env);
+
+    public BackOfficeService(ServiceFactory factory, Environment env,
+                             MessageProperties messageProperties) {
+        super(factory, env, messageProperties);
     }
 
     /**
@@ -89,7 +92,8 @@ public class BackOfficeService extends BaseService {
             }
         } catch (JSONException | CloneNotSupportedException e) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);
-            result.setMessage("Could not update quote values"); //TODO use message properties
+            result.setMessage(messageProperties.get("could.not.update",
+                    "quote values"));
         }
 
         return result;
@@ -114,7 +118,9 @@ public class BackOfficeService extends BaseService {
         Exchange exchange = exchService.save(ccy1, ccy2, rate, valueDate);
         if (exchange.getId() <= 0) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);
-            result.setMessage(""); //TODO use message properties
+            String arg = "exchange".concat(ccy1.getCode()).concat("/").concat(ccy2.getCode());
+            result.setMessage(messageProperties.get("could.not.update",
+                    arg));
         }
 
         return result;
