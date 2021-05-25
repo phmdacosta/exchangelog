@@ -24,13 +24,13 @@ public class MessagePropertiesTest {
 
     @Test
     public void testGetMassageWithoutContext() {
-        String msg = MessageProperties.get(msgTestKey, msgTestArgs);
+        String msg = Messages.get(msgTestKey, msgTestArgs);
         assert expectedMsg.equals(msg);
     }
 
     @Test
     public void testGetMessageWithContext() {
-        String msg = MessageProperties.get(context, msgTestKey, msgTestArgs);
+        String msg = Messages.get(context, msgTestKey, msgTestArgs);
         assert expectedMsg.equals(msg);
     }
 }
