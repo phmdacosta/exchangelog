@@ -11,26 +11,15 @@ import org.springframework.test.context.TestPropertySource;
  * @author Pedro H M da Costa
  * @version 1.0
  */
-@SpringBootTest(classes = ExchangelogApplication.class)
-@TestPropertySource(locations = "classpath:application.properties")
 public class MessagePropertiesTest {
-
-    @Autowired
-    private ApplicationContext context;
 
     private final String msgTestKey = "test.message";
     private final String[] msgTestArgs = {"Test1", "QWERTY"};
     private final String expectedMsg = "Test message Test1 QWERTY";
 
     @Test
-    public void testGetMassageWithoutContext() {
+    public void testGetMassage() {
         String msg = Messages.get(msgTestKey, msgTestArgs);
-        assert expectedMsg.equals(msg);
-    }
-
-    @Test
-    public void testGetMessageWithContext() {
-        String msg = Messages.get(context, msgTestKey, msgTestArgs);
         assert expectedMsg.equals(msg);
     }
 }

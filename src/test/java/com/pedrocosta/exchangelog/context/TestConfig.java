@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog;
+package com.pedrocosta.exchangelog.context;
 
 import com.pedrocosta.exchangelog.batch.ScheduledTask;
 import org.springframework.batch.item.NonTransientResourceException;

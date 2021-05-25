@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog;
+package com.pedrocosta.exchangelog.context;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
