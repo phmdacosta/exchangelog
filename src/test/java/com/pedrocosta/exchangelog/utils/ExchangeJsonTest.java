@@ -37,14 +37,14 @@ public class ExchangeJsonTest {
 
     @Test
     public void testJsonCreationFromObject() {
-        GsonUtils gsonUtils = new GsonUtils(null);
+        GsonUtils gsonUtils = new GsonUtils(null, null);
         String generateJson = gsonUtils.toJson(exchange, new ExchangeAdapter());
         assert exchangeJson(exchange).equals(generateJson);
     }
 
     @Test
     public void testObjectCreationFromJson() {
-        GsonUtils gsonUtils = new GsonUtils(null);
+        GsonUtils gsonUtils = new GsonUtils(null, null);
         Exchange newExch = gsonUtils.fromJson(exchangeJson(exchange),
                 Exchange.class, new ExchangeAdapter());
         assert exchange.equals(newExch);
