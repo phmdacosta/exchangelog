@@ -1,6 +1,5 @@
 package com.pedrocosta.exchangelog.utils;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
