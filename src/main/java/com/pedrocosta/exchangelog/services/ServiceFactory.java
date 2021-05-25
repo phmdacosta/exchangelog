@@ -1,6 +1,7 @@
 package com.pedrocosta.exchangelog.services;
 
 import com.pedrocosta.exchangelog.utils.Log;
+import com.pedrocosta.exchangelog.utils.MessageProperties;
 import com.pedrocosta.exchangelog.utils.PackageUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
@@ -13,10 +14,13 @@ public class ServiceFactory {
 
      private Environment env;
      private ApplicationContext context;
+     private MessageProperties messageProperties;
 
-    public ServiceFactory(ApplicationContext context, Environment env) {
+    public ServiceFactory(ApplicationContext context, Environment env,
+                          MessageProperties messageProperties) {
         this.context = context;
         this.env = env;
+        this.messageProperties = messageProperties;
     }
 
     private String getPackage() {
@@ -65,9 +69,8 @@ public class ServiceFactory {
             }
         }
 
-        //TODO use properties message
         if (service == null)
-            Log.error(this, "Could not find service with name " + type);
+            Log.error(this, messageProperties.get("service.not.found", type));
 
         return  service;
     }
