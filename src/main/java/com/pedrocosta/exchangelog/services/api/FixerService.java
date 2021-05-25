@@ -6,6 +6,7 @@ import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.request.RestResponse;
 import com.pedrocosta.exchangelog.services.BusinessService;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
+import com.pedrocosta.exchangelog.utils.ApiTypes;
 import com.pedrocosta.exchangelog.utils.DateUtils;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.MessageProperties;
@@ -27,6 +28,8 @@ import java.util.List;
  */
 @Service
 public class FixerService implements BusinessService {
+
+    private final String API_NAME = ApiTypes.FIXER;
 
     private FixerRequester requester;
     private MessageProperties messageProperties;
@@ -69,7 +72,7 @@ public class FixerService implements BusinessService {
             } else {
                 Log.error(this, getErrorMsg(response));
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(messageProperties.get("api.ccy.not.found", code, "Fixer"));
+                result.setMessage(messageProperties.get("api.ccy.not.found", code, API_NAME));
             }
         }
 
@@ -107,7 +110,7 @@ public class FixerService implements BusinessService {
         } else {
             Log.error(this, getErrorMsg(response));
             result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage("Could not find any currency at Fixer"); //TODO use message properties
+            result.setMessage(messageProperties.get("api.no.ccy.found", API_NAME));
         }
 
         return result;
@@ -173,7 +176,7 @@ public class FixerService implements BusinessService {
             } else {
                 Log.error(this, getErrorMsg(response));
                 result = new ServiceResponse(HttpStatus.NOT_FOUND);
-                result.setMessage("Could not find any quote exchange at Fixer"); //TODO use message properties
+                result.setMessage(messageProperties.get("api.no.exchange.found", API_NAME));
             }
         } catch (JSONException e) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);
