@@ -69,8 +69,7 @@ public class FixerService implements BusinessService {
             } else {
                 Log.error(this, getErrorMsg(response));
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(messageProperties.get())
-                result.setMessage("Could not find currency " + code + " at Fixer"); //TODO use message properties
+                result.setMessage(messageProperties.get("api.ccy.not.found", code, "Fixer"));
             }
         }
 
