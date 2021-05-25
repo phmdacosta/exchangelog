@@ -34,7 +34,14 @@ public class Messages {
         return this;
     }
 
-    private String getMessage(String key, String ... args) {
+    /**
+     * Get message by its key in properties file.
+     *
+     * @param key   Key name of message in properties file
+     * @param args  Arguments to include in message
+     * @return String with message
+     */
+    public String getMessage(String key, String ... args) {
         return source.getMessage(key, args, Defaults.LOCALE);
     }
 

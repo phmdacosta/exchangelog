@@ -92,7 +92,7 @@ public class BackOfficeService extends BaseService {
             }
         } catch (JSONException | CloneNotSupportedException e) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);
-            result.setMessage(messages.get("could.not.update",
+            result.setMessage(messages.getMessage("could.not.update",
                     "quote values"));
         }
 
@@ -119,7 +119,7 @@ public class BackOfficeService extends BaseService {
         if (exchange.getId() <= 0) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);
             String arg = "exchange".concat(ccy1.getCode()).concat("/").concat(ccy2.getCode());
-            result.setMessage(messages.get("could.not.update",
+            result.setMessage(messages.getMessage("could.not.update",
                     arg));
         }
 

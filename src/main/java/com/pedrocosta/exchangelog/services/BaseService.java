@@ -1,11 +1,9 @@
 package com.pedrocosta.exchangelog.services;
 
 import com.pedrocosta.exchangelog.models.Currency;
-import com.pedrocosta.exchangelog.persistence.CurrencyRepository;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import org.codehaus.jettison.json.JSONException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,10 +21,6 @@ public abstract class BaseService implements BusinessService {
     protected ServiceFactory factory;
     protected Environment env;
     protected Messages messages;
-//    @Autowired
-//    protected FixerService fixerService;
-    @Autowired
-    protected CurrencyRepository currencyRepo;
 
     public BaseService(ServiceFactory factory, Environment env,
                        Messages messages) {
@@ -55,7 +49,7 @@ public abstract class BaseService implements BusinessService {
                 currencies = ccyService.saveAll(response.getObject());
             } else {
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage("Could not find any currency");
+                result.setMessage(messages.getMessage("error.no.ccy.found"));
             }
         }
 
@@ -79,7 +73,7 @@ public abstract class BaseService implements BusinessService {
                 ccy = ccyService.save(response.getObject());
             } else {
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage("Could not find currency " + code);
+                result.setMessage(messages.getMessage("error.ccy.not.found", code));
             }
         }
 

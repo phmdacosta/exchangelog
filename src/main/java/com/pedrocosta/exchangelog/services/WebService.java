@@ -39,7 +39,7 @@ public class WebService extends BaseService {
         // Check arguments
         if (baseCode == null) {
             result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(messages.get("bad.request"));
+            result.setMessage(messages.getMessage("bad.request"));
             result.setException(new IllegalArgumentException());
         }
 
@@ -59,7 +59,7 @@ public class WebService extends BaseService {
 
                 if (exchange == null) {
                     result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                    result.setMessage(messages.get("could.not.find",
+                    result.setMessage(messages.getMessage("could.not.find",
                             "quote value"));
                     return result;
                 }
