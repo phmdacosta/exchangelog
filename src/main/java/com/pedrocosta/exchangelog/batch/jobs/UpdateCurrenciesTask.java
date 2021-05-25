@@ -21,8 +21,7 @@ import java.util.List;
 public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Currency>> {
     @Override
     public List<Currency> doRead() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        Log.info(this, MessageProperties.get(getContext(),
-                "task.reading", getProjectEngine()));
+        Log.info(this, MessageProperties.get("task.reading", getProjectEngine()));
         List<Currency> currencies = new ArrayList<>();
         BusinessService apiService = (BusinessService) getServiceFactory()
                 .create(getProjectEngine());
@@ -35,8 +34,7 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
 
     @Override
     public List<Currency> doProcess(List<Currency> currencies) throws Exception {
-        Log.info(this, MessageProperties.get(getContext(),
-                "task.processing", getProjectEngine()));
+        Log.info(this, MessageProperties.get("task.processing", getProjectEngine()));
         List<Currency> currenciesToSave = new ArrayList<>(currencies.size());
         CurrencyService service = (CurrencyService) getServiceFactory()
                 .create(CurrencyService.class);
@@ -51,8 +49,8 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
 
     @Override
     public void doWrite(List<Currency> list) throws Exception {
-        Log.info(this, MessageProperties.get(getContext(),
-                "task.writing", getProjectEngine()));
+        Log.info(this, MessageProperties.get("task.writing",
+                getProjectEngine()));
         CurrencyService service = (CurrencyService) getServiceFactory()
                 .create(CurrencyService.class);
         service.saveAll(list);

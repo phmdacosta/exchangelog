@@ -14,13 +14,10 @@ public class ServiceFactory {
 
      private Environment env;
      private ApplicationContext context;
-     private MessageProperties messageProperties;
 
-    public ServiceFactory(ApplicationContext context, Environment env,
-                          MessageProperties messageProperties) {
+    public ServiceFactory(ApplicationContext context, Environment env) {
         this.context = context;
         this.env = env;
-        this.messageProperties = messageProperties;
     }
 
     private String getPackage() {
@@ -70,7 +67,7 @@ public class ServiceFactory {
         }
 
         if (service == null)
-            Log.error(this, messageProperties.get("service.not.found", type));
+            Log.error(this, MessageProperties.get("service.not.found", type));
 
         return  service;
     }

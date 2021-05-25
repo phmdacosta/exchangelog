@@ -13,12 +13,29 @@ import org.springframework.context.support.ResourceBundleMessageSource;
  */
 public class MessageProperties {
 
+    public static final String PATH = "label/messages";
+
     private MessageSource source;
     private static final String MSG_BEAN_NAME = "messageProperties";
 
-    public MessageProperties setSource(MessageSource source) {
+    public MessageProperties() {
+        init();
+    }
+
+    private void init() {
+        var source = new ResourceBundleMessageSource();
+        source.setBasenames(PATH);
+        source.setUseCodeAsDefaultMessage(true);
+        this.setSource(source);
+    }
+
+    private MessageProperties setSource(MessageSource source) {
         this.source = source;
         return this;
+    }
+
+    private String getMessage(String key, String ... args) {
+        return source.getMessage(key, args, Defaults.LOCALE);
     }
 
     /**
@@ -28,8 +45,8 @@ public class MessageProperties {
      * @param args  Arguments to include in message
      * @return String with message
      */
-    public String get(String key, String ... args) {
-        return source.getMessage(key, args, Defaults.LOCALE);
+    public static String get(String key, String ... args) {
+        return new MessageProperties().getMessage(key, args);
     }
 
     /**

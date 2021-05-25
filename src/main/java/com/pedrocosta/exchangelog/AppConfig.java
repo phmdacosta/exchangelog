@@ -22,11 +22,6 @@ public class AppConfig {
 
 	@Bean
 	public static MessageProperties messageProperties() {
-		var source = new ResourceBundleMessageSource();
-		source.setBasenames("label/messages");
-		source.setUseCodeAsDefaultMessage(true);
-		MessageProperties properties = new MessageProperties();
-		properties.setSource(source);
-		return properties;
+		return new MessageProperties();
 	}
 }

@@ -32,12 +32,9 @@ public class FixerService implements BusinessService {
     private final String API_NAME = ApiTypes.FIXER;
 
     private FixerRequester requester;
-    private MessageProperties messageProperties;
 
-    public FixerService(FixerRequester requester,
-                        MessageProperties messageProperties) {
+    public FixerService(FixerRequester requester) {
         this.requester = requester;
-        this.messageProperties = messageProperties;
     }
 
     /**
@@ -72,7 +69,7 @@ public class FixerService implements BusinessService {
             } else {
                 Log.error(this, getErrorMsg(response));
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(messageProperties.get("api.ccy.not.found", code, API_NAME));
+                result.setMessage(MessageProperties.get("api.ccy.not.found", code, API_NAME));
             }
         }
 
@@ -110,7 +107,7 @@ public class FixerService implements BusinessService {
         } else {
             Log.error(this, getErrorMsg(response));
             result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(messageProperties.get("api.no.ccy.found", API_NAME));
+            result.setMessage(MessageProperties.get("api.no.ccy.found", API_NAME));
         }
 
         return result;
@@ -176,7 +173,7 @@ public class FixerService implements BusinessService {
             } else {
                 Log.error(this, getErrorMsg(response));
                 result = new ServiceResponse(HttpStatus.NOT_FOUND);
-                result.setMessage(messageProperties.get("api.no.exchange.found", API_NAME));
+                result.setMessage(MessageProperties.get("api.no.exchange.found", API_NAME));
             }
         } catch (JSONException e) {
             result = new ServiceResponse(HttpStatus.BAD_REQUEST);

@@ -82,7 +82,7 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
                     });
                 });
             } catch (NoSuchJobException e) {
-                Log.warn(this, MessageProperties.get(context,
+                Log.warn(this, MessageProperties.get(
                         "task.execution.not.canceled", jobName));
                 Log.error(this, e);
             }
@@ -113,13 +113,13 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
                 continue;
             }
 
-            Log.info(this, MessageProperties.get(context,
+            Log.info(this, MessageProperties.get(
                     "task.config.execution", batchJob.getName()));
 
             String jobCron = buildCron(batchJob, context.getEnvironment());
             // Ignore jobs with invalid cron
             if (!isValidCron(jobCron)) {
-                Log.warn(this, MessageProperties.get(context,
+                Log.warn(this, MessageProperties.get(
                         "task.cron.invalid", batchJob.getName()));
                 continue;
             }
@@ -131,7 +131,7 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
                                     service.findScheduledChain(jobName);
 
                             if (taskChain == null || taskChain.isEmpty()) {
-                                throw new NullPointerException(MessageProperties.get(context,
+                                throw new NullPointerException(MessageProperties.get(
                                         "task.job.not.found", jobName));
                             }
 

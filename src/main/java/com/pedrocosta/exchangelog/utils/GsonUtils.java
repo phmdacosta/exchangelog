@@ -13,11 +13,9 @@ import java.security.InvalidParameterException;
 public class GsonUtils {
 
     private final AdapterFactory adapterFactory;
-    private final MessageProperties messageProperties;
 
-    public GsonUtils(AdapterFactory adapterFactory, MessageProperties messageProperties) {
+    public GsonUtils(AdapterFactory adapterFactory) {
         this.adapterFactory = adapterFactory;
-        this.messageProperties = messageProperties;
     }
 
     public final String toJson(Object obj) throws NullPointerException, InvalidParameterException {
@@ -55,7 +53,8 @@ public class GsonUtils {
     private <T> Gson createGson(Class<T> classOfT, TypeAdapter adapter, String type) throws NullPointerException, InvalidParameterException {
         if (adapter == null) {
             if (adapterFactory == null) {
-                throw new NullPointerException(messageProperties.get("error.adapter.not.set"));
+                throw new NullPointerException(MessageProperties.get(
+                        "error.adapter.not.set"));
             }
 
             adapter = adapterFactory.create(classOfT, type);
@@ -69,7 +68,7 @@ public class GsonUtils {
             gson = builder.create();
         } else {
             throw new InvalidParameterException(
-                    messageProperties.get("error.adapter.not.found",
+                    MessageProperties.get("error.adapter.not.found",
                             classOfT.getSimpleName(), type));
         }
 

@@ -16,8 +16,6 @@ import org.springframework.test.context.TestPropertySource;
 public class MessagePropertiesTest {
 
     @Autowired
-    private MessageProperties messages;
-    @Autowired
     private ApplicationContext context;
 
     private final String msgTestKey = "test.message";
@@ -26,7 +24,7 @@ public class MessagePropertiesTest {
 
     @Test
     public void testGetMassageWithoutContext() {
-        String msg = messages.get(msgTestKey, msgTestArgs);
+        String msg = MessageProperties.get(msgTestKey, msgTestArgs);
         assert expectedMsg.equals(msg);
     }
 

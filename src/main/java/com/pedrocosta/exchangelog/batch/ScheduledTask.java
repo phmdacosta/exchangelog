@@ -280,8 +280,7 @@ public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcesso
         SimpleJobBuilder jobBuilder = jobBuilderFactory.get(getJobName())
                 .start(getStep());
         Job job = jobBuilder.build();
-        Log.info(this, MessageProperties.get(context,
-                "task.start", getJobName()));
+        Log.info(this, MessageProperties.get("task.start", getJobName()));
         Log.info(this, this.toString());
         return launcher.run(job, parameters);
     }
