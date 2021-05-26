@@ -72,4 +72,12 @@ public class User implements Cloneable {
 
         return cloned;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

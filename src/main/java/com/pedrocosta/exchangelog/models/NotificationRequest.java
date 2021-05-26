@@ -20,6 +20,9 @@ public class NotificationRequest implements Cloneable {
     private String name;
     private NotificationMeans means;
     private boolean enabled;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public long getId() {
         return id;
@@ -57,20 +60,28 @@ public class NotificationRequest implements Cloneable {
         return this;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public NotificationRequest setUser(User user) {
+        this.user = user;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NotificationRequest that = (NotificationRequest) o;
         return id == that.id &&
-                enabled == that.enabled &&
                 Objects.equals(name, that.name) &&
                 means == that.means;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, means, enabled);
+        return Objects.hash(id, name, means, enabled, user);
     }
 
     @Override
@@ -79,7 +90,19 @@ public class NotificationRequest implements Cloneable {
         cloned.setId(this.getId())
                 .setName(this.getName())
                 .setMeans(this.getMeans())
-                .setEnabled(this.isEnabled());
+                .setEnabled(this.isEnabled())
+                .setUser(this.getUser().clone());
         return cloned;
+    }
+
+    @Override
+    public String toString() {
+        return "NotificationRequest{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", means=" + means +
+                ", enabled=" + enabled +
+                ", user=" + user +
+                '}';
     }
 }
