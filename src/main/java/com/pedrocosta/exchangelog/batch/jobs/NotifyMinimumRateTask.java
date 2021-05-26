@@ -90,9 +90,18 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
                             ).findFirst().orElse(null);
 
                     if (emailContact != null) {
-                        SimpleMailMessage message = new SimpleMailMessage();
-                        message.setFrom("notification@exchlog.com");
 
+                        String defaultFromAddress = getEnvironment().getProperty("mail.default.address");
+                        NullPointerException defaultAddressNullEx =
+                                new NullPointerException(Messages.get("error.default.mail.not.set"));
+                        if (defaultFromAddress == null) {
+                            if (!exceptions.contains(defaultAddressNullEx))
+                                exceptions.add(defaultAddressNullEx);
+                            break;
+                        }
+
+                        SimpleMailMessage message = new SimpleMailMessage();
+                        message.setFrom(defaultFromAddress);
                         message.setTo(emailContact.getValue());
                         message.setSubject(Messages.get("notify.quote.title"));
                         message.setText(notifMessage.getMessage());
