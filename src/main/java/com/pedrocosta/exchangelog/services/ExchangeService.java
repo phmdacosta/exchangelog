@@ -116,6 +116,17 @@ public class ExchangeService implements RepositoryService<Exchange> {
     }
 
     /**
+     * List all exchanges from database between a period of time.
+     *
+     * @param startValueDate    Start date
+     * @param endValueDate      End date
+     * @return  List of all saved exchanges order from the most new to old one.
+     */
+    public List<Exchange> findAllOrderByValueDate(Date startValueDate, Date endValueDate) {
+        return repository.findAllByValueDateBetweenOrderByValueDateDesc(startValueDate, endValueDate);
+    }
+
+    /**
      * Find all exchanges ordered by minimum rate in a period from database.
      *
      * @param startValueDate    Start date

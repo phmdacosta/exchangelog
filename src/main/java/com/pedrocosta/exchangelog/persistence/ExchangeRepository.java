@@ -92,4 +92,14 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
      * @return Exchange with maximum rate.
      */
     List<Exchange> findAllByValueDateBetweenOrderByRateDesc(Date valueDateStart, Date valueDateEnd);
+
+    /**
+     * Search in database for exchanges with value date between a specific period
+     * order by descending value date.
+     *
+     * @param valueDateStart    Start date
+     * @param valueDateEnd      End date
+     * @return Exchange ordered by value date.
+     */
+    List<Exchange> findAllByValueDateBetweenOrderByValueDateDesc(Date valueDateStart, Date valueDateEnd);
 }

@@ -77,11 +77,6 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
                                     ContactTypes.EMAIL.getName().equals(userContact.getName())
                             ).findFirst().orElse(null);
 
-                    exceptions.add(new NullPointerException(
-                            Messages.get("error.contact.not.exists",
-                                    "E-mail",
-                                    String.valueOf(quoteNotificationRequest.getUser().getId()))));
-
                     if (emailContact != null) {
                         Exchange exch = quoteNotificationRequest.getExchange();
 
@@ -89,14 +84,19 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
                         message.setFrom("notification@exchlog.com");
 
                         message.setTo(emailContact.getValue());
-                        message.setSubject("Alert quote value");
-                        message.setText("Exchange rate between currencies "
-                                + exch.getBaseCurrency().getCode() + " and "
-                                + exch.getQuoteCurrency().getCode() + " reach the value of "
-                                + quoteNotificationRequest.getQuoteValue());
+                        message.setSubject(Messages.get("notify.quote.title"));
+                        message.setText(Messages.get("notify.target.value",
+                                exch.getBaseCurrency().getCode(),
+                                exch.getQuoteCurrency().getCode(),
+                                String.valueOf(quoteNotificationRequest.getQuoteValue())));
 
                         // Send e-mail
                         getContext().getBean(JavaMailSender.class).send(message);
+                    } else {
+                        exceptions.add(new NullPointerException(
+                                Messages.get("error.contact.not.exists",
+                                        "E-mail",
+                                        String.valueOf(quoteNotificationRequest.getUser().getId()))));
                     }
                     break;
                 default:

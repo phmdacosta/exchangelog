@@ -1,17 +1,15 @@
 package com.pedrocosta.exchangelog.batch.jobs;
 
 import com.pedrocosta.exchangelog.batch.ScheduledTask;
-import com.pedrocosta.exchangelog.models.Exchange;
-import com.pedrocosta.exchangelog.models.NotificationMessage;
-import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
+import com.pedrocosta.exchangelog.models.*;
 import com.pedrocosta.exchangelog.services.ExchangeService;
 import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
-import com.pedrocosta.exchangelog.utils.DateUtils;
-import com.pedrocosta.exchangelog.utils.Log;
-import com.pedrocosta.exchangelog.utils.ValueLogical;
+import com.pedrocosta.exchangelog.utils.*;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -55,18 +53,16 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
                     Exchange minRateExch = exchService.findWithMinRate(
                             startDate, endDate);
 
-                    /*
-                    Only send notifications if minimum rate exchange is not the last
-                     */
                     if (lastExchange != null
-                            && !lastExchange.equals(minRateExch)
-                            && ValueLogical.LESS_THEN.assertTrue(
-                            lastExchange.getRate(), minRateExch.getRate())) {
+                            && lastExchange.equals(minRateExch)) {
 
                         NotificationMessage notifMsg = new NotificationMessage(notifReq);
-                        StringBuilder strBuilder = new StringBuilder();
-                        strBuilder.append("Dollar reached its lowest value ("+ 0 +") against the Euro since " + notifReq.getExchStartDate());
-                        notifMsg.setMessage("");
+
+                        notifMsg.setMessage(Messages.get("notify.min.value",
+                                notifReq.getExchange().getBaseCurrency().getCode(),
+                                String.valueOf(minRateExch.getRate()),
+                                notifReq.getExchange().getQuoteCurrency().getCode(),
+                                String.valueOf(notifReq.getExchStartDate())));
                         notifToSend.add(notifMsg);
                     }
                 }
@@ -78,6 +74,8 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
 
     @Override
     public void doWrite(List<NotificationMessage> list) throws Exception {
+        List<Exception> exceptions = new ArrayList<>();
+
         list.forEach(notifMessage -> { // For each
             switch (notifMessage.getNotificationRequest().getMeans()) {
                 case APP:
@@ -85,12 +83,38 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
                     // TODO Implement app notification send
                     break;
                 case EMAIL:
-                    Log.info(this, "Sending notification to e-mail");
-                    // TODO Implement email send
+                    NotificationRequest notifRequest = notifMessage.getNotificationRequest();
+                    UserContact emailContact = notifRequest.getUser().getContacts()
+                            .stream().filter(userContact ->
+                                    ContactTypes.EMAIL.getName().equals(userContact.getName())
+                            ).findFirst().orElse(null);
+
+                    if (emailContact != null) {
+                        SimpleMailMessage message = new SimpleMailMessage();
+                        message.setFrom("notification@exchlog.com");
+
+                        message.setTo(emailContact.getValue());
+                        message.setSubject(Messages.get("notify.quote.title"));
+                        message.setText(notifMessage.getMessage());
+
+                        // Send e-mail
+                        getContext().getBean(JavaMailSender.class).send(message);
+                    } else {
+                        exceptions.add(new NullPointerException(
+                                Messages.get("error.contact.not.exists",
+                                        "E-mail",
+                                        String.valueOf(notifRequest.getUser().getId()))));
+                    }
                     break;
                 default:
+                    exceptions.add(new IllegalArgumentException(
+                            Messages.get("error.value.not.set",
+                                    "Mean", "notification request")));
             }
         });
+
+        if (!exceptions.isEmpty())
+            Log.warn(this, exceptions.toString());
     }
 
     private boolean isMinimumRate(List<Exchange> list, BigDecimal rate) {
