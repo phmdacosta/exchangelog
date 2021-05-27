@@ -35,49 +35,60 @@ public abstract class BaseService implements BusinessService {
 
     @Override
     public ServiceResponse<List<Currency>> loadCurrencies() throws JSONException {
-        ServiceResponse<List<Currency>> result = new ServiceResponse<>(HttpStatus.OK);
-
-        BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
+        // First get currencies from database
         CurrencyService ccyService = (CurrencyService) factory.create(Currency.class);
+        ServiceResponse<List<Currency>> result = ccyService.findAll();
 
-        List<Currency> currencies = ccyService.findAll();
-
-        if (currencies == null || currencies.isEmpty()) {
+        if (!result.isSuccess()) {
+            // If no currency found in database, retrieve currencies from API
+            BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
             ServiceResponse<List<Currency>> response = apiService.loadCurrencies();
 
-            if (response.isSuccess()) {
-                currencies = ccyService.saveAll(response.getObject());
-            } else {
+            if (response.isSuccess()) { // Saving currencies got by API
+                ServiceResponse<List<Currency>> respSave = ccyService.saveAll(response.getObject());
+                if (!respSave.isSuccess()) {
+                    // Could not save, return generic server error
+                    result = new ServiceResponse<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    result.setMessage(messages.getMessage("error.no.ccy.found"));
+                }
+                result = new ServiceResponse<>(HttpStatus.OK);
+                result.setObject(respSave.getObject());
+
+            } else { // If no currency found in API, return error
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
                 result.setMessage(messages.getMessage("error.no.ccy.found"));
             }
         }
 
-        result.setObject(currencies);
-
         return result;
     }
 
     public ServiceResponse<Currency> loadCurrency(String code) throws JSONException {
-        ServiceResponse<Currency> result = new ServiceResponse<>(HttpStatus.OK);
-
-        BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
+        // First get currency from database
         CurrencyService ccyService = (CurrencyService) factory.create(Currency.class);
+        ServiceResponse<Currency> result = ccyService.find(code);
 
-        Currency ccy = ccyService.find(code);
-
-        if (ccy == null) {
+        if (!result.isSuccess()) {
+            // If no currency found in database, retrieve it from API
+            BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
             ServiceResponse<Currency> response = apiService.loadCurrency(code);
 
-            if (response.isSuccess()) {
-                ccy = ccyService.save(response.getObject());
-            } else {
+            if (response.isSuccess()) { // Saving currency got by API
+                ServiceResponse<Currency> respSave = ccyService.save(response.getObject());
+                if (!respSave.isSuccess()) {
+                    // Could not save, return generic server error
+                    result = new ServiceResponse<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    result.setMessage(messages.getMessage("error.ccy.not.found", code));
+                }
+                result = new ServiceResponse<>(HttpStatus.OK);
+                result.setObject(respSave.getObject());
+
+            } else { // If no currency found in API, return error
                 result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
                 result.setMessage(messages.getMessage("error.ccy.not.found", code));
             }
         }
 
-        result.setObject(ccy);
         return result;
     }
 }

@@ -38,12 +38,12 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
         List<Currency> currenciesToSave = new ArrayList<>(currencies.size());
         CurrencyService service = (CurrencyService) getServiceFactory()
                 .create(CurrencyService.class);
-        List<Currency> dbCurrencies = service.findAll();
-        for (Currency ccy : currencies) {
-            if (dbCurrencies.contains(ccy)) {
+        final ServiceResponse<List<Currency>> response = service.findAll();
+        currencies.forEach(ccy -> {
+            if (response.getObject().contains(ccy)) {
                 currenciesToSave.add(ccy);
             }
-        }
+        });
         return currenciesToSave;
     }
 
