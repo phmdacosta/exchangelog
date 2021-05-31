@@ -2,6 +2,7 @@ package com.pedrocosta.exchangelog.batch.jobs;
 
 import com.pedrocosta.exchangelog.batch.ScheduledTask;
 import com.pedrocosta.exchangelog.models.Currency;
+import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.services.BusinessService;
 import com.pedrocosta.exchangelog.services.CurrencyService;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
@@ -53,6 +54,14 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
                 getProjectEngine()));
         CurrencyService service = (CurrencyService) getServiceFactory()
                 .create(CurrencyService.class);
-        service.saveAll(list);
+        ServiceResponse<List<Currency>> response = service.saveAll(list);
+
+        if (response.getObject() != null) {
+            Log.info(this, Messages.get("total.saved",
+                    String.valueOf(response.getObject().size())));
+        }
+        if (!response.isSuccess()) {
+            Log.error(this, response.getMessage());
+        }
     }
 }

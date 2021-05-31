@@ -6,6 +6,7 @@ import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
 import com.pedrocosta.exchangelog.models.UserContact;
 import com.pedrocosta.exchangelog.services.ExchangeService;
 import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
+import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.ContactTypes;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
@@ -31,7 +32,11 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
 
         QuoteNotificationRequestService service = (QuoteNotificationRequestService)
                 getServiceFactory().create(QuoteNotificationRequestService.class);
-        return service.findAll();
+        ServiceResponse<List<QuoteNotificationRequest>> response = service.findAll();
+        if (!response.isSuccess()) {
+            Log.error(this, response.getMessage());
+        }
+        return response.getObject();
     }
 
     @Override
@@ -45,16 +50,28 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
             Exchange notReqExch = notifReq.getExchange();
 
             if (notReqExch != null) {
-                Exchange mostCurrentExch = exchangeService.findLast(
+                if (notReqExch.getBaseCurrency() == null
+                        || notReqExch.getQuoteCurrency() == null) {
+                    Log.warn(this, (Messages.get("error.ccy.not.set",
+                            "Base or quote", "notification request")));
+                    continue;
+                }
+
+                ServiceResponse<Exchange> responseExch = exchangeService.findLast(
                         notReqExch.getBaseCurrency(), notReqExch.getQuoteCurrency());
-                if (mostCurrentExch != null) {
-                    // Check if target logic was reached
-                    ValueLogical valLogical = ValueLogical.get(notifReq.getLogicalOperator());
-                    if (valLogical != null
-                            && valLogical.assertTrue(mostCurrentExch.getRate(),
-                                                     notifReq.getQuoteValue())) {
-                        notificationsToLaunch.add(notifReq);
-                    }
+
+                if (!responseExch.isSuccess()) {
+                    Log.warn(this, responseExch.getMessage());
+                    continue;
+                }
+
+                Exchange mostCurrentExch = responseExch.getObject();
+                // Check if target logic was reached
+                ValueLogical valLogical = ValueLogical.get(notifReq.getLogicalOperator());
+                if (valLogical != null
+                        && valLogical.assertTrue(mostCurrentExch.getRate(),
+                                                 notifReq.getQuoteValue())) {
+                    notificationsToLaunch.add(notifReq);
                 }
             }
         }

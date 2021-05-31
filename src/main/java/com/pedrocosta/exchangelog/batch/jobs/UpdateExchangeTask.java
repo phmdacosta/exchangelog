@@ -7,6 +7,7 @@ import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.services.*;
 import com.pedrocosta.exchangelog.utils.Defaults;
 import com.pedrocosta.exchangelog.utils.Log;
+import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -109,6 +110,14 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
     public void doWrite(List<Exchange> list) throws Exception {
         ExchangeService exchService =
                 (ExchangeService) getServiceFactory().create(ExchangeService.class);
-        exchService.saveAll(list);
+        ServiceResponse<List<Exchange>> response = exchService.saveAll(list);
+
+        if (response.getObject() != null) {
+            Log.info(this, Messages.get("total.saved",
+                    String.valueOf(response.getObject().size())));
+        }
+        if (!response.isSuccess()) {
+            Log.error(this, response.getMessage());
+        }
     }
 }

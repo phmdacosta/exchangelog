@@ -4,6 +4,7 @@ import com.pedrocosta.exchangelog.batch.ScheduledTask;
 import com.pedrocosta.exchangelog.models.*;
 import com.pedrocosta.exchangelog.services.ExchangeService;
 import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
+import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.*;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -27,7 +28,12 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
     public List<QuoteNotificationRequest> doRead() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
         QuoteNotificationRequestService service = (QuoteNotificationRequestService)
                 getServiceFactory().create(QuoteNotificationRequestService.class);
-        return service.findAllByLogicalOperator(ValueLogical.MINIMUM.getOperator());
+        ServiceResponse<List<QuoteNotificationRequest>> response = service
+                .findAllByLogicalOperator(ValueLogical.MINIMUM.getOperator());
+        if (!response.isSuccess()) {
+            Log.error(this, response.getMessage());
+        }
+        return response.getObject();
     }
 
     @Override
@@ -46,12 +52,31 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
                         notifReq.getPeriodType(), period);
 
                 if (startDate != null) {
-                    Exchange lastExchange = exchService.findLast(
+                    if (notifReq.getExchange().getBaseCurrency() == null
+                            || notifReq.getExchange().getQuoteCurrency() == null) {
+                        Log.warn(this, (Messages.get("error.ccy.not.set",
+                                "Base or quote", "notification request")));
+                        return;
+                    }
+
+                    ServiceResponse<Exchange> respLastExch = exchService.findLast(
                             notifReq.getExchange().getBaseCurrency(),
                             notifReq.getExchange().getQuoteCurrency());
+                    if (!respLastExch.isSuccess()) {
+                        Log.warn(this, respLastExch.getMessage());
+                        return;
+                    }
 
-                    Exchange minRateExch = exchService.findWithMinRate(
+                    Exchange lastExchange = respLastExch.getObject();
+
+                    ServiceResponse<Exchange> respMinRateExch = exchService.findWithMinRate(
                             startDate, endDate);
+                    if (!respLastExch.isSuccess()) {
+                        Log.warn(this, respLastExch.getMessage());
+                        return;
+                    }
+
+                    Exchange minRateExch = respMinRateExch.getObject();
 
                     if (lastExchange != null
                             && lastExchange.equals(minRateExch)) {

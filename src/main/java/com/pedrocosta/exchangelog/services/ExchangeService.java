@@ -6,7 +6,6 @@ import com.pedrocosta.exchangelog.persistence.ExchangeRepository;
 import com.pedrocosta.exchangelog.utils.DatabaseOrder;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +55,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @return  {@link ServiceResponse} object with found exchanges.
      *          If not found, returns {@link ServiceResponse} with error message.
      */
-    public ServiceResponse<List<Exchange>> find(Currency ccy, Date valueDate) {
+    public ServiceResponse<List<Exchange>> find(@NotNull Currency ccy, Date valueDate) {
         ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
         result.setObject(repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate));
 
@@ -79,7 +78,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @return  {@link ServiceResponse} object with found exchange.
      *          If not found, returns {@link ServiceResponse} with error message.
      */
-    public ServiceResponse<Exchange> find(Currency ccy1, Currency ccy2, Date valueDate) {
+    public ServiceResponse<Exchange> find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate) {
         ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
         result.setObject(repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
                 ccy1, ccy2, valueDate));
@@ -102,7 +101,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @return  {@link ServiceResponse} object with found exchange.
      *          If not found, returns {@link ServiceResponse} with error message.
      */
-    public ServiceResponse<Exchange> findLast(Currency ccy1, Currency ccy2) {
+    public ServiceResponse<Exchange> findLast(@NotNull Currency ccy1, @NotNull Currency ccy2) {
         ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
         result.setObject(repository.findByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
                 ccy1, ccy2));
