@@ -7,18 +7,18 @@ import com.pedrocosta.exchangelog.models.UserContact;
 import com.pedrocosta.exchangelog.services.ExchangeService;
 import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
-import com.pedrocosta.exchangelog.utils.ContactTypes;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.ValueLogical;
+import com.pedrocosta.exchangelog.utils.notifications.NotificationSender;
+import com.pedrocosta.exchangelog.utils.notifications.NotificationSenderFactory;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Task to send notifications to users based on it's notification configuration.
@@ -81,57 +81,41 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
 
     @Override
     public void doWrite(List<QuoteNotificationRequest> list) throws Exception {
-        List<Exception> exceptions = new ArrayList<>();
+        Log.info(this, Messages.get("notify.total.to.send", String.valueOf(list.size())));
+        List<String> errorMsgs = new ArrayList<>();
+        AtomicInteger countSent = new AtomicInteger();
+
         list.forEach(quoteNotificationRequest -> { // For each
-            switch (quoteNotificationRequest.getMeans()) {
-                case APP:
-                    Log.info(this, "Push notification to App");
-                    // TODO Implement app notification send
-                    break;
-                case EMAIL:
-                    UserContact emailContact = quoteNotificationRequest.getUser().getContacts()
-                            .stream().filter(userContact ->
-                                    ContactTypes.EMAIL.getName().equals(userContact.getName())
-                            ).findFirst().orElse(null);
+            UserContact contact = quoteNotificationRequest.getUser().getContacts()
+                    .stream().filter(userContact ->
+                            quoteNotificationRequest.getMeans().equals(userContact.getType().getMeans())
+                    ).findFirst().orElse(null);
 
-                    if (emailContact != null) {
-                        Exchange exch = quoteNotificationRequest.getExchange();
+            if (contact != null) {
+                Exchange exch = quoteNotificationRequest.getExchange();
 
-                        String defaultFromAddress = getEnvironment().getProperty("mail.default.address");
-                        NullPointerException defaultAddressNullEx =
-                                new NullPointerException(Messages.get("error.default.mail.not.set"));
-                        if (defaultFromAddress == null) {
-                            if (!exceptions.contains(defaultAddressNullEx))
-                                exceptions.add(defaultAddressNullEx);
-                            break;
-                        }
+                NotificationSender sender = NotificationSenderFactory.create(
+                        getContext(), quoteNotificationRequest.getMeans());
 
-                        SimpleMailMessage message = new SimpleMailMessage();
-                        message.setFrom(defaultFromAddress);
-                        message.setTo(emailContact.getValue());
-                        message.setSubject(Messages.get("notify.quote.title"));
-                        message.setText(Messages.get("notify.target.value",
-                                exch.getBaseCurrency().getCode(),
-                                exch.getQuoteCurrency().getCode(),
-                                String.valueOf(quoteNotificationRequest.getQuoteValue())));
-
-                        // Send e-mail
-                        getContext().getBean(JavaMailSender.class).send(message);
-                    } else {
-                        exceptions.add(new NullPointerException(
-                                Messages.get("error.contact.not.exists",
-                                        "E-mail",
-                                        String.valueOf(quoteNotificationRequest.getUser().getId()))));
-                    }
-                    break;
-                default:
-                    exceptions.add(new IllegalArgumentException(
-                            Messages.get("error.value.not.set",
-                                    "Mean", "notification request")));
+                sender.setTo(contact.getValue());
+                sender.setSubject(Messages.get("notify.quote.title"));
+                sender.setBody(Messages.get("notify.target.value",
+                        exch.getBaseCurrency().getCode(),
+                        exch.getQuoteCurrency().getCode(),
+                        String.valueOf(quoteNotificationRequest.getQuoteValue())));
+                sender.send();
+                countSent.getAndIncrement();
+            } else {
+                errorMsgs.add(Messages.get("error.contact.not.exists",
+                        quoteNotificationRequest.getMeans().name(),
+                        String.valueOf(quoteNotificationRequest.getUser().getId())));
             }
         });
 
-        if (!exceptions.isEmpty())
-            Log.warn(this, exceptions.toString());
+        Log.info(this, Messages.get("notify.total.sent", countSent.toString()));
+
+        if (!errorMsgs.isEmpty())
+            Log.warn(this, Messages.get("error.list.notify.send",
+                    errorMsgs.toString()));
     }
 }

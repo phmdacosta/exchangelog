@@ -6,17 +6,16 @@ import com.pedrocosta.exchangelog.services.ExchangeService;
 import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.*;
+import com.pedrocosta.exchangelog.utils.notifications.NotificationSender;
+import com.pedrocosta.exchangelog.utils.notifications.NotificationSenderFactory;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Pedro H M da Costa
@@ -99,67 +98,38 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
 
     @Override
     public void doWrite(List<NotificationMessage> list) throws Exception {
-        List<Exception> exceptions = new ArrayList<>();
+        Log.info(this, Messages.get("notify.total.to.send", String.valueOf(list.size())));
+        List<String> errorMsgs = new ArrayList<>();
+        AtomicInteger countSent = new AtomicInteger();
 
         list.forEach(notifMessage -> { // For each
-            switch (notifMessage.getNotificationRequest().getMeans()) {
-                case APP:
-                    Log.info(this, "Push notification to App");
-                    // TODO Implement app notification send
-                    break;
-                case EMAIL:
-                    NotificationRequest notifRequest = notifMessage.getNotificationRequest();
-                    UserContact emailContact = notifRequest.getUser().getContacts()
-                            .stream().filter(userContact ->
-                                    ContactTypes.EMAIL.getName().equals(userContact.getName())
-                            ).findFirst().orElse(null);
+            NotificationRequest notifRequest = notifMessage.getNotificationRequest();
+            UserContact contact = notifRequest.getUser().getContacts()
+                    .stream().filter(userContact ->
+                            notifRequest.getMeans().equals(userContact.getType().getMeans())
+                    ).findFirst().orElse(null);
 
-                    if (emailContact != null) {
+            if (contact != null) {
+                NotificationSender sender = NotificationSenderFactory.create(
+                        getContext(), notifRequest.getMeans());
 
-                        String defaultFromAddress = getEnvironment().getProperty("mail.default.address");
-                        NullPointerException defaultAddressNullEx =
-                                new NullPointerException(Messages.get("error.default.mail.not.set"));
-                        if (defaultFromAddress == null) {
-                            if (!exceptions.contains(defaultAddressNullEx))
-                                exceptions.add(defaultAddressNullEx);
-                            break;
-                        }
-
-                        SimpleMailMessage message = new SimpleMailMessage();
-                        message.setFrom(defaultFromAddress);
-                        message.setTo(emailContact.getValue());
-                        message.setSubject(Messages.get("notify.quote.title"));
-                        message.setText(notifMessage.getMessage());
-
-                        // Send e-mail
-                        getContext().getBean(JavaMailSender.class).send(message);
-                    } else {
-                        exceptions.add(new NullPointerException(
-                                Messages.get("error.contact.not.exists",
-                                        "E-mail",
-                                        String.valueOf(notifRequest.getUser().getId()))));
-                    }
-                    break;
-                default:
-                    exceptions.add(new IllegalArgumentException(
-                            Messages.get("error.value.not.set",
-                                    "Mean", "notification request")));
+                sender.setTo(contact.getValue());
+                sender.setSubject(Messages.get("notify.quote.title"));
+                sender.setBody(Messages.get("notify.target.value",
+                        notifMessage.getMessage()));
+                sender.send();
+                countSent.getAndIncrement();
+            } else {
+                errorMsgs.add(Messages.get("error.contact.not.exists",
+                        notifRequest.getMeans().name(),
+                        String.valueOf(notifRequest.getUser().getId())));
             }
         });
 
-        if (!exceptions.isEmpty())
-            Log.warn(this, exceptions.toString());
-    }
+        Log.info(this, Messages.get("notify.total.sent", countSent.toString()));
 
-    private boolean isMinimumRate(List<Exchange> list, BigDecimal rate) {
-        boolean isMin = true;
-
-        for (Exchange exchange : list) {
-            if (ValueLogical.GREATER_THEN.assertTrue(rate, exchange.getRate())) {
-                isMin = false;
-            }
-        }
-
-        return isMin;
+        if (!errorMsgs.isEmpty())
+            Log.warn(this, Messages.get("error.list.notify.send",
+                    errorMsgs.toString()));
     }
 }
