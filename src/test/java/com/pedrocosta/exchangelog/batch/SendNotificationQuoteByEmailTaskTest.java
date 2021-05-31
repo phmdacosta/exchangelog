@@ -3,7 +3,7 @@ package com.pedrocosta.exchangelog.batch;
 import com.pedrocosta.exchangelog.ExchangelogApplication;
 import com.pedrocosta.exchangelog.batch.jobs.SendNotificationQuoteByEmailTask;
 import com.pedrocosta.exchangelog.models.ScheduledJob;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -12,7 +12,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestPropertySource;
 
 /**
