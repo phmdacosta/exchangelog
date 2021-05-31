@@ -23,12 +23,12 @@ public class ServiceResponseAdapter extends TypeAdapter<ServiceResponse> {
         writer.beginObject();
         writer.name("success");
         writer.value(obj.isSuccess());
+        writer.name("code");
+        writer.value(obj.getCode().value());
         if (obj.isSuccess()) {
             writer.name("info");
             writer.jsonValue(gsonUtils.toJson(obj.getObject()));
         } else {
-            writer.name("code");
-            writer.value(obj.getCode().value());
             writer.name("label");
             writer.value(obj.getMessage());
         }
