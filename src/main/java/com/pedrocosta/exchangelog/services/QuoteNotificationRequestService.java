@@ -1,11 +1,8 @@
 package com.pedrocosta.exchangelog.services;
 
-import com.pedrocosta.exchangelog.models.Currency;
-import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
 import com.pedrocosta.exchangelog.persistence.QuoteNotificationRequestRepository;
 import com.pedrocosta.exchangelog.utils.Messages;
-import com.sun.istack.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +13,20 @@ import java.util.List;
 @Service
 public class QuoteNotificationRequestService implements RepositoryService<QuoteNotificationRequest> {
 
-    private QuoteNotificationRequestRepository repository;
+    private final QuoteNotificationRequestRepository repository;
 
     public QuoteNotificationRequestService(QuoteNotificationRequestRepository repository) {
         this.repository = repository;
     }
 
+    /**
+     * Save a notification request into database.
+     *
+     * @param quoteNotifReq Notification request to save
+     *
+     * @return  {@link ServiceResponse} object with saved notification request.
+     *          If error, returns {@link ServiceResponse} with error message.
+     */
     @Override
     public ServiceResponse<QuoteNotificationRequest> save(QuoteNotificationRequest quoteNotifReq) {
         ServiceResponse<QuoteNotificationRequest> result = new ServiceResponse<>(HttpStatus.CREATED);
@@ -32,6 +37,14 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
         return result;
     }
 
+    /**
+     * Save all notification request from a list into database.
+     *
+     * @param col   List of notification requests to save
+     *
+     * @return  {@link ServiceResponse} object with saved notification requests.
+     *          If error, returns {@link ServiceResponse} with error message.
+     */
     @Override
     public ServiceResponse<List<QuoteNotificationRequest>> saveAll(Collection<QuoteNotificationRequest> col) {
         ServiceResponse<List<QuoteNotificationRequest>> result = new ServiceResponse<>(HttpStatus.CREATED);
@@ -39,8 +52,7 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            String arg = "any notification request";
-            result.setMessage(Messages.get("error.not.saved", arg));
+            result.setMessage(Messages.get("error.not.saved", "any notification request"));
         }
         else if(result.getObject().size() != col.size()) {
             List<QuoteNotificationRequest> notSaved = new ArrayList<>();
@@ -58,22 +70,95 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
         return result;
     }
 
+    /**
+     * Find a specific notification request from database.
+     *
+     * @param id Notification request's id in database
+     *
+     * @return  {@link ServiceResponse} object with found notification request.
+     *          If not found, returns {@link ServiceResponse} with error message.
+     */
     @Override
-    @Nullable
-    public QuoteNotificationRequest find(long id) {
-        return repository.findById(id).orElse(null);
+    public ServiceResponse<QuoteNotificationRequest> find(long id) {
+        ServiceResponse<QuoteNotificationRequest> result = new ServiceResponse<>(HttpStatus.OK);
+        result.setObject(repository.findById(id).orElse(null));
+
+        if (result.getObject() == null) {
+            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
+            String arg = "with id " + id;
+            result.setMessage(Messages.get("error.notif.req.not.found", arg));
+        }
+
+        return result;
     }
 
-    public QuoteNotificationRequest find(String name) {
-        return repository.findByName(name);
+    /**
+     * Find a specific notification request from database.
+     *
+     * @param name Notification request's name
+     *
+     * @return  {@link ServiceResponse} object with found notification request.
+     *          If not found, returns {@link ServiceResponse} with error message.
+     */
+    public ServiceResponse<QuoteNotificationRequest> find(String name) {
+        ServiceResponse<QuoteNotificationRequest> result = new ServiceResponse<>(HttpStatus.OK);
+        result.setObject(repository.findByName(name));
+
+        if (result.getObject() == null) {
+            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
+            result.setMessage(Messages.get("error.notif.req.not.found", name));
+        }
+
+        return result;
     }
 
+    /**
+     * Find all notification requests in database.
+     *
+     * @return  {@link ServiceResponse} object with found notification requests.
+     *          If not found, returns {@link ServiceResponse} with error message.
+     */
     @Override
-    public List<QuoteNotificationRequest> findAll() {
-        return repository.findAll();
+    public ServiceResponse<List<QuoteNotificationRequest>> findAll() {
+        ServiceResponse<List<QuoteNotificationRequest>> result = new ServiceResponse<>(HttpStatus.OK);
+        result.setObject(repository.findAll());
+
+        if (result.getObject() == null || result.getObject().isEmpty()) {
+            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
+            result.setMessage(Messages.get("could.not.find", "any notification request"));
+        }
+
+        return result;
     }
 
-    public List<QuoteNotificationRequest> findAllByLogicalOperator(String logicalOperator) {
-        return repository.findAllByLogicalOperator(logicalOperator);
+    /**
+     * Find all notification request from database with specific logical operator.
+     * <pre>
+     * Logical operators are:
+     *      = (equals),
+     *      < (less then),
+     *      > (greater then),
+     *      <= (less then and equals),
+     *      >= (greater then and equals),
+     *      min (minimum),
+     *      max (maximum)
+     * </pre>
+     *
+     * @param logicalOperator Notification request's logical operator
+     *
+     * @return  {@link ServiceResponse} object with found notification requests.
+     *          If not found, returns {@link ServiceResponse} with error message.
+     */
+    public ServiceResponse<List<QuoteNotificationRequest>> findAllByLogicalOperator(String logicalOperator) {
+        ServiceResponse<List<QuoteNotificationRequest>> result = new ServiceResponse<>(HttpStatus.OK);
+        result.setObject(repository.findAllByLogicalOperator(logicalOperator));
+
+        if (result.getObject() == null || result.getObject().isEmpty()) {
+            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
+            String arg = "with logical operator ".concat(logicalOperator);
+            result.setMessage(Messages.get("error.notif.req.not.found", arg));
+        }
+
+        return result;
     }
 }

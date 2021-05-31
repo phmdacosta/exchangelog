@@ -1,24 +1,19 @@
 package com.pedrocosta.exchangelog.services;
 
 import com.pedrocosta.exchangelog.models.Currency;
-import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.persistence.CurrencyRepository;
-import com.pedrocosta.exchangelog.persistence.ExchangeRepository;
 import com.pedrocosta.exchangelog.utils.Messages;
-import com.sun.istack.Nullable;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class CurrencyService implements RepositoryService<Currency> {
 
-    private CurrencyRepository repository;
+    private final CurrencyRepository repository;
 
     public CurrencyService(CurrencyRepository repository) {
         this.repository = repository;
@@ -29,9 +24,9 @@ public class CurrencyService implements RepositoryService<Currency> {
      *
      * @param code Currency code
      *
-     * @return {@link Currency} object.
+     * @return  {@link ServiceResponse} object with found currency.
+     *          If currency not found, returns {@link ServiceResponse} with error message.
      */
-    @Nullable
     public ServiceResponse<Currency> find(String code) {
         ServiceResponse<Currency> result = new ServiceResponse<>(HttpStatus.OK);
         result.setObject(repository.findByCode(code));
@@ -44,8 +39,15 @@ public class CurrencyService implements RepositoryService<Currency> {
         return result;
     }
 
+    /**
+     * Find a specific currency from database.
+     *
+     * @param id    Currency id in database
+     *
+     * @return  {@link ServiceResponse} object with found currency.
+     *          If currency not found, returns {@link ServiceResponse} with error message.
+     */
     @Override
-    @Nullable
     public ServiceResponse<Currency> find(long id) {
         ServiceResponse<Currency> result = new ServiceResponse<>(HttpStatus.OK);
         result.setObject(repository.findById(id).orElse(null));
@@ -62,7 +64,8 @@ public class CurrencyService implements RepositoryService<Currency> {
     /**
      * Get all currencies from database.
      *
-     * @return List of {@link Currency}.
+     * @return {@link ServiceResponse} object with list of found currencies.
+     *         If currency not found, returns {@link ServiceResponse} with error message.
      */
     @Override
     public ServiceResponse<List<Currency>> findAll() {
@@ -82,7 +85,8 @@ public class CurrencyService implements RepositoryService<Currency> {
      *
      * @param currency Currency to save
      *
-     * @return Saved currency.
+     * @return {@link ServiceResponse} object with saved currency.
+     *         If error, returns {@link ServiceResponse} with error message.
      */
     @Override
     public ServiceResponse<Currency> save(Currency currency) {
@@ -103,7 +107,8 @@ public class CurrencyService implements RepositoryService<Currency> {
      *
      * @param currencies List of currencies to save
      *
-     * @return List of saved currencies.
+     * @return {@link ServiceResponse} object with list of saved currencies.
+     *         If error, returns {@link ServiceResponse} with error message.
      */
     @Override
     public ServiceResponse<List<Currency>> saveAll(Collection<Currency> currencies) {
@@ -112,8 +117,7 @@ public class CurrencyService implements RepositoryService<Currency> {
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            String arg = "any currency";
-            result.setMessage(Messages.get("error.not.saved", arg));
+            result.setMessage(Messages.get("error.not.saved", "any currency"));
         }
         else if(result.getObject().size() != currencies.size()) {
             List<Currency> notSaved = new ArrayList<>();

@@ -20,14 +20,16 @@ public interface QuoteNotificationRequestRepository extends JpaRepository<QuoteN
 
     /**
      * Search in database for quote notification request by logical operator.
+     * <pre>
      * Logical operators are:
-     *          = (equals),
-     *          < (less then),
-     *          > (greater then),
-     *          <= (less then and equals),
-     *          >= (greater then and equals),
-     *          min (minimum),
-     *          max (maximum)
+     *      = (equals),
+     *      < (less then),
+     *      > (greater then),
+     *      <= (less then and equals),
+     *      >= (greater then and equals),
+     *      min (minimum),
+     *      max (maximum)
+     * </pre>
      *
      * @param logicalOperator   Logical operator to search.
      * @return  {@link QuoteNotificationRequest} object if it exists.
