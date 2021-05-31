@@ -1,6 +1,5 @@
 package com.pedrocosta.exchangelog.utils;
 
-import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 /**
@@ -12,24 +11,17 @@ import org.springframework.context.support.ResourceBundleMessageSource;
  */
 public class Messages {
 
-    public static final String PATH = "label/messages";
+    private static final String PATH = "label/messages";
 
-    private MessageSource source;
+    private static ResourceBundleMessageSource source;
 
-    public Messages() {
-        init();
-    }
-
-    private void init() {
-        var source = new ResourceBundleMessageSource();
-        source.setBasenames(PATH);
-        source.setUseCodeAsDefaultMessage(true);
-        this.setSource(source);
-    }
-
-    private Messages setSource(MessageSource source) {
-        this.source = source;
-        return this;
+    private static ResourceBundleMessageSource getSource() {
+        if (source == null) {
+            source = new ResourceBundleMessageSource();
+            source.setBasenames(PATH);
+            source.setUseCodeAsDefaultMessage(true);
+        }
+        return source;
     }
 
     /**
@@ -40,7 +32,7 @@ public class Messages {
      * @return String with message
      */
     public String getMessage(String key, String ... args) {
-        return source.getMessage(key, args, Defaults.LOCALE);
+        return getSource().getMessage(key, args, Defaults.LOCALE);
     }
 
     /**
@@ -50,7 +42,7 @@ public class Messages {
      * @param args  Arguments to include in message
      * @return String with message
      */
-    public static String get(String key, String ... args) {
-        return new Messages().getMessage(key, args);
+    public static synchronized String get(String key, String ... args) {
+        return getSource().getMessage(key, args, Defaults.LOCALE);
     }
 }

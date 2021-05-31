@@ -11,6 +11,8 @@ public final class Log {
     private static final int WARN = 3;
     private static final int ERROR = 4;
 
+    private static Logger logger;
+
     public static void trace(Object obj, String msg) {
         log(TRACE, obj, msg, null);
     }
@@ -44,7 +46,9 @@ public final class Log {
     }
 
     private static void log(int type, Object obj, String msg, Throwable throwable) {
-        Logger logger = LogManager.getLogger(obj);
+        if (logger == null) {
+            logger = LogManager.getLogger(obj);
+        }
         switch(type) {
             case TRACE:
                 logger.trace(msg);
