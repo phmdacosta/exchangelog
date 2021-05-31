@@ -1,5 +1,7 @@
 package com.pedrocosta.exchangelog.models;
 
+import com.pedrocosta.exchangelog.utils.ContactTypes;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,6 +16,7 @@ public class UserContact implements Cloneable {
     private long id;
     private String name;
     private String value;
+    private ContactTypes type;
 
     public long getId() {
         return id;
@@ -37,6 +40,15 @@ public class UserContact implements Cloneable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public ContactTypes getType() {
+        return type;
+    }
+
+    public void setType(ContactTypes type) {
+        this.type = type;
+        setName(type.name().toLowerCase());
     }
 
     @Override
