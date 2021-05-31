@@ -1,9 +1,9 @@
 package com.pedrocosta.exchangelog.services.api;
 
-import com.pedrocosta.exchangelog.request.api.FixerRequester;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.request.RestResponse;
+import com.pedrocosta.exchangelog.request.api.FixerRequester;
 import com.pedrocosta.exchangelog.services.BusinessService;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.ApiTypes;
@@ -31,7 +31,7 @@ public class FixerService implements BusinessService {
 
     private final String API_NAME = ApiTypes.FIXER;
 
-    private FixerRequester requester;
+    private final FixerRequester requester;
 
     public FixerService(FixerRequester requester) {
         this.requester = requester;
@@ -60,7 +60,7 @@ public class FixerService implements BusinessService {
                 Iterator itCodes = jsonCcy.keys();
 
                 while (itCodes.hasNext()) {
-                    if (code.equals((String) itCodes.next())) {
+                    if (code.equals(itCodes.next())) {
                         result.setObject(new Currency(code, jsonCcy.getString(code)));
                         break;
                     }
@@ -133,7 +133,7 @@ public class FixerService implements BusinessService {
      * @return {@link ServiceResponse} object with a list of {@link Exchange}.
      */
     public ServiceResponse<List<Exchange>> getQuoteRate(String baseCode, String[] quoteCodes) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
 
         try {
             String params;
@@ -172,11 +172,11 @@ public class FixerService implements BusinessService {
                 result.setObject(quotes);
             } else {
                 Log.error(this, getErrorMsg(response));
-                result = new ServiceResponse(HttpStatus.NOT_FOUND);
+                result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
                 result.setMessage(Messages.get("api.no.exchange.found", API_NAME));
             }
         } catch (JSONException e) {
-            result = new ServiceResponse(HttpStatus.BAD_REQUEST);
+            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
         }
 
         return result;

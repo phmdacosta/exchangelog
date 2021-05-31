@@ -7,10 +7,10 @@ import com.pedrocosta.exchangelog.models.ScheduledJob;
 import com.pedrocosta.exchangelog.persistence.ScheduledBatchJobRepository;
 import com.sun.istack.Nullable;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ScheduledBatchJobService implements CoreService {

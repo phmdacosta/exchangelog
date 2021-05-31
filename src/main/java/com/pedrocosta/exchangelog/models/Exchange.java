@@ -1,10 +1,9 @@
 package com.pedrocosta.exchangelog.models;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
-
-import javax.persistence.*;
 
 @Entity
 public class Exchange implements Cloneable {

@@ -14,7 +14,7 @@ public class PackageUtils {
      * @return List of {@link Package} objects.
      */
     public static List<Package> getSubPackages(String packageName) {
-        return Arrays.asList(Package.getPackages()).stream()
+        return Arrays.stream(Package.getPackages())
                 .filter(pack ->
                         pack.getName().startsWith(packageName) //filter by name
                 ).collect(Collectors.toList());

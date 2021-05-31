@@ -6,8 +6,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 public class EmailNotificationSender extends NotificationSender {
 
-    private JavaMailSender mailSender;
-    private Environment environment;
+    private final JavaMailSender mailSender;
+    private final Environment environment;
 
     public EmailNotificationSender(JavaMailSender mailSender, Environment environment) {
         super(NotificationMeans.EMAIL);

@@ -45,9 +45,8 @@ public class DateUtils {
             date = new SimpleDateFormat(format).parse(s);
         } catch (ParseException e) {
             e.printStackTrace();
-        } finally {
-            return date;
         }
+        return date;
     }
 
     /**

@@ -1,16 +1,16 @@
 package com.pedrocosta.exchangelog.request;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.sun.istack.NotNull;
 import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.codehaus.jettison.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Request generic class, it has all configuration names to load the API config.

@@ -10,7 +10,7 @@ public class NotificationSenderFactory {
 
     private static final String SUFFIX = "NotificationSender";
 
-    private ApplicationContext context;
+    private final ApplicationContext context;
 
     public NotificationSenderFactory(ApplicationContext context) {
         this.context = context;

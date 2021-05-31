@@ -12,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Service to execute business for batch processes.
@@ -36,7 +39,7 @@ public class BackOfficeService extends BaseService {
      * @return {@link ServiceResponse} of a list of {@link Exchange} with new rates.
      */
     public ServiceResponse<List<Exchange>> updateQuoteValues(String baseCcyCode) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
 
         try {
             BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
@@ -75,12 +78,16 @@ public class BackOfficeService extends BaseService {
                     Date valDate = exchange.getValueDate();
 
                     // Exchange rate for base currency
-//                    double baseRate = exchange.getRate();
                     BigDecimal baseRate = exchange.getRate();
-                    quotes.add(exchService.save(base, quote, baseRate, valDate));
+                    ServiceResponse<Exchange> saveResp = exchService.save(base, quote, baseRate, valDate);
+                    if (saveResp.isSuccess()) {
+                        quotes.add(saveResp.getObject());
+                    } else {
+                        Log.warn(this, Messages.get("error.exch.not.saved",
+                                base.getCode(), quote.getCode()));
+                    }
 
                     // Exchange rate for quote currency
-//                    double quoteRate = 1 / baseRate;
                     BigDecimal quoteRate = BigDecimal.ONE.divide(baseRate, Defaults.ROUNDING_MODE);
                     exchService.save(quote, base, quoteRate, valDate);
                 }
@@ -91,7 +98,7 @@ public class BackOfficeService extends BaseService {
                 result = response; // Return error
             }
         } catch (JSONException | CloneNotSupportedException e) {
-            result = new ServiceResponse(HttpStatus.BAD_REQUEST);
+            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
             result.setMessage(messages.getMessage("could.not.update",
                     "quote values"));
         }
@@ -110,17 +117,17 @@ public class BackOfficeService extends BaseService {
      * @return {@link ServiceResponse} with new {@link Exchange}.
      */
     public ServiceResponse<Exchange> updateQuote(Currency ccy1, Currency ccy2, BigDecimal rate, Date valueDate) {
-        ServiceResponse<Exchange> result = new ServiceResponse(HttpStatus.OK);
+        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
 
         ExchangeService exchService =
                 (ExchangeService) factory.create(ExchangeService.class);
 
-        Exchange exchange = exchService.save(ccy1, ccy2, rate, valueDate);
-        if (exchange.getId() <= 0) {
-            result = new ServiceResponse(HttpStatus.BAD_REQUEST);
-            String arg = "exchange".concat(ccy1.getCode()).concat("/").concat(ccy2.getCode());
-            result.setMessage(messages.getMessage("could.not.update",
-                    arg));
+        ServiceResponse<Exchange> saveResp = exchService.save(ccy1, ccy2, rate, valueDate);
+
+        if (!saveResp.isSuccess()) {
+            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
+            result.setMessage(messages.getMessage("exchange.not.updated",
+                    ccy1.getCode(), ccy2.getCode()));
         }
 
         return result;
@@ -159,7 +166,6 @@ public class BackOfficeService extends BaseService {
                         continue;
                     }
 
-//                    double newRate = CustomMath.division(baseRate, quoteRate);
                     try {
                         BigDecimal newRate = quoteRate.divide(baseRate, Defaults.ROUNDING_MODE);
 

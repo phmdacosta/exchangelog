@@ -11,8 +11,8 @@ public enum ContactTypes {
     PHONE("phone", NotificationMeans.SMS),
     MOBILE_APP("mobile_app", NotificationMeans.APP);
 
-    private String name;
-    private NotificationMeans means;
+    private final String name;
+    private final NotificationMeans means;
 
     ContactTypes(String name, NotificationMeans means) {
         this.name = name;

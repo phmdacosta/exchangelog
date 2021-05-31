@@ -4,7 +4,10 @@ import com.pedrocosta.exchangelog.batch.ScheduledTask;
 import com.pedrocosta.exchangelog.exceptions.ServiceException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
-import com.pedrocosta.exchangelog.services.*;
+import com.pedrocosta.exchangelog.services.BackOfficeService;
+import com.pedrocosta.exchangelog.services.BusinessService;
+import com.pedrocosta.exchangelog.services.ExchangeService;
+import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.Defaults;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
@@ -43,10 +46,8 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
             Currency base = responseCcy.getObject().clone();
 
             List<Exchange> rates = response.getObject();
-            Iterator<Exchange> itRates = rates.iterator();
 
-            while (itRates.hasNext()) {
-                Exchange exchange = itRates.next();
+            for (Exchange exchange : rates) {
                 String quoteCode = exchange.getQuoteCurrency().getCode();
                 if (quoteCode.equals(baseCcyCode)) {
                     continue;

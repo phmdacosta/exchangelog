@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 public interface RepositoryService<T> extends CoreService {
-    public ServiceResponse<T> save (T obj);
-    public ServiceResponse<List<T>> saveAll(Collection<T> col);
-    public ServiceResponse<T> find(long id);
-    public ServiceResponse<List<T>> findAll();
+    ServiceResponse<T> save (T obj);
+    ServiceResponse<List<T>> saveAll(Collection<T> col);
+    ServiceResponse<T> find(long id);
+    ServiceResponse<List<T>> findAll();
 }

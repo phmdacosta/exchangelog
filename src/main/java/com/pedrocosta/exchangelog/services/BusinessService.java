@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface BusinessService extends CoreService {
-    public ServiceResponse<List<Currency>> loadCurrencies() throws JSONException;
-    public ServiceResponse<Currency> loadCurrency(String code) throws JSONException;
-    public ServiceResponse<List<Exchange>> getQuoteRate(String baseCode, String[] quoteCodes, Double amount, Date valDate);
+    ServiceResponse<List<Currency>> loadCurrencies() throws JSONException;
+    ServiceResponse<Currency> loadCurrency(String code) throws JSONException;
+    ServiceResponse<List<Exchange>> getQuoteRate(String baseCode, String[] quoteCodes, Double amount, Date valDate);
 }

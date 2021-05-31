@@ -1,9 +1,7 @@
 package com.pedrocosta.exchangelog.persistence;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.pedrocosta.exchangelog.models.Currency;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CurrencyRepository extends JpaRepository<Currency, Long> {
 

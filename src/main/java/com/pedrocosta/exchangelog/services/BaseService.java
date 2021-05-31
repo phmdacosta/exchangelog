@@ -18,9 +18,9 @@ import java.util.List;
 @Service
 public abstract class BaseService implements BusinessService {
 
-    protected ServiceFactory factory;
-    protected Environment env;
-    protected Messages messages;
+    protected final ServiceFactory factory;
+    protected final Environment env;
+    protected final Messages messages;
 
     public BaseService(ServiceFactory factory, Environment env,
                        Messages messages) {

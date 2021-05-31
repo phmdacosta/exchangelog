@@ -1,6 +1,5 @@
 package com.pedrocosta.exchangelog.persistence;
 
-import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

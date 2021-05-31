@@ -2,7 +2,6 @@ package com.pedrocosta.exchangelog.batch.jobs;
 
 import com.pedrocosta.exchangelog.batch.ScheduledTask;
 import com.pedrocosta.exchangelog.models.Currency;
-import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.services.BusinessService;
 import com.pedrocosta.exchangelog.services.CurrencyService;
 import com.pedrocosta.exchangelog.services.ServiceResponse;

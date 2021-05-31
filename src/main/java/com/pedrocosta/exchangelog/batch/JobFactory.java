@@ -2,12 +2,8 @@ package com.pedrocosta.exchangelog.batch;
 
 import com.pedrocosta.exchangelog.models.ScheduledJob;
 import com.pedrocosta.exchangelog.services.CoreService;
-import com.pedrocosta.exchangelog.services.ServiceFactory;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.PackageUtils;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -25,6 +21,8 @@ import java.util.List;
 @Component
 public class JobFactory<T extends ScheduledTask> {
 
+    private final String SUFFIX = "Task";
+
     private final Environment env;
     private final ApplicationContext context;
 
@@ -35,10 +33,6 @@ public class JobFactory<T extends ScheduledTask> {
 
     private String getPackage() {
         return env.getProperty("project.package") + ".batch.jobs";
-    }
-
-    private String getSuffix() {
-        return "Task";
     }
 
     /**
@@ -79,7 +73,7 @@ public class JobFactory<T extends ScheduledTask> {
         for (Package pack : subPackages) {
             try {
                 Class<?> clazz = Class.forName(pack.getName() + "." +
-                        StringUtils.capitalize(name) + getSuffix());
+                        StringUtils.capitalize(name) + SUFFIX);
                 scheduler = create((Class<T>) clazz);
                 break;
             } catch (ClassNotFoundException e) {

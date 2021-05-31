@@ -3,7 +3,6 @@ package com.pedrocosta.exchangelog.adapters;
 import com.google.gson.TypeAdapter;
 import com.pedrocosta.exchangelog.utils.PackageUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -15,12 +14,10 @@ public class AdapterFactory {
     private static final String ADAPTER_PACKAGE = "adapters";
     private static final String PROJECT_PACKAGE = "project.package";
 
-    private ApplicationContext context;
-    private Environment env;
+    private final ApplicationContext context;
 
-    public AdapterFactory(ApplicationContext context, Environment env) {
+    public AdapterFactory(ApplicationContext context) {
         this.context = context;
-        this.env = env;
     }
 
     /**

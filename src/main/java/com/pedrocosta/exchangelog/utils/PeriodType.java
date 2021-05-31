@@ -5,5 +5,5 @@ package com.pedrocosta.exchangelog.utils;
  * @version 1.0
  */
 public enum PeriodType {
-    DAYS, MONTHS, YEARS;
+    DAYS, MONTHS, YEARS
 }

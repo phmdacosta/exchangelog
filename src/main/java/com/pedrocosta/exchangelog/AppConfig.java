@@ -1,12 +1,12 @@
 package com.pedrocosta.exchangelog;
 
-import java.time.Duration;
-
 import com.pedrocosta.exchangelog.utils.Messages;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.Duration;
 
 @Configuration
 public class AppConfig {
@@ -17,10 +17,5 @@ public class AppConfig {
 				.setConnectTimeout(Duration.ofMillis(3000))
 				.setReadTimeout(Duration.ofMillis(3000))
 				.build();
-	}
-
-	@Bean
-	public static Messages messageProperties() {
-		return new Messages();
 	}
 }

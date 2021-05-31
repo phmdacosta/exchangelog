@@ -19,8 +19,8 @@ public class HomeController {
 
     Logger logger = LogManager.getLogger(HomeController.class);
 
-    private WebService service;
-    private GsonUtils gsonUtils;
+    private final WebService service;
+    private final GsonUtils gsonUtils;
 
     public HomeController(WebService service, GsonUtils gsonUtils) {
         this.service = service;

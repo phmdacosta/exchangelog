@@ -12,8 +12,10 @@ import java.util.List;
 @Component
 public class ServiceFactory {
 
-     private Environment env;
-     private ApplicationContext context;
+    private final String SUFFIX = "Service";
+
+     private final Environment env;
+     private final ApplicationContext context;
 
     public ServiceFactory(ApplicationContext context, Environment env) {
         this.context = context;
@@ -24,10 +26,6 @@ public class ServiceFactory {
         return env.getProperty("project.package") + ".services";
     }
 
-    private String getSuffix() {
-        return "Service";
-    }
-
     /**
      * Create a new instance of service based on class parameter.
      *
@@ -36,7 +34,7 @@ public class ServiceFactory {
      * @return {@link CoreService} instance.
      */
     public CoreService create(Class clazz) {
-        if (!clazz.getSimpleName().endsWith(getSuffix())) {
+        if (!clazz.getSimpleName().endsWith(SUFFIX)) {
             return create(clazz.getSimpleName());
         }
         return (CoreService) context.getBean(clazz);
@@ -58,7 +56,7 @@ public class ServiceFactory {
 
         for (Package pack : subPackages) {
             try {
-                Class clazz = Class.forName(pack.getName() + "." + type + getSuffix());
+                Class clazz = Class.forName(pack.getName() + "." + type + SUFFIX);
                 service = (CoreService) context.getBean(clazz);
                 break;
             } catch (ClassNotFoundException e) {

@@ -12,7 +12,7 @@ import java.io.IOException;
 @Component
 public class ServiceResponseAdapter extends TypeAdapter<ServiceResponse> {
 
-    private GsonUtils gsonUtils;
+    private final GsonUtils gsonUtils;
 
     public ServiceResponseAdapter(GsonUtils gsonUtils) {
         this.gsonUtils = gsonUtils;
