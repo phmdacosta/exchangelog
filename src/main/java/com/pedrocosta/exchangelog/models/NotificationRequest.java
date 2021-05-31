@@ -1,9 +1,8 @@
 package com.pedrocosta.exchangelog.models;
 
-import com.pedrocosta.exchangelog.utils.NotificationMeans;
+import com.pedrocosta.exchangelog.utils.notifications.NotificationMeans;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
