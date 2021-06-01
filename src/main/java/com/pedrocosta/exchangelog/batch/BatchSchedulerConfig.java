@@ -3,6 +3,7 @@ package com.pedrocosta.exchangelog.batch;
 import com.pedrocosta.exchangelog.models.ScheduledJob;
 import com.pedrocosta.exchangelog.services.ScheduledBatchJobService;
 import com.pedrocosta.exchangelog.services.ServiceFactory;
+import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
@@ -108,10 +109,13 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
         taskRegistrar.setScheduler(taskExecutor());
         ScheduledBatchJobService service =
                 (ScheduledBatchJobService) serviceFactory.create(ScheduledBatchJobService.class);
-        List<String> jobNames = service.findAllJobNames();
+        ServiceResponse<List<String>> jobNamesResp = service.findAllJobNames();
+        if (!jobNamesResp.isSuccess())
+            return;
 
-        for (String jobName : jobNames) {
-            ScheduledJob batchJob = service.findBatchJob(jobName);
+        for (String jobName : jobNamesResp.getObject()) {
+            ServiceResponse<ScheduledJob> batchJobResp = service.findBatchJob(jobName);
+            ScheduledJob batchJob = batchJobResp.getObject();
 
             // Ignore any disabled job
             if (batchJob == null || !batchJob.isEnabled()) {
@@ -132,15 +136,14 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
             taskRegistrar.addTriggerTask(
                     () -> {
                         try {
-                            TaskChain taskChain =
-                                    service.findScheduledChain(jobName);
+                            ServiceResponse<TaskChain> taskChainResp
+                                    = service.findScheduledChain(jobName);
 
-                            if (taskChain == null || taskChain.isEmpty()) {
-                                throw new NullPointerException(Messages.get(
-                                        "task.job.not.found", jobName));
-                            }
+                            if (!taskChainResp.isSuccess())
+                                throw new NullPointerException(
+                                        taskChainResp.getMessage());
 
-                            taskChain.execute();
+                            taskChainResp.getObject().execute();
 
                         } catch (JobExecutionAlreadyRunningException
                                 | JobRestartException

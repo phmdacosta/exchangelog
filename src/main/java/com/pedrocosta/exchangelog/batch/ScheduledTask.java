@@ -55,7 +55,7 @@ import java.util.Map;
  * @author Pedro H M da Costa
  * @version 1.0
  */
-public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcessor<I, O>, ItemWriter<O> {
+public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcessor<I, O>, ItemWriter<O>, Cloneable {
 
     private ApplicationContext context;
     private ServiceFactory factory;
@@ -315,6 +315,21 @@ public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcesso
     public abstract O doProcess(I i) throws Exception;
 
     public abstract void doWrite(O o) throws Exception;
+
+    @Override
+    public ScheduledTask<I, O> clone() throws CloneNotSupportedException {
+        ScheduledTask<I, O> cloned = (ScheduledTask<I, O>) super.clone();
+        cloned.setContext(this.getContext());
+        cloned.setServiceFactory(this.getServiceFactory());
+        cloned.setJobBuilderFactory(this.getJobBuilderFactory());
+        cloned.setStepBuilderFactory(this.getStepBuilderFactory());
+        cloned.setJobLauncher(this.getJobLauncher());
+        cloned.setSchedBatchJob(this.getSchedBatchJob().clone());
+        cloned.setStartLimit(this.getStartLimit());
+        cloned.setChunk(this.getChunk());
+        cloned.setListener(this.getListener());
+        return cloned;
+    }
 
     @Override
     public String toString() {

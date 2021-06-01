@@ -41,11 +41,13 @@ public class ServiceResponse<T> {
      *          If parameter is not a error, it will return previous object without changes.
      *          If parameter is {@code null}, it will return previous object without changes.
      */
-    public ServiceResponse<T> fromError(ServiceResponse error) {
+    public ServiceResponse<T> fromError(ServiceResponse<?> error) {
         if (error == null) return this;
         if (error.isSuccess()) return this;
         setCode(error.getCode());
         setMessage(error.getMessage());
+        setException(error.getException());
+        setExecTime((Date) error.getExecTime().clone());
         return this;
     }
 

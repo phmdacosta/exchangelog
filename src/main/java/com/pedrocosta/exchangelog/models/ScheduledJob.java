@@ -131,7 +131,7 @@ public class ScheduledJob implements Cloneable {
     }
 
     @Override
-    protected ScheduledJob clone() throws CloneNotSupportedException {
+    public ScheduledJob clone() throws CloneNotSupportedException {
         ScheduledJob cloned = (ScheduledJob) super.clone();
         cloned.setId(this.id);
         cloned.setName(this.name);
