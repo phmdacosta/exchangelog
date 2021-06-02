@@ -80,20 +80,19 @@ public class WebService extends BaseService {
 
     private List<Exchange> getExchanges(String baseCode, Date valDate) {
         CurrencyService ccyService = (CurrencyService) factory.create(CurrencyService.class);
-        Currency base = ccyService.find(baseCode);
+        Currency base = ccyService.find(baseCode).getObject();
 
         ExchangeService exchService = (ExchangeService) factory.create(ExchangeService.class);
-
-        return exchService.find(base, valDate);
+        return exchService.find(base, valDate).getObject();
     }
 
     private Exchange getExchange(String baseCode, String quoteCode, Date valDate) {
         CurrencyService ccyService = (CurrencyService) factory.create(CurrencyService.class);
-        Currency base = ccyService.find(baseCode);
-        Currency quote = ccyService.find(quoteCode);
+        Currency base = ccyService.find(baseCode).getObject();
+        Currency quote = ccyService.find(quoteCode).getObject();
 
         ExchangeService exchService = (ExchangeService) factory.create(ExchangeService.class);
 
-        return exchService.find(base, quote, valDate);
+        return exchService.find(base, quote, valDate).getObject();
     }
 }
