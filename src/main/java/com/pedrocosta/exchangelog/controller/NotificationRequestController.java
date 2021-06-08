@@ -1,6 +1,9 @@
 package com.pedrocosta.exchangelog.controller;
 
+import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
+import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
 import com.pedrocosta.exchangelog.services.ServiceFactory;
+import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.GsonUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -22,8 +25,13 @@ public class NotificationRequestController {
         this.gsonUtils = gsonUtils;
     }
 
-    @RequestMapping(value = "/notif-request/save", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String save(@RequestBody String notReqJson) {
-        return null;
+    @RequestMapping(value = "/quote-notif-request/new/save", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String saveQuoteNotificationRequest(@RequestBody String notReqJson) {
+        QuoteNotificationRequest quoteNotificationRequest =
+                gsonUtils.fromJson(notReqJson, QuoteNotificationRequest.class);
+        QuoteNotificationRequestService service = (QuoteNotificationRequestService)
+                serviceFactory.create(QuoteNotificationRequest.class);
+        ServiceResponse<QuoteNotificationRequest> response = service.save(quoteNotificationRequest);
+        return gsonUtils.toJson(response);
     }
 }
