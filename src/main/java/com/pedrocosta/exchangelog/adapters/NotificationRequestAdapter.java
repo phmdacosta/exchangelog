@@ -1,28 +1,76 @@
 package com.pedrocosta.exchangelog.adapters;
 
-import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import com.pedrocosta.exchangelog.models.NotificationRequest;
+import com.pedrocosta.exchangelog.models.User;
+import com.pedrocosta.exchangelog.utils.GsonUtils;
 import com.pedrocosta.exchangelog.utils.notifications.NotificationMeans;
 
 import java.io.IOException;
 
-public class NotificationRequestAdapter extends TypeAdapter<NotificationRequest> {
+public abstract class NotificationRequestAdapter<T extends NotificationRequest> extends JsonAdapter<T> {
+    protected final String ID = "id";
     protected final String NAME = "name";
     protected final String MEANS = "means";
     protected final String ENABLED = "enabled";
     protected final String USER = "user";
 
+    public NotificationRequestAdapter(GsonUtils gsonUtils) {
+        super(gsonUtils);
+    }
+
     @Override
-    public void write(JsonWriter writer, NotificationRequest notificationRequest) throws IOException {
+    public void write(JsonWriter writer, T notificationRequest) throws IOException {
         writer.beginObject();
-        writeObject(writer, notificationRequest);
+        writeParent(writer, notificationRequest);
+        writeJson(writer, notificationRequest);
+//        writeNested(writer, notificationRequest);
         writer.endObject();
     }
 
-    protected void writeObject(JsonWriter writer, NotificationRequest notificationRequest) throws IOException {
+    protected void readParent(JsonReader reader, String fieldName, T notifReq) throws IOException {
+        JsonToken token = reader.peek();
+
+        if (reader.peek() == JsonToken.NULL) {
+            reader.nextNull();
+            return;
+        }
+
+        if (JsonToken.NAME.equals(token)) {
+            fieldName = reader.nextName();
+        }
+
+        switch (fieldName) {
+            case ID:
+                token = reader.peek();
+                notifReq.setId(reader.nextLong());
+                break;
+            case NAME:
+                token = reader.peek();
+                notifReq.setName(reader.nextString());
+                break;
+            case MEANS:
+                token = reader.peek();
+                notifReq.setMeans(NotificationMeans
+                        .valueOf(reader.nextString().toUpperCase()));
+                break;
+            case ENABLED:
+                token = reader.peek();
+                notifReq.setEnabled(reader.nextBoolean());
+                break;
+//            case USER:
+//                token = reader.peek();
+//                User user = getGsonUtils().fromJson(reader, User.class);
+//                notifReq.setUser(user);
+//                break;
+            default:
+                reader.skipValue();
+        }
+    }
+
+    private void writeParent(JsonWriter writer, T notificationRequest) throws IOException {
         writer.name(NAME);
         writer.value(notificationRequest.getName());
         writer.name(MEANS);
@@ -31,45 +79,8 @@ public class NotificationRequestAdapter extends TypeAdapter<NotificationRequest>
         writer.value(notificationRequest.isEnabled());
     }
 
-    @Override
-    public NotificationRequest read(JsonReader reader) throws IOException {
-        reader.beginObject();
-        NotificationRequest notifReq = readObject(reader);
-        reader.endObject();
-        return notifReq;
-    }
-
-    protected NotificationRequest readObject(JsonReader reader) throws IOException {
-        NotificationRequest notifReq = new NotificationRequest();
-        String fieldName = "";
-        while (reader.hasNext()) {
-            JsonToken token = reader.peek();
-
-            if (JsonToken.NAME.equals(token)) {
-                fieldName = reader.nextName();
-            }
-
-            switch (fieldName) {
-                case NAME:
-                    token = reader.peek();
-                    notifReq.setName(reader.nextString());
-                    break;
-                case MEANS:
-                    token = reader.peek();
-                    notifReq.setMeans(NotificationMeans
-                            .valueOf(reader.nextString().toUpperCase()));
-                    break;
-                case ENABLED:
-                    token = reader.peek();
-                    notifReq.setEnabled(reader.nextBoolean());
-                    break;
-                case USER:
-                    token = reader.peek();
-                    // TODO implement user adapter
-                    break;
-                default: // do nothing
-            }
-        }
-        return notifReq;
+    private void writeNested(JsonWriter writer, T notificationRequest) throws IOException {
+        writer.name(USER);
+        writer.jsonValue(getGsonUtils().toJson(notificationRequest.getUser()));
     }
 }

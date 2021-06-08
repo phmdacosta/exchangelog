@@ -14,6 +14,7 @@ import java.io.IOException;
 @Component
 public class ExchangeAdapter extends TypeAdapter<Exchange> {
 
+    protected final String ID = "id";
     protected final String BASE = "base";
     protected final String QUOTE = "quote";
     protected final String RATE = "rate";
@@ -46,6 +47,10 @@ public class ExchangeAdapter extends TypeAdapter<Exchange> {
             }
 
             switch (fieldName) {
+                case ID:
+                    token = reader.peek();
+                    exchange.setId(reader.nextLong());
+                    break;
                 case BASE:
                     token = reader.peek();
                     exchange.setBaseCurrency(
@@ -65,7 +70,7 @@ public class ExchangeAdapter extends TypeAdapter<Exchange> {
                     exchange.setValueDate(
                             DateUtils.stringToDate(reader.nextString()));
                     break;
-                default: // do nothing
+                default: reader.skipValue();
             }
         }
         reader.endObject();

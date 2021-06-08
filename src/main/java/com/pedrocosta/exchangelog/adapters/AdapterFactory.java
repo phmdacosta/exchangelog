@@ -1,8 +1,10 @@
 package com.pedrocosta.exchangelog.adapters;
 
 import com.google.gson.TypeAdapter;
+import com.pedrocosta.exchangelog.utils.AppProperties;
+import com.pedrocosta.exchangelog.utils.GsonUtils;
+import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.PackageUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -13,12 +15,6 @@ public class AdapterFactory {
     private static final String ADAPTER_SUFFIX = "Adapter";
     private static final String ADAPTER_PACKAGE = "adapters";
     private static final String PROJECT_PACKAGE = "project.package";
-
-    private final ApplicationContext context;
-
-    public AdapterFactory(ApplicationContext context) {
-        this.context = context;
-    }
 
     /**
      * Get suffix of adapter's name.
@@ -31,7 +27,7 @@ public class AdapterFactory {
      * Get package name of adapters.
      */
     protected String getAdapterPackage() {
-        return ADAPTER_PACKAGE;
+        return AppProperties.get(PROJECT_PACKAGE) + "." + ADAPTER_PACKAGE;
     }
 
     /**
@@ -86,11 +82,20 @@ public class AdapterFactory {
 
         for (Package pack : subPackages) {
             try {
-                Class adapterClass = Class.forName(getAdapterName(pack.getName(), clazz, type));
-                adapter = (TypeAdapter<T>) context.getBean(adapterClass);
+                Class<TypeAdapter<T>> adapterClass = (Class<TypeAdapter<T>>)
+                        Class.forName(getAdapterName(pack.getName(), clazz, type));
+                if (adapterClass.getConstructors().length > 0) {
+                    Class<?>[] paramTypes = adapterClass.getConstructors()[0].getParameterTypes();
+                    if (paramTypes.length > 0) {
+                        adapter = adapterClass.getConstructor(paramTypes)
+                                .newInstance(new GsonUtils(new AdapterFactory()));
+                    } else {
+                        adapter = adapterClass.getConstructor(new Class[0]).newInstance();
+                    }
+                }
                 break;
-            } catch (ClassNotFoundException e) {
-                // Continue to search
+            } catch (Exception e) {
+                Log.warn(this, e.getMessage());
             }
         }
 

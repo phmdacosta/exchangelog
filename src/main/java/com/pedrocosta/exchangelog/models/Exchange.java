@@ -36,7 +36,7 @@ public class Exchange implements Cloneable {
 		return id;
 	}
 
-	protected Exchange setId(long id) {
+	public Exchange setId(long id) {
 		this.id = id;
 		return this;
 	}

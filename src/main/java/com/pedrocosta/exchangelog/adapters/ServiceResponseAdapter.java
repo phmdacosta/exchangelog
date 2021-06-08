@@ -10,33 +10,29 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class ServiceResponseAdapter extends TypeAdapter<ServiceResponse> {
-
-    private final GsonUtils gsonUtils;
+public class ServiceResponseAdapter extends JsonAdapter<ServiceResponse<?>> {
 
     public ServiceResponseAdapter(GsonUtils gsonUtils) {
-        this.gsonUtils = gsonUtils;
+        super(gsonUtils);
     }
 
     @Override
-    public void write(JsonWriter writer, ServiceResponse obj) throws IOException {
-        writer.beginObject();
+    protected void writeJson(JsonWriter writer, ServiceResponse<?> obj) throws IOException {
         writer.name("success");
         writer.value(obj.isSuccess());
         writer.name("code");
         writer.value(obj.getCode().value());
         if (obj.isSuccess()) {
             writer.name("info");
-            writer.jsonValue(gsonUtils.toJson(obj.getObject()));
+            writer.jsonValue(getGsonUtils().toJson(obj.getObject()));
         } else {
             writer.name("label");
             writer.value(obj.getMessage());
         }
-        writer.endObject();
     }
 
     @Override
-    public ServiceResponse read(JsonReader reader) throws IOException {
+    protected ServiceResponse<?> readJson(JsonReader reader) throws IOException {
         throw new IllegalStateException("There is no support for deserializing " +
                 "transformation result objects at the moment");
     }

@@ -1,7 +1,6 @@
 package com.pedrocosta.exchangelog.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.pedrocosta.exchangelog.adapters.AdapterFactory;
 import com.pedrocosta.exchangelog.adapters.ExchangeAdapter;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
@@ -17,11 +16,15 @@ import java.util.Calendar;
  */
 public class ExchangeJsonTest {
 
+    private GsonUtils gsonUtils;
     private Exchange exchange;
 
     @BeforeEach
     public void setUp() {
+        gsonUtils = new GsonUtils(new AdapterFactory());
+
         Calendar calendar = Calendar.getInstance();
+        calendar.set(2021, Calendar.JUNE, 8);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
@@ -30,30 +33,55 @@ public class ExchangeJsonTest {
         exchange = new Exchange(
                 new Currency("EUR", ""),
                 new Currency("USD", ""),
-                BigDecimal.valueOf(2D),
-                calendar.getTime());
+                BigDecimal.valueOf(0.82D),
+                calendar.getTime())
+                .setId(67);
     }
 
     @Test
     public void testJsonCreationFromObject() {
-        GsonUtils gsonUtils = new GsonUtils(null);
         String generateJson = gsonUtils.toJson(exchange, new ExchangeAdapter());
-        assert exchangeJson(exchange).equals(generateJson);
+        assert jsonForExchangeSerialize().equals(generateJson);
     }
 
     @Test
     public void testObjectCreationFromJson() {
-        GsonUtils gsonUtils = new GsonUtils(null);
-        Exchange newExch = gsonUtils.fromJson(exchangeJson(exchange),
-                Exchange.class, new ExchangeAdapter());
-        assert exchange.equals(newExch);
+        Exchange newExch = gsonUtils.fromJson(jsonForExchangeDeserialize(),
+                Exchange.class);
+        assert isExact(exchange, newExch);
     }
 
-    private String exchangeJson(Exchange exchange) {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(exchange.getClass(), new ExchangeAdapter());
-        Gson gson = builder.create();
-        return gson.toJson(exchange);
+    private String jsonForExchangeSerialize() {
+        String result =
+                "{" +
+                        "\"base\":\"EUR\"" +
+                        ",\"quote\":\"USD\"" +
+                        ",\"rate\":0.82" +
+                        ",\"date\":\"2021-06-08\"" +
+                "}";
+
+        return result;
+    }
+
+    private String jsonForExchangeDeserialize() {
+        String result =
+                "{" +
+                        "\"id\":67" +
+                        ",\"base\":\"EUR\"" +
+                        ",\"quote\":\"USD\"" +
+                        ",\"rate\":0.82" +
+                        ",\"date\":\"2021-06-08\"" +
+                "}";
+
+        return result;
+    }
+
+    private boolean isExact(Exchange o1, Exchange o2) {
+        return o1.getId() == o2.getId()
+                && o1.getBaseCurrency().getCode().equals(o2.getBaseCurrency().getCode())
+                && o1.getQuoteCurrency().getCode().equals(o2.getQuoteCurrency().getCode())
+                && o1.getRate().equals(o2.getRate())
+                && o1.getValueDate().equals(o2.getValueDate());
     }
 
 }
