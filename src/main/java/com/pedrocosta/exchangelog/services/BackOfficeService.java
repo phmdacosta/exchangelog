@@ -39,7 +39,7 @@ public class BackOfficeService extends BaseService {
      * @return {@link ServiceResponse} of a list of {@link Exchange} with new rates.
      */
     public ServiceResponse<List<Exchange>> updateQuoteValues(String baseCcyCode) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
 
         try {
             BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
@@ -98,9 +98,9 @@ public class BackOfficeService extends BaseService {
                 result = response; // Return error
             }
         } catch (JSONException | CloneNotSupportedException e) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(messages.getMessage("could.not.update",
-                    "quote values"));
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    messages.getMessage("could.not.update",
+                            "quote values"));
         }
 
         return result;
@@ -117,7 +117,7 @@ public class BackOfficeService extends BaseService {
      * @return {@link ServiceResponse} with new {@link Exchange}.
      */
     public ServiceResponse<Exchange> updateQuote(Currency ccy1, Currency ccy2, BigDecimal rate, Date valueDate) {
-        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
 
         ExchangeService exchService =
                 (ExchangeService) factory.create(ExchangeService.class);
@@ -125,9 +125,9 @@ public class BackOfficeService extends BaseService {
         ServiceResponse<Exchange> saveResp = exchService.save(ccy1, ccy2, rate, valueDate);
 
         if (!saveResp.isSuccess()) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(messages.getMessage("exchange.not.updated",
-                    ccy1.getCode(), ccy2.getCode()));
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    messages.getMessage("exchange.not.updated",
+                            ccy1.getCode(), ccy2.getCode()));
         }
 
         return result;

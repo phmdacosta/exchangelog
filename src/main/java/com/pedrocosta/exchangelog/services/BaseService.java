@@ -42,21 +42,23 @@ public abstract class BaseService implements BusinessService {
         if (!result.isSuccess()) {
             // If no currency found in database, retrieve currencies from API
             BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
-            ServiceResponse<List<Currency>> response = apiService.loadCurrencies();
+            ServiceResponse<List<Currency>> apiResponse = apiService.loadCurrencies();
 
-            if (response.isSuccess()) { // Saving currencies got by API
-                ServiceResponse<List<Currency>> respSave = ccyService.saveAll(response.getObject());
+            if (apiResponse.isSuccess()) { // Saving currencies got by API
+                ServiceResponse<List<Currency>> respSave =
+                        ccyService.saveAll(apiResponse.getObject());
+
                 if (!respSave.isSuccess()) {
                     // Could not save, return generic server error
-                    result = new ServiceResponse<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                    result.setMessage(messages.getMessage("error.no.ccy.found"));
+                    return ServiceResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
+                            messages.getMessage("error.no.ccy.found"));
                 }
-                result = new ServiceResponse<>(HttpStatus.OK);
-                result.setObject(respSave.getObject());
+                result = ServiceResponse.<List<Currency>>createSuccess()
+                        .setObject(respSave.getObject());
 
             } else { // If no currency found in API, return error
-                result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(messages.getMessage("error.no.ccy.found"));
+                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                        messages.getMessage("error.no.ccy.found"));
             }
         }
 
@@ -71,21 +73,21 @@ public abstract class BaseService implements BusinessService {
         if (!result.isSuccess()) {
             // If no currency found in database, retrieve it from API
             BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
-            ServiceResponse<Currency> response = apiService.loadCurrency(code);
+            ServiceResponse<Currency> apiResponse = apiService.loadCurrency(code);
 
-            if (response.isSuccess()) { // Saving currency got by API
-                ServiceResponse<Currency> respSave = ccyService.save(response.getObject());
+            if (apiResponse.isSuccess()) { // Saving currency got by API
+                ServiceResponse<Currency> respSave = ccyService.save(apiResponse.getObject());
                 if (!respSave.isSuccess()) {
                     // Could not save, return generic server error
-                    result = new ServiceResponse<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                    result.setMessage(messages.getMessage("error.ccy.not.found", code));
+                    return ServiceResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
+                            messages.getMessage("error.ccy.not.found", code));
                 }
-                result = new ServiceResponse<>(HttpStatus.OK);
-                result.setObject(respSave.getObject());
+                result = ServiceResponse.<Currency>createSuccess()
+                        .setObject(respSave.getObject());
 
             } else { // If no currency found in API, return error
-                result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(messages.getMessage("error.ccy.not.found", code));
+                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                        messages.getMessage("error.ccy.not.found", code));
             }
         }
 

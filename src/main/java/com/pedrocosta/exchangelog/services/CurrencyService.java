@@ -28,12 +28,12 @@ public class CurrencyService implements RepositoryService<Currency> {
      *          If currency not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Currency> find(String code) {
-        ServiceResponse<Currency> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Currency> result = ServiceResponse.createSuccess();
         result.setObject(repository.findByCode(code));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.ccy.not.found", code));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.ccy.not.found", code));
         }
 
         return result;
@@ -49,13 +49,13 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<Currency> find(long id) {
-        ServiceResponse<Currency> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Currency> result = ServiceResponse.createSuccess();
         result.setObject(repository.findById(id).orElse(null));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
             String arg = "with id " + id;
-            result.setMessage(Messages.get("error.ccy.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.ccy.not.found", arg));
         }
 
         return result;
@@ -69,12 +69,12 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<List<Currency>> findAll() {
-        ServiceResponse<List<Currency>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Currency>> result = ServiceResponse.createSuccess();
         result.setObject(repository.findAll());
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.no.ccy.found"));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.no.ccy.found"));
         }
 
         return result;
@@ -90,13 +90,14 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<Currency> save(Currency currency) {
-        ServiceResponse<Currency> result = new ServiceResponse<>(HttpStatus.CREATED);
+        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
+                .setCode(HttpStatus.CREATED);
         result.setObject(repository.save(currency));
 
         if (result.getObject() == null || result.getObject().getId() == 0) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
             String arg = "currency ".concat(currency.getCode());
-            result.setMessage(Messages.get("error.not.saved", arg));
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.not.saved", arg));
         }
 
         return result;
@@ -112,12 +113,13 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<List<Currency>> saveAll(Collection<Currency> currencies) {
-        ServiceResponse<List<Currency>> result = new ServiceResponse<>(HttpStatus.CREATED);
+        ServiceResponse<List<Currency>> result = ServiceResponse
+                .<List<Currency>>createSuccess().setCode(HttpStatus.CREATED);
         result.setObject(repository.saveAll(currencies));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(Messages.get("error.not.saved", "any currency"));
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.not.saved", "any currency"));
         }
         else if(result.getObject().size() != currencies.size()) {
             List<Currency> notSaved = new ArrayList<>();

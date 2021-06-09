@@ -34,13 +34,13 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Override
     public ServiceResponse<Exchange> find(long id) {
-        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
         result.setObject(repository.findById(id).orElse(null));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
             String arg = "with id " + id;
-            result.setMessage(Messages.get("error.exch.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found", arg));
         }
 
         return result;
@@ -56,13 +56,13 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<Exchange>> find(@NotNull Currency ccy, Date valueDate) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
         result.setObject(repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
             String arg = "of " + ccy.getCode() + " in " + valueDate;
-            result.setMessage(Messages.get("error.exch.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found", arg));
         }
 
         return result;
@@ -79,14 +79,14 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate) {
-        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
         result.setObject(repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
                 ccy1, ccy2, valueDate));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
             String arg = ccy1.getCode() + "/" + ccy2.getCode() + " in " + valueDate;
-            result.setMessage(Messages.get("error.exch.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found", arg));
         }
 
         return result;
@@ -102,14 +102,14 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> findLast(@NotNull Currency ccy1, @NotNull Currency ccy2) {
-        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
         result.setObject(repository.findByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
                 ccy1, ccy2));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
             String arg = ccy1.getCode() + "/" + ccy2.getCode();
-            result.setMessage(Messages.get("error.exch.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found", arg));
         }
 
         return result;
@@ -125,14 +125,14 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> findWithMinRate(Date startValueDate, Date endValueDate) {
-        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
         result.setObject(repository.findByValueDateBetweenOrderByRateAsc(
                 startValueDate, endValueDate));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.exch.not.found.in.dates",
-                    String.valueOf(startValueDate), String.valueOf(endValueDate)));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found.in.dates",
+                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
         }
 
         return result;
@@ -148,14 +148,14 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> findWithMaxRate(Date startValueDate, Date endValueDate) {
-        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
         result.setObject(repository.findByValueDateBetweenOrderByRateDesc(
                 startValueDate, endValueDate));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.exch.not.found.in.dates",
-                    String.valueOf(startValueDate), String.valueOf(endValueDate)));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found.in.dates",
+                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
         }
 
         return result;
@@ -169,12 +169,12 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Override
     public ServiceResponse<List<Exchange>> findAll() {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
         result.setObject(repository.findAll());
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.no.exch.found"));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.no.exch.found"));
         }
 
         return result;
@@ -190,13 +190,13 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<Exchange>> findAll(Date startValueDate, Date endValueDate) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
         result.setObject(repository.findAllByValueDateBetween(startValueDate, endValueDate));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.exch.not.found.in.dates",
-                    String.valueOf(startValueDate), String.valueOf(endValueDate)));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found.in.dates",
+                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
         }
 
         return result;
@@ -212,14 +212,14 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<Exchange>> findAllOrderByValueDate(Date startValueDate, Date endValueDate) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
         result.setObject(repository.findAllByValueDateBetweenOrderByValueDateDesc(
                 startValueDate, endValueDate));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.exch.not.found.in.dates",
-                    String.valueOf(startValueDate), String.valueOf(endValueDate)));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found.in.dates",
+                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
         }
 
         return result;
@@ -237,7 +237,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<Exchange>> findAllOrderedByRate(Date startValueDate, Date endValueDate, DatabaseOrder order) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
 
         if (DatabaseOrder.DESC == order) {
             result.setObject(repository.findAllByValueDateBetweenOrderByRateDesc(
@@ -248,9 +248,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
         }
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.exch.not.found.in.dates",
-                    String.valueOf(startValueDate), String.valueOf(endValueDate)));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.exch.not.found.in.dates",
+                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
         }
 
         return result;
@@ -267,21 +267,23 @@ public class ExchangeService implements RepositoryService<Exchange> {
     @Override
     public ServiceResponse<Exchange> save(Exchange exchange) {
         if (exchange.getBaseCurrency() == null) {
-            return new ServiceResponse<Exchange>(HttpStatus.BAD_REQUEST)
-                    .setMessage(Messages.get("error.exch.save.no.ccy.set", "base"));
+            return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.exch.save.no.ccy.set", "base"));
         }
         if (exchange.getQuoteCurrency() == null) {
-            return new ServiceResponse<Exchange>(HttpStatus.BAD_REQUEST)
-                    .setMessage(Messages.get("error.exch.save.no.ccy.set", "quote"));
+            return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.exch.save.no.ccy.set", "quote"));
         }
 
-        ServiceResponse<Exchange> result = new ServiceResponse<>(HttpStatus.CREATED);
+        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
+                .setCode(HttpStatus.CREATED);
         result.setObject(repository.save(exchange));
 
         if (result.getObject() == null || result.getObject().getId() == 0) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(Messages.get("error.exch.not.saved",
-                    exchange.getBaseCurrency().getCode(), exchange.getQuoteCurrency().getCode()));
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.exch.not.saved",
+                        exchange.getBaseCurrency().getCode(),
+                            exchange.getQuoteCurrency().getCode()));
         }
 
         return result;
@@ -319,16 +321,18 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Override
     public ServiceResponse<List<Exchange>> saveAll(Collection<Exchange> exchanges) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.CREATED);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.<List<Exchange>>createSuccess()
+                .setCode(HttpStatus.CREATED);
         result.setObject(repository.saveAll(exchanges));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(Messages.get("error.not.saved", "any exchange"));
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.not.saved", "any exchange"));
         }
         else if(result.getObject().size() != exchanges.size()) {
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST);
             List<Exchange> notSaved = new ArrayList<>();
-            ServiceResponse<List<Exchange>> auxResult = result.setCode(HttpStatus.BAD_REQUEST);
+            ServiceResponse<List<Exchange>> auxResult = result;
             exchanges.forEach(exchange -> {
                 if (!auxResult.getObject().contains(exchange)) {
                     notSaved.add(exchange);

@@ -11,14 +11,20 @@ public class ServiceResponse<T> {
     private String message;
     private T object;
     private Date execTime;
+    private boolean success;
 
     @Expose(serialize = false)
     private Exception exception;
 
-    public ServiceResponse() {
+    private ServiceResponse() {
+        this.setSuccess(true);
         this.setCode(HttpStatus.OK);
         this.setMessage("");
         this.setExecTime(new Date());
+    }
+
+    public ServiceResponse(int code) {
+        this(HttpStatus.valueOf(code));
     }
 
     public ServiceResponse(HttpStatus code) {
@@ -27,8 +33,61 @@ public class ServiceResponse<T> {
         this.setExecTime(new Date());
     }
 
-    public ServiceResponse(int code) {
-        this(HttpStatus.valueOf(code));
+    /**
+     * Create a success response with empty message.
+     *
+     * @param <T>   {@link ServiceResponse} type
+     * @return  Success response
+     */
+    public static <T> ServiceResponse<T> createSuccess() {
+        return createSuccess("");
+    }
+
+    /**
+     * Create a success response.
+     *
+     * @param message   Success message
+     * @param <T>       {@link ServiceResponse} type
+     * @return  Success response
+     */
+    public static <T> ServiceResponse<T> createSuccess(String message) {
+        return new ServiceResponse<T>().setMessage(message);
+    }
+
+    /**
+     * Create a {@linkplain HttpStatus#BAD_REQUEST BAD_REQUEST}
+     * error response with empty message.
+     *
+     * @param <T>   {@link ServiceResponse} type
+     * @return  Error response
+     */
+    public static <T> ServiceResponse<T> createError() {
+        return createError(HttpStatus.BAD_REQUEST, "");
+    }
+
+    /**
+     * Create a error response with empty message.
+     *
+     * @param code  {@link HttpStatus} code
+     * @param <T>   {@link ServiceResponse} type
+     * @return  Error response
+     */
+    public static <T> ServiceResponse<T> createError(HttpStatus code) {
+        return createError(code, "");
+    }
+
+    /**
+     * Create a error response.
+     *
+     * @param code      {@link HttpStatus} code
+     * @param message   Error message
+     * @param <T>       {@link ServiceResponse} type
+     * @return  Error response
+     */
+    public static <T> ServiceResponse<T> createError(HttpStatus code, String message) {
+        return new ServiceResponse<T>(code)
+                .setSuccess(false)
+                .setMessage(message);
     }
 
     /**
@@ -44,44 +103,12 @@ public class ServiceResponse<T> {
     public ServiceResponse<T> fromError(ServiceResponse<?> error) {
         if (error == null) return this;
         if (error.isSuccess()) return this;
+        this.setSuccess(false);
         setCode(error.getCode());
         setMessage(error.getMessage());
         setException(error.getException());
         setExecTime((Date) error.getExecTime().clone());
         return this;
-    }
-
-    /**
-     * Check if service request was successful.
-     *
-     * @return
-     *          True if it is on of the next http codes:
-     *              [{@linkplain HttpStatus#OK OK},
-     *               {@linkplain HttpStatus#CREATED CREATED},
-     *               {@linkplain HttpStatus#ACCEPTED ACCEPTED},
-     *               {@linkplain HttpStatus#NON_AUTHORITATIVE_INFORMATION NON_AUTHORITATIVE_INFORMATION},
-     *               {@linkplain HttpStatus#NO_CONTENT NO_CONTENT},
-     *               {@linkplain HttpStatus#RESET_CONTENT RESET_CONTENT},
-     *               {@linkplain HttpStatus#PARTIAL_CONTENT PARTIAL_CONTENT},
-     *               {@linkplain HttpStatus#MULTI_STATUS MULTI_STATUS},
-     *               {@linkplain HttpStatus#ALREADY_REPORTED ALREADY_REPORTED},
-     *               {@linkplain HttpStatus#IM_USED IM_USED}],<br>
-     *          false otherwise.
-     */
-    public boolean isSuccess() {
-        switch (getCode()) {
-            case OK:
-            case CREATED:
-            case ACCEPTED:
-            case NON_AUTHORITATIVE_INFORMATION:
-            case NO_CONTENT:
-            case RESET_CONTENT:
-            case PARTIAL_CONTENT:
-            case MULTI_STATUS:
-            case ALREADY_REPORTED:
-            case IM_USED: return true;
-            default: return false;
-        }
     }
 
     public Exception getException() {
@@ -126,6 +153,45 @@ public class ServiceResponse<T> {
 
     public ServiceResponse<T> setExecTime(Date execTime) {
         this.execTime = execTime;
+        return this;
+    }
+
+    /**
+     * Check if service request was successful.
+     *
+     * @return
+     *          True if it is on of the next http codes:
+     *              [{@linkplain HttpStatus#OK OK},
+     *               {@linkplain HttpStatus#CREATED CREATED},
+     *               {@linkplain HttpStatus#ACCEPTED ACCEPTED},
+     *               {@linkplain HttpStatus#NON_AUTHORITATIVE_INFORMATION NON_AUTHORITATIVE_INFORMATION},
+     *               {@linkplain HttpStatus#NO_CONTENT NO_CONTENT},
+     *               {@linkplain HttpStatus#RESET_CONTENT RESET_CONTENT},
+     *               {@linkplain HttpStatus#PARTIAL_CONTENT PARTIAL_CONTENT},
+     *               {@linkplain HttpStatus#MULTI_STATUS MULTI_STATUS},
+     *               {@linkplain HttpStatus#ALREADY_REPORTED ALREADY_REPORTED},
+     *               {@linkplain HttpStatus#IM_USED IM_USED}],<br>
+     *          false otherwise.
+     */
+    public boolean isSuccess() {
+        return success;
+//        switch (getCode()) {
+//            case OK:
+//            case CREATED:
+//            case ACCEPTED:
+//            case NON_AUTHORITATIVE_INFORMATION:
+//            case NO_CONTENT:
+//            case RESET_CONTENT:
+//            case PARTIAL_CONTENT:
+//            case MULTI_STATUS:
+//            case ALREADY_REPORTED:
+//            case IM_USED: return true;
+//            default: return false;
+//        }
+    }
+
+    public ServiceResponse<T> setSuccess(boolean success) {
+        this.success = success;
         return this;
     }
 }

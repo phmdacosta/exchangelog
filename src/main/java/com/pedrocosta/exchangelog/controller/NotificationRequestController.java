@@ -30,8 +30,9 @@ public class NotificationRequestController {
     public String saveQuoteNotificationRequest(@RequestBody String notReqJson) {
         if (notReqJson == null || notReqJson.isBlank()) {
             return gsonUtils.toJson(
-                    new ServiceResponse<QuoteNotificationRequest>(HttpStatus.BAD_REQUEST)
-                            .setMessage("Missing body.")); //TODO use message properties
+                    ServiceResponse.<QuoteNotificationRequest>createError(
+                            HttpStatus.BAD_REQUEST, "Missing body."));
+            //TODO use message properties
         }
 
         QuoteNotificationRequest quoteNotificationRequest =
