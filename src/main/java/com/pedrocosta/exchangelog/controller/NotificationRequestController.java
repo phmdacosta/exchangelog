@@ -5,6 +5,7 @@ import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
 import com.pedrocosta.exchangelog.services.ServiceFactory;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.GsonUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +28,18 @@ public class NotificationRequestController {
 
     @RequestMapping(value = "/quote-notif-request/new/save", produces = MediaType.APPLICATION_JSON_VALUE)
     public String saveQuoteNotificationRequest(@RequestBody String notReqJson) {
+        if (notReqJson == null || notReqJson.isBlank()) {
+            return gsonUtils.toJson(
+                    new ServiceResponse<QuoteNotificationRequest>(HttpStatus.BAD_REQUEST)
+                            .setMessage("Missing body.")); //TODO use message properties
+        }
+
         QuoteNotificationRequest quoteNotificationRequest =
                 gsonUtils.fromJson(notReqJson, QuoteNotificationRequest.class);
         QuoteNotificationRequestService service = (QuoteNotificationRequestService)
                 serviceFactory.create(QuoteNotificationRequest.class);
         ServiceResponse<QuoteNotificationRequest> response = service.save(quoteNotificationRequest);
+
         return gsonUtils.toJson(response);
     }
 }
