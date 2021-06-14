@@ -63,11 +63,7 @@ public class Currency implements Cloneable {
 
 	@Override
 	public Currency clone() throws CloneNotSupportedException {
-		Currency newCcy = (Currency) super.clone();
-		newCcy.setId(this.id);
-		newCcy.setCode(this.code);
-		newCcy.setName(this.name);
-		return newCcy;
+		return (Currency) super.clone();
 	}
 
 	@Override

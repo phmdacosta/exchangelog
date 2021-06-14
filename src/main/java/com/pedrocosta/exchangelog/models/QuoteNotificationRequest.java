@@ -106,12 +106,6 @@ public class QuoteNotificationRequest extends NotificationRequest implements Clo
 
     @Override
     protected QuoteNotificationRequest clone() throws CloneNotSupportedException {
-        QuoteNotificationRequest cloned = (QuoteNotificationRequest) super.clone();
-        cloned.setQuoteValue(this.getQuoteValue())
-                .setLogicalOperator(this.getLogicalOperator())
-                .setExchange(this.getExchange().clone())
-                .setExchStartDate(this.getExchStartDate())
-                .setExchEndDate(this.getExchEndDate());
-        return cloned;
+        return (QuoteNotificationRequest) super.clone();
     }
 }

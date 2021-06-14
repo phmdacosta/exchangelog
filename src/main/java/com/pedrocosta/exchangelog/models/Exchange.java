@@ -100,13 +100,7 @@ public class Exchange implements Cloneable {
 
 	@Override
 	public Exchange clone() throws CloneNotSupportedException {
-		Exchange newExch = (Exchange) super.clone();
-		newExch.setId(this.id);
-		newExch.setBaseCurrency(this.baseCurrency);
-		newExch.setQuoteCurrency(this.quoteCurrency);
-		newExch.setRate(this.rate);
-		newExch.setValueDate(this.valueDate);
-		return newExch;
+		return(Exchange) super.clone();
 	}
 
 	@Override

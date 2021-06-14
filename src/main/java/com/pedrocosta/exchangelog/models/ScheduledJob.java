@@ -132,18 +132,7 @@ public class ScheduledJob implements Cloneable {
 
     @Override
     public ScheduledJob clone() throws CloneNotSupportedException {
-        ScheduledJob cloned = (ScheduledJob) super.clone();
-        cloned.setId(this.id);
-        cloned.setName(this.name);
-        cloned.setScheduleCron(this.scheduleCron);
-        cloned.setExecWeekend(this.execWeekend);
-        cloned.setExecDay((Date) this.execDay.clone());
-        cloned.setExecTime(this.execTime);
-        cloned.setEnabled(this.enabled);
-        for (BatchJobParameter parameter : this.parameters) {
-            cloned.getParameters().add(parameter.clone());
-        }
-        return cloned;
+        return (ScheduledJob) super.clone();
     }
 
     @Override

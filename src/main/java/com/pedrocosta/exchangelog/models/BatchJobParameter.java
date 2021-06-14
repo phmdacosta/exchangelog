@@ -55,10 +55,6 @@ public class BatchJobParameter {
 
     @Override
     protected BatchJobParameter clone() throws CloneNotSupportedException {
-        BatchJobParameter cloned = (BatchJobParameter) super.clone();
-        cloned.setId(this.id);
-        cloned.setName(this.name);
-        cloned.setValue(this.value);
-        return cloned;
+        return (BatchJobParameter) super.clone();
     }
 }

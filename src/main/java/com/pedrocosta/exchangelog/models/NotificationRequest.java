@@ -85,13 +85,7 @@ public class NotificationRequest implements Cloneable {
 
     @Override
     protected NotificationRequest clone() throws CloneNotSupportedException {
-        NotificationRequest cloned = (NotificationRequest) super.clone();
-        cloned.setId(this.getId())
-                .setName(this.getName())
-                .setMeans(this.getMeans())
-                .setEnabled(this.isEnabled())
-                .setUser(this.getUser().clone());
-        return cloned;
+        return (NotificationRequest) super.clone();
     }
 
     @Override

@@ -58,19 +58,7 @@ public class User implements Cloneable {
 
     @Override
     protected User clone() throws CloneNotSupportedException {
-        User cloned = (User) super.clone();
-        cloned.setId(this.getId());
-        cloned.setName(this.getName());
-
-        if (!this.getContacts().isEmpty()) {
-            List<UserContact> contactsClone = new ArrayList<>();
-            for (UserContact contact : this.getContacts()) {
-                contactsClone.add(contact.clone());
-            }
-            cloned.setContacts(contactsClone);
-        }
-
-        return cloned;
+        return (User) super.clone();
     }
 
     @Override

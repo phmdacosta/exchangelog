@@ -67,10 +67,6 @@ public class UserContact implements Cloneable {
 
     @Override
     protected UserContact clone() throws CloneNotSupportedException {
-        UserContact cloned = (UserContact) super.clone();
-        cloned.setId(this.getId());
-        cloned.setName(this.getName());
-        cloned.setValue(this.getValue());
-        return cloned;
+        return (UserContact) super.clone();
     }
 }
