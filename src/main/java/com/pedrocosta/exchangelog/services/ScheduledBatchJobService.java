@@ -30,7 +30,7 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
 
     @Nullable
     public <I, O, T extends ScheduledTask<I, O>> ServiceResponse<T> findScheduledTask(String name) {
-        ServiceResponse<T> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<T> result = ServiceResponse.createSuccess();
         ServiceResponse<ScheduledJob> scheduledJobResp = findBatchJob(name);
 
         if (scheduledJobResp.isSuccess()) {
@@ -41,8 +41,8 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
                 scheduledTask.setSchedBatchJob(scheduledJob);
                 result.setObject(scheduledTask);
             } else {
-                result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(Messages.get("task.job.not.found", name));
+                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                        Messages.get("task.job.not.found", name));
             }
         } else {
             result.fromError(scheduledJobResp);
@@ -62,32 +62,33 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
     @Override
     public ServiceResponse<ScheduledJob> find(long id) {
         ServiceResponse<ScheduledJob> result =
-                new ServiceResponse<ScheduledJob>(HttpStatus.OK)
+                ServiceResponse.<ScheduledJob>createSuccess()
                     .setObject(this.repository.findById(id).orElse(null));
 
         if (result.getObject() == null) {
             String arg = "with id " + id;
-            result = new ServiceResponse<ScheduledJob>(HttpStatus.NOT_FOUND)
-                    .setMessage(Messages.get("task.job.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("task.job.not.found", arg));
         }
 
         return result;
     }
 
     public ServiceResponse<ScheduledJob> findBatchJob(String name) {
-        ServiceResponse<ScheduledJob> result = new ServiceResponse<>(HttpStatus.OK);
-        result.setObject(this.repository.findByName(name));
+        ServiceResponse<ScheduledJob> result =
+                ServiceResponse.<ScheduledJob>createSuccess()
+                        .setObject(this.repository.findByName(name));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<ScheduledJob>(HttpStatus.NOT_FOUND)
-                    .setMessage(Messages.get("task.job.not.found", name));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("task.job.not.found", name));
         }
 
         return result;
     }
 
     public <I, O, T extends ScheduledTask<I, O>> ServiceResponse<List<T>> findAllScheduledTasks() {
-        ServiceResponse<List<T>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<T>> result = ServiceResponse.createSuccess();
         List<T> scheduledTaskList = new ArrayList<>();
         ServiceResponse<List<ScheduledJob>> jobListResp = findAll();
 
@@ -106,8 +107,8 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
         if (!scheduledTaskList.isEmpty())
             result.setObject(scheduledTaskList);
         else
-            result = new ServiceResponse<List<T>>(HttpStatus.NOT_FOUND)
-                    .setMessage(Messages.get("task.no.job.found"));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("task.no.job.found"));
 
         return result;
     }
@@ -124,7 +125,7 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
      * @return  List of scheduled tasks ordered by chain sequence.
      */
     public ServiceResponse<TaskChain> findScheduledChain(String firstJobName) {
-        ServiceResponse<TaskChain> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<TaskChain> result = ServiceResponse.createSuccess();
         String jobName = firstJobName;
         TaskChain chain = new TaskChain();
         boolean finished = false;
@@ -148,8 +149,8 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
         if (!chain.isEmpty())
             result.setObject(chain);
         else
-            result = new ServiceResponse<TaskChain>(HttpStatus.NOT_FOUND)
-                    .setMessage(Messages.get("task.chain.not.found", firstJobName));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("task.chain.not.found", firstJobName));
 
         return result;
     }
@@ -162,19 +163,20 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
      */
     @Override
     public ServiceResponse<List<ScheduledJob>> findAll() {
-        ServiceResponse<List<ScheduledJob>> result = new ServiceResponse<>(HttpStatus.OK);
-        result.setObject(this.repository.findAll());
+        ServiceResponse<List<ScheduledJob>> result =
+                ServiceResponse.<List<ScheduledJob>>createSuccess()
+                        .setObject(this.repository.findAll());
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = new ServiceResponse<List<ScheduledJob>>(HttpStatus.NOT_FOUND)
-                    .setMessage(Messages.get("task.no.job.found"));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("task.no.job.found"));
         }
 
         return result;
     }
 
     public ServiceResponse<List<String>> findAllJobNames() {
-        ServiceResponse<List<String>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<String>> result = ServiceResponse.createSuccess();
         ServiceResponse<List<ScheduledJob>> jobListResp = findAll();
 
         if (!jobListResp.isSuccess())
@@ -192,11 +194,12 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
     }
 
     public ServiceResponse<ScheduledJob> save(ScheduledJob batchJob) {
-        return new ServiceResponse<ScheduledJob>(HttpStatus.OK).setObject(repository.save(batchJob));
+        return ServiceResponse.<ScheduledJob>createSuccess()
+                .setObject(repository.save(batchJob));
     }
 
     public <I, O, T extends ScheduledTask<I, O>> ServiceResponse<T> save(T scheduledTasks) {
-        ServiceResponse<T> result = new ServiceResponse<T>(HttpStatus.OK);
+        ServiceResponse<T> result = ServiceResponse.createSuccess();
         try {
             result.setObject((T) scheduledTasks.clone());
         } catch (Exception e) {
@@ -223,12 +226,12 @@ public class ScheduledBatchJobService implements RepositoryService<ScheduledJob>
      */
     @Override
     public ServiceResponse<List<ScheduledJob>> saveAll(Collection<ScheduledJob> batchJobs) {
-        return new ServiceResponse<List<ScheduledJob>>(HttpStatus.OK)
+        return ServiceResponse.<List<ScheduledJob>>createSuccess()
                 .setObject(repository.saveAll(batchJobs));
     }
 
     public <I, O, T extends ScheduledTask<I, O>> ServiceResponse<List<T>> saveAllScheduledTasks(List<T> scheduledTasks) {
-        ServiceResponse<List<T>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<T>> result = ServiceResponse.createSuccess();
         List<ScheduledJob> batchJobs = new ArrayList<>(scheduledTasks.size());
         for (ScheduledTask<?, ?> task : scheduledTasks) {
             batchJobs.add(task.getSchedBatchJob());

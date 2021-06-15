@@ -23,35 +23,43 @@ public class ServiceResponse<T> {
         this.setExecTime(new Date());
     }
 
-    public ServiceResponse(int code) {
-        this(HttpStatus.valueOf(code));
-    }
-
-    public ServiceResponse(HttpStatus code) {
+    private ServiceResponse(HttpStatus code) {
+        this();
         this.setCode(code);
-        this.setMessage("");
-        this.setExecTime(new Date());
     }
 
     /**
-     * Create a success response with empty message.
+     * Create a a {@linkplain HttpStatus#OK OK}
+     * success response with empty message.
      *
      * @param <T>   {@link ServiceResponse} type
      * @return  Success response
      */
     public static <T> ServiceResponse<T> createSuccess() {
-        return createSuccess("");
+        return createSuccess(HttpStatus.OK, "");
     }
 
     /**
      * Create a success response.
      *
+     * @param code  {@link HttpStatus} code
+     * @param <T>   {@link ServiceResponse} type
+     * @return  Success response
+     */
+    public static <T> ServiceResponse<T> createSuccess(HttpStatus code) {
+        return createSuccess(code, "");
+    }
+
+    /**
+     * Create a success response.
+     *
+     * @param code      {@link HttpStatus} code
      * @param message   Success message
      * @param <T>       {@link ServiceResponse} type
      * @return  Success response
      */
-    public static <T> ServiceResponse<T> createSuccess(String message) {
-        return new ServiceResponse<T>().setMessage(message);
+    public static <T> ServiceResponse<T> createSuccess(HttpStatus code, String message) {
+        return new ServiceResponse<T>(code).setMessage(message);
     }
 
     /**

@@ -181,14 +181,6 @@ public class BackOfficeService extends BaseService {
         return result;
     }
 
-    @Deprecated
-    private ServiceResponse getResponseErrorFromJson(JSONObject json) throws JSONException {
-        JSONObject jsonError = json.getJSONObject("error");
-        ServiceResponse result = new ServiceResponse(jsonError.getInt("code"));
-        result.setMessage(jsonError.getString("info"));
-        return result;
-    }
-
     /**
      * Not supported.
      */

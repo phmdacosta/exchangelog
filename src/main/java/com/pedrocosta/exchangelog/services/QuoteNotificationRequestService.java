@@ -29,10 +29,13 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      */
     @Override
     public ServiceResponse<QuoteNotificationRequest> save(QuoteNotificationRequest quoteNotifReq) {
-        ServiceResponse<QuoteNotificationRequest> result = new ServiceResponse<>(HttpStatus.CREATED);
+        ServiceResponse<QuoteNotificationRequest> result =
+                ServiceResponse.<QuoteNotificationRequest>createSuccess()
+                        .setCode(HttpStatus.CREATED);
         QuoteNotificationRequest saved = repository.save(quoteNotifReq);
         if (saved.getId() == 0) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    "Could not save notification"); // TODO use properties
         }
         return result;
     }
@@ -47,17 +50,19 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      */
     @Override
     public ServiceResponse<List<QuoteNotificationRequest>> saveAll(Collection<QuoteNotificationRequest> col) {
-        ServiceResponse<List<QuoteNotificationRequest>> result = new ServiceResponse<>(HttpStatus.CREATED);
+        ServiceResponse<List<QuoteNotificationRequest>> result =
+                ServiceResponse.<List<QuoteNotificationRequest>>createSuccess()
+                        .setCode(HttpStatus.CREATED);
         result.setObject(repository.saveAll(col));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(Messages.get("error.not.saved", "any notification request"));
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.not.saved", "any notification request"));
         }
         else if(result.getObject().size() != col.size()) {
             List<QuoteNotificationRequest> notSaved = new ArrayList<>();
-            ServiceResponse<List<QuoteNotificationRequest>> auxResult =
-                    result.setCode(HttpStatus.BAD_REQUEST);
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST);
+            ServiceResponse<List<QuoteNotificationRequest>> auxResult = result;
             col.forEach(notifReq -> {
                 if (!auxResult.getObject().contains(notifReq)) {
                     notSaved.add(notifReq);
@@ -80,13 +85,13 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      */
     @Override
     public ServiceResponse<QuoteNotificationRequest> find(long id) {
-        ServiceResponse<QuoteNotificationRequest> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<QuoteNotificationRequest> result = ServiceResponse.createSuccess();
         result.setObject(repository.findById(id).orElse(null));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
             String arg = "with id " + id;
-            result.setMessage(Messages.get("error.notif.req.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.notif.req.not.found", arg));
         }
 
         return result;
@@ -101,12 +106,12 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<QuoteNotificationRequest> find(String name) {
-        ServiceResponse<QuoteNotificationRequest> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<QuoteNotificationRequest> result = ServiceResponse.createSuccess();
         result.setObject(repository.findByName(name));
 
         if (result.getObject() == null) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("error.notif.req.not.found", name));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.notif.req.not.found", name));
         }
 
         return result;
@@ -120,12 +125,12 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      */
     @Override
     public ServiceResponse<List<QuoteNotificationRequest>> findAll() {
-        ServiceResponse<List<QuoteNotificationRequest>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<QuoteNotificationRequest>> result = ServiceResponse.createSuccess();
         result.setObject(repository.findAll());
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("could.not.find", "any notification request"));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("could.not.find", "any notification request"));
         }
 
         return result;
@@ -150,13 +155,13 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<QuoteNotificationRequest>> findAllByLogicalOperator(String logicalOperator) {
-        ServiceResponse<List<QuoteNotificationRequest>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<QuoteNotificationRequest>> result = ServiceResponse.createSuccess();
         result.setObject(repository.findAllByLogicalOperator(logicalOperator));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
             String arg = "with logical operator ".concat(logicalOperator);
-            result.setMessage(Messages.get("error.notif.req.not.found", arg));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.notif.req.not.found", arg));
         }
 
         return result;

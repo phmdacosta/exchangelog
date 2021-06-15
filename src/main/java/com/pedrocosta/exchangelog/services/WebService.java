@@ -33,14 +33,11 @@ public class WebService extends BaseService {
     }
 
     public ServiceResponse<List<Exchange>> getQuoteRate(@NotNull String baseCode, String[] quoteCodes, Double amount, Date valDate) {
-
-        ServiceResponse<List<Exchange>> result;
-
         // Check arguments
         if (baseCode == null) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
-            result.setMessage(messages.getMessage("bad.request"));
-            result.setException(new IllegalArgumentException());
+            return ServiceResponse.<List<Exchange>>createError(HttpStatus.BAD_REQUEST,
+                    messages.getMessage("bad.request"))
+                    .setException(new IllegalArgumentException());
         }
 
         List<Exchange> exchanges = new ArrayList<>();
@@ -58,10 +55,8 @@ public class WebService extends BaseService {
                 Exchange exchange = getExchange(baseCode, quoteCode, targetDate);
 
                 if (exchange == null) {
-                    result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                    result.setMessage(messages.getMessage("could.not.find",
-                            "quote value"));
-                    return result;
+                    return ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                            messages.getMessage("could.not.find", "quote value"));
                 }
 
 //                double rate = CustomMath.multiply(amount, exchange.getRate());
@@ -72,10 +67,7 @@ public class WebService extends BaseService {
         }
 
         // Everything is ok
-        result = new ServiceResponse<>(HttpStatus.OK);
-        result.setObject(exchanges);
-
-        return result;
+        return ServiceResponse.<List<Exchange>>createSuccess().setObject(exchanges);
     }
 
     private List<Exchange> getExchanges(String baseCode, Date valDate) {

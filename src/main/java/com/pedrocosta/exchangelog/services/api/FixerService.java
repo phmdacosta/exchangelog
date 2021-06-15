@@ -47,7 +47,7 @@ public class FixerService implements BusinessService {
      */
     @Override
     public ServiceResponse<Currency> loadCurrency(String code) throws JSONException {
-        ServiceResponse<Currency> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<Currency> result = ServiceResponse.createSuccess();
 
         if (code != null) {
             RestResponse response = requester.symbols();
@@ -68,8 +68,8 @@ public class FixerService implements BusinessService {
 
             } else {
                 Log.error(this, getErrorMsg(response));
-                result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(Messages.get("api.ccy.not.found", code, API_NAME));
+                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                        Messages.get("api.ccy.not.found", code, API_NAME));
             }
         }
 
@@ -84,7 +84,7 @@ public class FixerService implements BusinessService {
      */
     @Override
     public ServiceResponse<List<Currency>> loadCurrencies() throws JSONException {
-        ServiceResponse<List<Currency>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Currency>> result = ServiceResponse.createSuccess();
 
         RestResponse response = requester.symbols();
 
@@ -106,8 +106,8 @@ public class FixerService implements BusinessService {
 
         } else {
             Log.error(this, getErrorMsg(response));
-            result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-            result.setMessage(Messages.get("api.no.ccy.found", API_NAME));
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("api.no.ccy.found", API_NAME));
         }
 
         return result;
@@ -133,7 +133,7 @@ public class FixerService implements BusinessService {
      * @return {@link ServiceResponse} object with a list of {@link Exchange}.
      */
     public ServiceResponse<List<Exchange>> getQuoteRate(String baseCode, String[] quoteCodes) {
-        ServiceResponse<List<Exchange>> result = new ServiceResponse<>(HttpStatus.OK);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
 
         try {
             String params;
@@ -172,11 +172,13 @@ public class FixerService implements BusinessService {
                 result.setObject(quotes);
             } else {
                 Log.error(this, getErrorMsg(response));
-                result = new ServiceResponse<>(HttpStatus.NOT_FOUND);
-                result.setMessage(Messages.get("api.no.exchange.found", API_NAME));
+                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                        Messages.get("api.no.exchange.found", API_NAME));
             }
         } catch (JSONException e) {
-            result = new ServiceResponse<>(HttpStatus.BAD_REQUEST);
+            Log.error(this, e);
+            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("api.no.exchange.found", API_NAME));
         }
 
         return result;
