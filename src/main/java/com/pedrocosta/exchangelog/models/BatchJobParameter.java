@@ -57,4 +57,13 @@ public class BatchJobParameter {
     protected BatchJobParameter clone() throws CloneNotSupportedException {
         return (BatchJobParameter) super.clone();
     }
+
+    @Override
+    public String toString() {
+        return "BatchJobParameter{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

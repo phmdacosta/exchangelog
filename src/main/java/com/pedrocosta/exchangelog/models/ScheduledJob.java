@@ -140,13 +140,12 @@ public class ScheduledJob implements Cloneable {
         return "ScheduledJob{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", nextJobId=" + nextJobId +
                 ", scheduleCron='" + scheduleCron + '\'' +
                 ", execWeekend=" + execWeekend +
                 ", execDay=" + execDay +
                 ", execTime='" + execTime + '\'' +
                 ", enabled=" + enabled +
-                ", parameters=" + parameters +
-                ", nextJobId=" + nextJobId +
                 '}';
     }
 }

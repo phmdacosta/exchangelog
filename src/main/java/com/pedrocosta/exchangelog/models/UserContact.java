@@ -69,4 +69,14 @@ public class UserContact implements Cloneable {
     protected UserContact clone() throws CloneNotSupportedException {
         return (UserContact) super.clone();
     }
+
+    @Override
+    public String toString() {
+        return "UserContact{" +
+                "id=" + id +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }
