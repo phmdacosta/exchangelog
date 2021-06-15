@@ -28,8 +28,8 @@ public class CurrencyService implements RepositoryService<Currency> {
      *          If currency not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Currency> find(String code) {
-        ServiceResponse<Currency> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findByCode(code));
+        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
+                .setObject(repository.findByCode(code));
 
         if (result.getObject() == null) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -49,8 +49,8 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<Currency> find(long id) {
-        ServiceResponse<Currency> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findById(id).orElse(null));
+        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
+                .setObject(repository.findById(id).orElse(null));
 
         if (result.getObject() == null) {
             String arg = "with id " + id;
@@ -69,8 +69,9 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<List<Currency>> findAll() {
-        ServiceResponse<List<Currency>> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findAll());
+        ServiceResponse<List<Currency>> result =
+                ServiceResponse.<List<Currency>>createSuccess()
+                        .setObject(repository.findAll());
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -90,9 +91,9 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<Currency> save(Currency currency) {
-        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
-                .setCode(HttpStatus.CREATED);
-        result.setObject(repository.save(currency));
+        ServiceResponse<Currency> result =
+                ServiceResponse.<Currency>createSuccess(HttpStatus.CREATED)
+                        .setObject(repository.save(currency));
 
         if (result.getObject() == null || result.getObject().getId() == 0) {
             String arg = "currency ".concat(currency.getCode());
@@ -113,9 +114,9 @@ public class CurrencyService implements RepositoryService<Currency> {
      */
     @Override
     public ServiceResponse<List<Currency>> saveAll(Collection<Currency> currencies) {
-        ServiceResponse<List<Currency>> result = ServiceResponse
-                .<List<Currency>>createSuccess().setCode(HttpStatus.CREATED);
-        result.setObject(repository.saveAll(currencies));
+        ServiceResponse<List<Currency>> result =
+                ServiceResponse.<List<Currency>>createSuccess(HttpStatus.CREATED)
+                        .setObject(repository.saveAll(currencies));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,

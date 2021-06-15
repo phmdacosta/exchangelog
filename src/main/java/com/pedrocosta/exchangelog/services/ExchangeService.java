@@ -34,8 +34,8 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Override
     public ServiceResponse<Exchange> find(long id) {
-        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findById(id).orElse(null));
+        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
+                .setObject(repository.findById(id).orElse(null));
 
         if (result.getObject() == null) {
             String arg = "with id " + id;
@@ -56,8 +56,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<Exchange>> find(@NotNull Currency ccy, Date valueDate) {
-        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate));
+        ServiceResponse<List<Exchange>> result =
+                ServiceResponse.<List<Exchange>>createSuccess()
+                        .setObject(repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate));
 
         if (result.getObject() == null) {
             String arg = "of " + ccy.getCode() + " in " + valueDate;
@@ -79,9 +80,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate) {
-        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
-                ccy1, ccy2, valueDate));
+        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
+                .setObject(repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
+                    ccy1, ccy2, valueDate));
 
         if (result.getObject() == null) {
             String arg = ccy1.getCode() + "/" + ccy2.getCode() + " in " + valueDate;
@@ -102,9 +103,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> findLast(@NotNull Currency ccy1, @NotNull Currency ccy2) {
-        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
-                ccy1, ccy2));
+        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
+                .setObject(repository.findByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
+                    ccy1, ccy2));
 
         if (result.getObject() == null) {
             String arg = ccy1.getCode() + "/" + ccy2.getCode();
@@ -125,9 +126,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> findWithMinRate(Date startValueDate, Date endValueDate) {
-        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findByValueDateBetweenOrderByRateAsc(
-                startValueDate, endValueDate));
+        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
+                .setObject(repository.findByValueDateBetweenOrderByRateAsc(
+                        startValueDate, endValueDate));
 
         if (result.getObject() == null) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -148,9 +149,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<Exchange> findWithMaxRate(Date startValueDate, Date endValueDate) {
-        ServiceResponse<Exchange> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findByValueDateBetweenOrderByRateDesc(
-                startValueDate, endValueDate));
+        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
+                .setObject(repository.findByValueDateBetweenOrderByRateDesc(
+                        startValueDate, endValueDate));
 
         if (result.getObject() == null) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -169,8 +170,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Override
     public ServiceResponse<List<Exchange>> findAll() {
-        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findAll());
+        ServiceResponse<List<Exchange>> result =
+                ServiceResponse.<List<Exchange>>createSuccess()
+                        .setObject(repository.findAll());
 
         if (result.getObject() == null) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -190,8 +192,10 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<Exchange>> findAll(Date startValueDate, Date endValueDate) {
-        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findAllByValueDateBetween(startValueDate, endValueDate));
+        ServiceResponse<List<Exchange>> result =
+                ServiceResponse.<List<Exchange>>createSuccess()
+                        .setObject(repository.findAllByValueDateBetween(
+                                startValueDate, endValueDate));
 
         if (result.getObject() == null) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -212,9 +216,10 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<Exchange>> findAllOrderByValueDate(Date startValueDate, Date endValueDate) {
-        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findAllByValueDateBetweenOrderByValueDateDesc(
-                startValueDate, endValueDate));
+        ServiceResponse<List<Exchange>> result =
+                ServiceResponse.<List<Exchange>>createSuccess()
+                        .setObject(repository.findAllByValueDateBetweenOrderByValueDateDesc(
+                                startValueDate, endValueDate));
 
         if (result.getObject() == null) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -275,9 +280,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
                     Messages.get("error.exch.save.no.ccy.set", "quote"));
         }
 
-        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
-                .setCode(HttpStatus.CREATED);
-        result.setObject(repository.save(exchange));
+        ServiceResponse<Exchange> result =
+                ServiceResponse.<Exchange>createSuccess(HttpStatus.CREATED)
+                        .setObject(repository.save(exchange));
 
         if (result.getObject() == null || result.getObject().getId() == 0) {
             result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
@@ -321,9 +326,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Override
     public ServiceResponse<List<Exchange>> saveAll(Collection<Exchange> exchanges) {
-        ServiceResponse<List<Exchange>> result = ServiceResponse.<List<Exchange>>createSuccess()
-                .setCode(HttpStatus.CREATED);
-        result.setObject(repository.saveAll(exchanges));
+        ServiceResponse<List<Exchange>> result =
+                ServiceResponse.<List<Exchange>>createSuccess(HttpStatus.CREATED)
+                        .setObject(repository.saveAll(exchanges));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,

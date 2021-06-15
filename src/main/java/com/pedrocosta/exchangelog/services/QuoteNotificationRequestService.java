@@ -30,10 +30,10 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
     @Override
     public ServiceResponse<QuoteNotificationRequest> save(QuoteNotificationRequest quoteNotifReq) {
         ServiceResponse<QuoteNotificationRequest> result =
-                ServiceResponse.<QuoteNotificationRequest>createSuccess()
-                        .setCode(HttpStatus.CREATED);
-        QuoteNotificationRequest saved = repository.save(quoteNotifReq);
-        if (saved.getId() == 0) {
+                ServiceResponse.<QuoteNotificationRequest>createSuccess(HttpStatus.CREATED)
+                        .setObject(repository.save(quoteNotifReq));
+
+        if (result.getObject().getId() == 0) {
             result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
                     "Could not save notification"); // TODO use properties
         }
@@ -51,9 +51,8 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
     @Override
     public ServiceResponse<List<QuoteNotificationRequest>> saveAll(Collection<QuoteNotificationRequest> col) {
         ServiceResponse<List<QuoteNotificationRequest>> result =
-                ServiceResponse.<List<QuoteNotificationRequest>>createSuccess()
-                        .setCode(HttpStatus.CREATED);
-        result.setObject(repository.saveAll(col));
+                ServiceResponse.<List<QuoteNotificationRequest>>createSuccess(HttpStatus.CREATED)
+                        .setObject(repository.saveAll(col));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
@@ -85,8 +84,9 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      */
     @Override
     public ServiceResponse<QuoteNotificationRequest> find(long id) {
-        ServiceResponse<QuoteNotificationRequest> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findById(id).orElse(null));
+        ServiceResponse<QuoteNotificationRequest> result =
+                ServiceResponse.<QuoteNotificationRequest>createSuccess()
+                        .setObject(repository.findById(id).orElse(null));
 
         if (result.getObject() == null) {
             String arg = "with id " + id;
@@ -106,8 +106,9 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<QuoteNotificationRequest> find(String name) {
-        ServiceResponse<QuoteNotificationRequest> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findByName(name));
+        ServiceResponse<QuoteNotificationRequest> result =
+                ServiceResponse.<QuoteNotificationRequest>createSuccess()
+                        .setObject(repository.findByName(name));
 
         if (result.getObject() == null) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -125,8 +126,9 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      */
     @Override
     public ServiceResponse<List<QuoteNotificationRequest>> findAll() {
-        ServiceResponse<List<QuoteNotificationRequest>> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findAll());
+        ServiceResponse<List<QuoteNotificationRequest>> result =
+                ServiceResponse.<List<QuoteNotificationRequest>>createSuccess()
+                        .setObject(repository.findAll());
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
@@ -155,8 +157,9 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      *          If not found, returns {@link ServiceResponse} with error message.
      */
     public ServiceResponse<List<QuoteNotificationRequest>> findAllByLogicalOperator(String logicalOperator) {
-        ServiceResponse<List<QuoteNotificationRequest>> result = ServiceResponse.createSuccess();
-        result.setObject(repository.findAllByLogicalOperator(logicalOperator));
+        ServiceResponse<List<QuoteNotificationRequest>> result =
+                ServiceResponse.<List<QuoteNotificationRequest>>createSuccess()
+                        .setObject(repository.findAllByLogicalOperator(logicalOperator));
 
         if (result.getObject() == null || result.getObject().isEmpty()) {
             String arg = "with logical operator ".concat(logicalOperator);
