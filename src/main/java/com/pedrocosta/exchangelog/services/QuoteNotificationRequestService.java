@@ -1,8 +1,10 @@
 package com.pedrocosta.exchangelog.services;
 
 import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
+import com.pedrocosta.exchangelog.models.User;
 import com.pedrocosta.exchangelog.persistence.QuoteNotificationRequestRepository;
 import com.pedrocosta.exchangelog.utils.Messages;
+import com.sun.istack.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +31,18 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
      */
     @Override
     public ServiceResponse<QuoteNotificationRequest> save(QuoteNotificationRequest quoteNotifReq) {
+        if (!isValidParameter(quoteNotifReq)) {
+            return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.request.param"));
+        }
+
         ServiceResponse<QuoteNotificationRequest> result =
                 ServiceResponse.<QuoteNotificationRequest>createSuccess(HttpStatus.CREATED)
                         .setObject(repository.save(quoteNotifReq));
 
         if (result.getObject().getId() == 0) {
             result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-                    "Could not save notification"); // TODO use properties
+                    Messages.get("error.not.saved", "notification"));
         }
         return result;
     }
@@ -139,6 +146,31 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
     }
 
     /**
+     * Find all notification requests in database of an user.
+     *
+     * @param user  {@link User} object.
+     * @return  {@link ServiceResponse} object with found notification requests.
+     *          If not found, returns {@link ServiceResponse} with error message.
+     */
+    public ServiceResponse<List<QuoteNotificationRequest>> findAll(User user) {
+        if (user == null) {
+            return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.request.param"));
+        }
+
+        ServiceResponse<List<QuoteNotificationRequest>> result =
+                ServiceResponse.<List<QuoteNotificationRequest>>createSuccess()
+                        .setObject(repository.findAllByUser(user));
+
+        if (result.getObject() == null || result.getObject().isEmpty()) {
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("could.not.find", "any notification request"));
+        }
+
+        return result;
+    }
+
+    /**
      * Find all notification request from database with specific logical operator.
      * <pre>
      * Logical operators are:
@@ -168,5 +200,16 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
         }
 
         return result;
+    }
+
+    private boolean isValidParameter(QuoteNotificationRequest quoteNotificationRequest) {
+        return quoteNotificationRequest != null
+                && quoteNotificationRequest.getExchange() != null
+                && quoteNotificationRequest.getExchange().getBaseCurrency() != null
+                && quoteNotificationRequest.getExchange().getBaseCurrency().getCode() != null
+                && !quoteNotificationRequest.getExchange().getBaseCurrency().getCode().isBlank()
+                && quoteNotificationRequest.getExchange().getQuoteCurrency() != null
+                && quoteNotificationRequest.getExchange().getQuoteCurrency().getCode() != null
+                && !quoteNotificationRequest.getExchange().getQuoteCurrency().getCode().isBlank();
     }
 }

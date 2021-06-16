@@ -1,6 +1,7 @@
 package com.pedrocosta.exchangelog.persistence;
 
 import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
+import com.pedrocosta.exchangelog.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -34,4 +35,12 @@ public interface QuoteNotificationRequestRepository extends JpaRepository<QuoteN
      * @return  {@link QuoteNotificationRequest} object if it exists.
      */
     List<QuoteNotificationRequest> findAllByLogicalOperator(String logicalOperator);
+
+    /**
+     * Search in database for quote notification request by user.
+     *
+     * @param user  {@link User} object.
+     * @return  {@link QuoteNotificationRequest} object if it exists.
+     */
+    List<QuoteNotificationRequest> findAllByUser(User user);
 }

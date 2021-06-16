@@ -48,6 +48,7 @@ public class QuoteNotificationRequestJsonTest {
     @Test
     public void testCreateJson() {
         String generateJson = gsonUtils.toJson(quoteNotificationRequest);
+        Log.info(this, generateJson);
         assert jsonForQuoteNotificationRequestSerialize().equals(generateJson);
     }
 
