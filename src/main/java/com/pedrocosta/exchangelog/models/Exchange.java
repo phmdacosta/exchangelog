@@ -6,18 +6,26 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(
+		columnNames = {
+				"base_currency_id",
+				"quote_currency_id",
+				"value_date"
+		})
+)
 public class Exchange implements Cloneable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private Currency baseCurrency;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	private Currency quoteCurrency;
 
+	@Column(name = "value_date")
 	private Date valueDate;
 	private BigDecimal rate;
 

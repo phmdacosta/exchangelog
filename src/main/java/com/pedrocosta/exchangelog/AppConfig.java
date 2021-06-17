@@ -18,4 +18,9 @@ public class AppConfig {
 				.setReadTimeout(Duration.ofMillis(3000))
 				.build();
 	}
+
+	@Bean
+	public Messages messages() {
+		return new Messages();
+	}
 }

@@ -169,8 +169,17 @@ public class BackOfficeService extends BaseService {
                     try {
                         BigDecimal newRate = quoteRate.divide(baseRate, Defaults.ROUNDING_MODE);
 
-                        result.add(new Exchange(baseCcy, quoteCcy,
-                                newRate, exchange2.getValueDate()));
+                        Exchange newExch = new Exchange(baseCcy, quoteCcy,
+                                newRate, exchange2.getValueDate());
+                        ServiceResponse<Exchange> exchResp =
+                                ((ExchangeService) factory.create(Exchange.class))
+                                        .find(newExch.getBaseCurrency(),
+                                                newExch.getQuoteCurrency(), newExch.getValueDate());
+                        if (exchResp.isSuccess()) {
+                            newExch.setId(exchResp.getObject().getId());
+                        }
+
+                        result.add(newExch);
                     } catch (ArithmeticException e) {
                         Log.error(this, e);
                     }

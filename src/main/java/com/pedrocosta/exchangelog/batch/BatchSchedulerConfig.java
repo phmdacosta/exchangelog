@@ -28,6 +28,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -66,7 +67,12 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
      * this method will search for theses tasks and stop it.
      */
     private void cancelUndoneTasks() {
-        List<String> jobNames = jobExplorer.getJobNames();
+        List<String> jobNames = new ArrayList<>();
+        try {
+            jobNames = jobExplorer.getJobNames();
+        } catch (Exception e) {
+            Log.error(this, e);
+        }
 
         for (String jobName : jobNames) {
             try {

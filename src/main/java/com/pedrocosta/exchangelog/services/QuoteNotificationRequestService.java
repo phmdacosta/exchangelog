@@ -1,10 +1,11 @@
 package com.pedrocosta.exchangelog.services;
 
+import com.pedrocosta.exchangelog.models.Currency;
+import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
 import com.pedrocosta.exchangelog.models.User;
 import com.pedrocosta.exchangelog.persistence.QuoteNotificationRequestRepository;
 import com.pedrocosta.exchangelog.utils.Messages;
-import com.sun.istack.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,12 @@ import java.util.List;
 public class QuoteNotificationRequestService implements RepositoryService<QuoteNotificationRequest> {
 
     private final QuoteNotificationRequestRepository repository;
+    private ServiceFactory serviceFactory;
 
-    public QuoteNotificationRequestService(QuoteNotificationRequestRepository repository) {
+    public QuoteNotificationRequestService(QuoteNotificationRequestRepository repository,
+                                           ServiceFactory serviceFactory) {
         this.repository = repository;
+        this.serviceFactory = serviceFactory;
     }
 
     /**
@@ -35,6 +39,30 @@ public class QuoteNotificationRequestService implements RepositoryService<QuoteN
             return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
                     Messages.get("error.request.param"));
         }
+
+        // Select saved currencies
+        CurrencyService ccyServ = (CurrencyService) serviceFactory.create(Currency.class);
+        ServiceResponse<Currency> baseCcyResp = ccyServ.find(
+                quoteNotifReq.getExchange().getBaseCurrency().getCode());
+        ServiceResponse<Currency> quoteCcyResp = ccyServ.find(
+                quoteNotifReq.getExchange().getQuoteCurrency().getCode());
+
+        if (!baseCcyResp.isSuccess() || !quoteCcyResp.isSuccess()) {
+            return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.request.param"));
+        }
+
+        // Get last exchange of currency pair
+        ExchangeService exchServ = (ExchangeService) serviceFactory.create(Exchange.class);
+        ServiceResponse<Exchange> exchResp = exchServ.findLast(
+                baseCcyResp.getObject(), quoteCcyResp.getObject());
+
+        if (!exchResp.isSuccess()) {
+            return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+                    Messages.get("error.request.param"));
+        }
+
+        quoteNotifReq.setExchange(exchResp.getObject());
 
         ServiceResponse<QuoteNotificationRequest> result =
                 ServiceResponse.<QuoteNotificationRequest>createSuccess(HttpStatus.CREATED)

@@ -71,7 +71,9 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
 
                 // Exchange rate for base currency
                 BigDecimal baseRate = exchange.getRate();
-                quotes.add(new Exchange(base, quote, baseRate, valDateCalendar.getTime()));
+                Exchange toSave = new Exchange(base, quote, baseRate, valDateCalendar.getTime());
+                updateExchangeWithExistingId(toSave);
+                quotes.add(toSave);
             }
         } else {
             Log.error(this, response.getCode() + ": " + response.getMessage());
@@ -94,9 +96,11 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
                         .divide(exchange.getRate(), Defaults.ROUNDING_MODE);
             }
 
-            newList.add(new Exchange(exchange.getQuoteCurrency(),
+            Exchange toSave = new Exchange(exchange.getQuoteCurrency(),
                     exchange.getBaseCurrency(), quoteRate,
-                    exchange.getValueDate()));
+                    exchange.getValueDate());
+            updateExchangeWithExistingId(toSave);
+            newList.add(toSave);
         }
 
         // Calculate rate for others currencies as base
@@ -120,5 +124,22 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
         if (!response.isSuccess()) {
             Log.error(this, response.getMessage());
         }
+    }
+
+    /**
+     * Update passing exchange object with its id from data, if it exists.
+     * @param exchange {@link Exchange} object to be updated.
+     */
+    private void updateExchangeWithExistingId(Exchange exchange) {
+        ExchangeService exchService = (ExchangeService) getServiceFactory().create(Exchange.class);
+        ServiceResponse<Exchange> exchResp = exchService.find(
+                exchange.getBaseCurrency(), exchange.getQuoteCurrency(), exchange.getValueDate());
+        if (exchResp.isSuccess()) {
+            exchange.setId(exchResp.getObject().getId());
+        }
+    }
+
+    private void removeDuplicates(List<Exchange> exchanges) {
+
     }
 }

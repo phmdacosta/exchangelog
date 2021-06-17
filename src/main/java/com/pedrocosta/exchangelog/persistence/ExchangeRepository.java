@@ -30,7 +30,7 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
      * @param quoteCcy  Exchange's quote currency
      * @return The most current found {@link Exchange} instance.
      */
-    Exchange findByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(Currency baseCcy, Currency quoteCcy);
+    Exchange findFirstByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(Currency baseCcy, Currency quoteCcy);
 
     /**
      * Search in database for exchanges with value date between a specific period
