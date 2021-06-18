@@ -6,7 +6,6 @@ import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
 import com.pedrocosta.exchangelog.models.UserContact;
 import com.pedrocosta.exchangelog.services.ExchangeService;
 import com.pedrocosta.exchangelog.services.QuoteNotificationRequestService;
-import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.ValueLogical;
@@ -32,11 +31,11 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
 
         QuoteNotificationRequestService service = (QuoteNotificationRequestService)
                 getServiceFactory().create(QuoteNotificationRequestService.class);
-        ServiceResponse<List<QuoteNotificationRequest>> response = service.findAll();
-        if (!response.isSuccess()) {
-            Log.error(this, response.getMessage());
-        }
-        return response.getObject();
+//        ServiceResponse<List<QuoteNotificationRequest>> response = service.findAll();
+//        if (!response.isSuccess()) {
+//            Log.error(this, response.getMessage());
+//        }
+        return service.findAll();
     }
 
     @Override
@@ -57,15 +56,17 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
                     continue;
                 }
 
-                ServiceResponse<Exchange> responseExch = exchangeService.findLast(
+//                ServiceResponse<Exchange> responseExch = exchangeService.findLast(
+//                        notReqExch.getBaseCurrency(), notReqExch.getQuoteCurrency());
+//
+//                if (!responseExch.isSuccess()) {
+//                    Log.warn(this, responseExch.getMessage());
+//                    continue;
+//                }
+//
+//                Exchange mostCurrentExch = responseExch.getObject();
+                Exchange mostCurrentExch = exchangeService.findLast(
                         notReqExch.getBaseCurrency(), notReqExch.getQuoteCurrency());
-
-                if (!responseExch.isSuccess()) {
-                    Log.warn(this, responseExch.getMessage());
-                    continue;
-                }
-
-                Exchange mostCurrentExch = responseExch.getObject();
                 // Check if target logic was reached
                 ValueLogical valLogical = ValueLogical.get(notifReq.getLogicalOperator());
                 if (valLogical != null

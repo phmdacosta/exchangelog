@@ -1,9 +1,10 @@
 package com.pedrocosta.exchangelog.services;
 
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.persistence.CurrencyRepository;
 import com.pedrocosta.exchangelog.utils.Messages;
-import org.springframework.http.HttpStatus;
+import com.sun.istack.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,19 +25,21 @@ public class CurrencyService implements RepositoryService<Currency> {
      *
      * @param code Currency code
      *
-     * @return  {@link ServiceResponse} object with found currency.
-     *          If currency not found, returns {@link ServiceResponse} with error message.
+     * @return  Found currency. Null if not found.
      */
-    public ServiceResponse<Currency> find(String code) {
-        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
-                .setObject(repository.findByCode(code));
+    @Nullable
+    public Currency find(String code) {
+//        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
+//                .setObject(repository.findByCode(code));
+//        Currency result = repository.findByCode(code);
 
-        if (result.getObject() == null) {
-            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                    Messages.get("error.ccy.not.found", code));
-        }
+//        if (result == null) {
+//            throw new NoSuchDataException(Messages.get("error.ccy.not.found", code));
+////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+////                    Messages.get("error.ccy.not.found", code));
+//        }
 
-        return result;
+        return repository.findByCode(code);
     }
 
     /**
@@ -44,41 +47,46 @@ public class CurrencyService implements RepositoryService<Currency> {
      *
      * @param id    Currency id in database
      *
-     * @return  {@link ServiceResponse} object with found currency.
-     *          If currency not found, returns {@link ServiceResponse} with error message.
+     * @return Found currency. Null if not found.
      */
     @Override
-    public ServiceResponse<Currency> find(long id) {
-        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
-                .setObject(repository.findById(id).orElse(null));
+    @Nullable
+    public Currency find(long id) {
+//        ServiceResponse<Currency> result = ServiceResponse.<Currency>createSuccess()
+//                .setObject(repository.findById(id).orElse(null));
 
-        if (result.getObject() == null) {
-            String arg = "with id " + id;
-            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                    Messages.get("error.ccy.not.found", arg));
-        }
+//        Currency result = repository.findById(id).orElse(null);
 
-        return result;
+//        if (result == null) {
+//            String arg = "with id " + id;
+//            throw new NoSuchDataException(Messages.get("error.ccy.not.found", arg));
+////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+////                    Messages.get("error.ccy.not.found", arg));
+//        }
+
+        return repository.findById(id).orElse(null);
     }
 
     /**
      * Get all currencies from database.
      *
-     * @return {@link ServiceResponse} object with list of found currencies.
-     *         If currency not found, returns {@link ServiceResponse} with error message.
+     * @return List of found currencies. Empty list if not found.
      */
     @Override
-    public ServiceResponse<List<Currency>> findAll() {
-        ServiceResponse<List<Currency>> result =
-                ServiceResponse.<List<Currency>>createSuccess()
-                        .setObject(repository.findAll());
+    public List<Currency> findAll() {
+//        ServiceResponse<List<Currency>> result =
+//                ServiceResponse.<List<Currency>>createSuccess()
+//                        .setObject(repository.findAll());
 
-        if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                    Messages.get("error.no.ccy.found"));
-        }
+//        List<Currency> result = repository.findAll();
 
-        return result;
+//        if (result.isEmpty()) {
+//            throw new NoSuchDataException(Messages.get("error.no.ccy.found"));
+////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+////                    Messages.get("error.no.ccy.found"));
+//        }
+
+        return repository.findAll();
     }
 
     /**
@@ -86,19 +94,23 @@ public class CurrencyService implements RepositoryService<Currency> {
      *
      * @param currency Currency to save
      *
-     * @return {@link ServiceResponse} object with saved currency.
-     *         If error, returns {@link ServiceResponse} with error message.
+     * @return Saved currency.
+     *         If error, thorws {@link SaveDataException} with error message.
+     * @throws SaveDataException if error
      */
     @Override
-    public ServiceResponse<Currency> save(Currency currency) {
-        ServiceResponse<Currency> result =
-                ServiceResponse.<Currency>createSuccess(HttpStatus.CREATED)
-                        .setObject(repository.save(currency));
+    public Currency save(Currency currency) throws SaveDataException {
+//        ServiceResponse<Currency> result =
+//                ServiceResponse.<Currency>createSuccess(HttpStatus.CREATED)
+//                        .setObject(repository.save(currency));
 
-        if (result.getObject() == null || result.getObject().getId() == 0) {
+        Currency result = repository.save(currency);
+
+        if (result.getId() == 0) {
             String arg = "currency ".concat(currency.getCode());
-            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-                    Messages.get("error.not.saved", arg));
+            throw new SaveDataException(Messages.get("error.not.saved", arg));
+//            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+//                    Messages.get("error.not.saved", arg));
         }
 
         return result;
@@ -109,29 +121,34 @@ public class CurrencyService implements RepositoryService<Currency> {
      *
      * @param currencies List of currencies to save
      *
-     * @return {@link ServiceResponse} object with list of saved currencies.
-     *         If error, returns {@link ServiceResponse} with error message.
+     * @return List of saved currencies.
+     *         If error, thorws {@link SaveDataException} with error message.
+     * @throws SaveDataException if error
      */
     @Override
-    public ServiceResponse<List<Currency>> saveAll(Collection<Currency> currencies) {
-        ServiceResponse<List<Currency>> result =
-                ServiceResponse.<List<Currency>>createSuccess(HttpStatus.CREATED)
-                        .setObject(repository.saveAll(currencies));
+    public List<Currency> saveAll(Collection<Currency> currencies) throws SaveDataException {
+//        ServiceResponse<List<Currency>> result =
+//                ServiceResponse.<List<Currency>>createSuccess(HttpStatus.CREATED)
+//                        .setObject(repository.saveAll(currencies));
+        List<Currency> result = repository.saveAll(currencies);
 
-        if (result.getObject() == null || result.getObject().isEmpty()) {
-            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-                    Messages.get("error.not.saved", "any currency"));
+        if (result.isEmpty()) {
+            throw new SaveDataException(Messages.get("error.not.saved", "any currency"));
+//            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+//                    Messages.get("error.not.saved", "any currency"));
         }
-        else if(result.getObject().size() != currencies.size()) {
+        else if(result.size() != currencies.size()) {
             List<Currency> notSaved = new ArrayList<>();
-            ServiceResponse<List<Currency>> auxResult = result.setCode(HttpStatus.BAD_REQUEST);
+//            ServiceResponse<List<Currency>> auxResult = result.setCode(HttpStatus.BAD_REQUEST);
             currencies.forEach(currency -> {
-                if (!auxResult.getObject().contains(currency)) {
+                if (!result.contains(currency)) {
                     notSaved.add(currency);
                 }
             });
-            String msg = Messages.get("error.some.ccy.not.saved", notSaved.toString());
-            result.setMessage(msg);
+//            String msg = Messages.get("error.some.ccy.not.saved", notSaved.toString());
+            throw new SaveDataException(
+                    Messages.get("error.some.ccy.not.saved", notSaved.toString()));
+//            result.setMessage(msg);
         }
 
         return result;

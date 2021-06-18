@@ -1,10 +1,11 @@
 package com.pedrocosta.exchangelog.services;
+
+import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.sun.istack.NotNull;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,24 +21,22 @@ public class WebService extends BaseService {
         super(factory, env, messages);
     }
 
-    public ServiceResponse<List<Exchange>> getQuoteRate(@NotNull String baseCcy, String[] quoteCcy) {
+    public List<Exchange> getQuoteRate(@NotNull String baseCcy, String[] quoteCcy) throws NoSuchDataException {
         return getQuoteRate(baseCcy, quoteCcy, 1D, null);
     }
 
-    public ServiceResponse<List<Exchange>> getQuoteRate(@NotNull String baseCcy, String[] quoteCcy, Date valDate) {
+    public List<Exchange> getQuoteRate(@NotNull String baseCcy, String[] quoteCcy, Date valDate) throws NoSuchDataException {
         return getQuoteRate(baseCcy, quoteCcy, 1D, valDate);
     }
 
-    public ServiceResponse<List<Exchange>> getQuoteRate(@NotNull String baseCcy, String[] quoteCcy, Double amount) {
+    public List<Exchange> getQuoteRate(@NotNull String baseCcy, String[] quoteCcy, Double amount) throws NoSuchDataException {
         return getQuoteRate(baseCcy, quoteCcy, amount, null);
     }
 
-    public ServiceResponse<List<Exchange>> getQuoteRate(@NotNull String baseCode, String[] quoteCodes, Double amount, Date valDate) {
+    public List<Exchange> getQuoteRate(@NotNull String baseCode, String[] quoteCodes, Double amount, Date valDate) throws NoSuchDataException {
         // Check arguments
         if (baseCode == null) {
-            return ServiceResponse.<List<Exchange>>createError(HttpStatus.BAD_REQUEST,
-                    messages.getMessage("bad.request"))
-                    .setException(new IllegalArgumentException());
+            throw new NoSuchDataException(messages.getMessage("bad.request"));
         }
 
         List<Exchange> exchanges = new ArrayList<>();
@@ -55,8 +54,8 @@ public class WebService extends BaseService {
                 Exchange exchange = getExchange(baseCode, quoteCode, targetDate);
 
                 if (exchange == null) {
-                    return ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                            messages.getMessage("could.not.find", "quote value"));
+                    throw new NoSuchDataException(messages.getMessage("could.not.find",
+                            "quote value"));
                 }
 
 //                double rate = CustomMath.multiply(amount, exchange.getRate());
@@ -67,24 +66,24 @@ public class WebService extends BaseService {
         }
 
         // Everything is ok
-        return ServiceResponse.<List<Exchange>>createSuccess().setObject(exchanges);
+        return exchanges;
     }
 
     private List<Exchange> getExchanges(String baseCode, Date valDate) {
         CurrencyService ccyService = (CurrencyService) factory.create(CurrencyService.class);
-        Currency base = ccyService.find(baseCode).getObject();
+        Currency base = ccyService.find(baseCode);
 
         ExchangeService exchService = (ExchangeService) factory.create(ExchangeService.class);
-        return exchService.find(base, valDate).getObject();
+        return exchService.find(base, valDate);
     }
 
     private Exchange getExchange(String baseCode, String quoteCode, Date valDate) {
         CurrencyService ccyService = (CurrencyService) factory.create(CurrencyService.class);
-        Currency base = ccyService.find(baseCode).getObject();
-        Currency quote = ccyService.find(quoteCode).getObject();
+        Currency base = ccyService.find(baseCode);
+        Currency quote = ccyService.find(quoteCode);
 
         ExchangeService exchService = (ExchangeService) factory.create(ExchangeService.class);
 
-        return exchService.find(base, quote, valDate).getObject();
+        return exchService.find(base, quote, valDate);
     }
 }

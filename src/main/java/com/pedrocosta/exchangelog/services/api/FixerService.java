@@ -1,5 +1,7 @@
 package com.pedrocosta.exchangelog.services.api;
 
+import com.pedrocosta.exchangelog.exceptions.ApiException;
+import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.request.RestResponse;
@@ -12,7 +14,6 @@ import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,48 +44,19 @@ public class FixerService implements BusinessService {
      * @param code Currency code
      *
      * @return {@link ServiceResponse} object with {@link Currency}.
-     * @throws JSONException
+     *
+     * @throws JSONException if any json error happens
+     * @throws NoSuchDataException if not found
      */
     @Override
-    public ServiceResponse<Currency> loadCurrency(String code) throws JSONException {
-        ServiceResponse<Currency> result = ServiceResponse.createSuccess();
-
-        if (code != null) {
-            RestResponse response = requester.symbols();
-
-            if (response.isSuccess()) {
-                JSONObject json = response.getJsonObject();
-                Log.info(this, json.toString());
-                
-                JSONObject jsonCcy = json.getJSONObject("symbols");
-                Iterator itCodes = jsonCcy.keys();
-
-                while (itCodes.hasNext()) {
-                    if (code.equals(itCodes.next())) {
-                        result.setObject(new Currency(code, jsonCcy.getString(code)));
-                        break;
-                    }
-                }
-
-            } else {
-                Log.error(this, getErrorMsg(response));
-                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                        Messages.get("api.ccy.not.found", code, API_NAME));
-            }
+    public Currency loadCurrency(String code) throws JSONException, NoSuchDataException {
+//        ServiceResponse<Currency> result = ServiceResponse.createSuccess();
+        if (code == null) {
+            throw new NoSuchDataException(
+                    Messages.get("api.ccy.not.found", "NULL", API_NAME));
         }
 
-        return result;
-    }
-
-    /**
-     * Load all currencies from Fixer API.
-     *
-     * @return {@link ServiceResponse} object with a list of {@link Currency}.
-     * @throws JSONException
-     */
-    @Override
-    public ServiceResponse<List<Currency>> loadCurrencies() throws JSONException {
-        ServiceResponse<List<Currency>> result = ServiceResponse.createSuccess();
+        Currency result = null;
 
         RestResponse response = requester.symbols();
 
@@ -95,18 +67,69 @@ public class FixerService implements BusinessService {
             JSONObject jsonCcy = json.getJSONObject("symbols");
             Iterator itCodes = jsonCcy.keys();
 
-            List<Currency> currencies = new ArrayList<>();
-
             while (itCodes.hasNext()) {
-                String code = (String) itCodes.next();
-                currencies.add(new Currency(code, jsonCcy.getString(code)));
+                if (code.equals(itCodes.next())) {
+                    result = new Currency(code, jsonCcy.getString(code));
+//                        result.setObject(new Currency(code, jsonCcy.getString(code)));
+                    break;
+                }
             }
-
-            result.setObject(currencies);
 
         } else {
             Log.error(this, getErrorMsg(response));
-            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+//            throw new NoSuchDataException(
+//                    Messages.get("api.ccy.not.found", code, API_NAME));
+//                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+//                        Messages.get("api.ccy.not.found", code, API_NAME));
+        }
+
+        if (result == null) {
+            throw new NoSuchDataException(
+                    Messages.get("api.ccy.not.found", code, API_NAME));
+        }
+
+        return result;
+    }
+
+    /**
+     * Load all currencies from Fixer API.
+     *
+     * @return {@link ServiceResponse} object with a list of {@link Currency}.
+     * @throws JSONException if any json error happens
+     * @throws NoSuchDataException if not found
+     */
+    @Override
+    public List<Currency> loadCurrencies() throws JSONException, NoSuchDataException {
+//        ServiceResponse<List<Currency>> result = ServiceResponse.createSuccess();
+        List<Currency> result = new ArrayList<>();
+
+        RestResponse response = requester.symbols();
+
+        if (response.isSuccess()) {
+            JSONObject json = response.getJsonObject();
+            Log.info(this, json.toString());
+
+            JSONObject jsonCcy = json.getJSONObject("symbols");
+            Iterator itCodes = jsonCcy.keys();
+
+//            List<Currency> currencies = new ArrayList<>();
+
+            while (itCodes.hasNext()) {
+                String code = (String) itCodes.next();
+                result.add(new Currency(code, jsonCcy.getString(code)));
+            }
+
+//            result.setObject(currencies);
+
+        } else {
+            Log.error(this, getErrorMsg(response));
+//            throw new ServiceException(Messages.get("api.no.ccy.found", API_NAME));
+//            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+//                    Messages.get("api.no.ccy.found", API_NAME));
+        }
+
+        if (result.isEmpty()) {
+            throw new NoSuchDataException(
                     Messages.get("api.no.ccy.found", API_NAME));
         }
 
@@ -120,7 +143,7 @@ public class FixerService implements BusinessService {
      *
      * @return {@link ServiceResponse} object with a list of {@link Exchange}.
      */
-    public ServiceResponse<List<Exchange>> getQuoteRate(String baseCode) {
+    public List<Exchange> getQuoteRate(String baseCode) throws NoSuchDataException {
         return getQuoteRate(baseCode, null);
     }
 
@@ -132,8 +155,9 @@ public class FixerService implements BusinessService {
      *
      * @return {@link ServiceResponse} object with a list of {@link Exchange}.
      */
-    public ServiceResponse<List<Exchange>> getQuoteRate(String baseCode, String[] quoteCodes) {
-        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
+    public List<Exchange> getQuoteRate(String baseCode, String[] quoteCodes) throws NoSuchDataException {
+//        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
+        List<Exchange> result = new ArrayList<>();
 
         try {
             String params;
@@ -166,18 +190,31 @@ public class FixerService implements BusinessService {
                     Date jsonDate = DateUtils.stringToDate(jsonExch.getString("date"), "yyyy-MM-dd");
 
                     double baseRate = jsonRates.getDouble(quoteCode);
-                    quotes.add(createExchange(base, quote, baseRate, jsonDate));
+                    result.add(createExchange(base, quote, baseRate, jsonDate));
+//                    quotes.add(createExchange(base, quote, baseRate, jsonDate));
                 }
 
-                result.setObject(quotes);
+//                result.setObject(quotes);
             } else {
-                Log.error(this, getErrorMsg(response));
-                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                        Messages.get("api.no.exchange.found", API_NAME));
+                throw new NoSuchDataException(
+                        Messages.get("api.no.exchange.found", API_NAME),
+                        new ApiException(getErrorMsg(response)));
+//                Log.error(this, getErrorMsg(response));
+//                throw new ServiceException(Messages.get("api.no.exchange.found", API_NAME));
+//                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+//                        Messages.get("api.no.exchange.found", API_NAME));
             }
         } catch (JSONException e) {
-            Log.error(this, e);
-            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+            throw new NoSuchDataException(
+                    Messages.get("api.no.exchange.found", API_NAME), e);
+//            Log.error(this, e);
+//            throw new ServiceException(Messages.get("api.no.exchange.found", API_NAME));
+//            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
+//                    Messages.get("api.no.exchange.found", API_NAME));
+        }
+
+        if (result.isEmpty()) {
+            throw new NoSuchDataException(
                     Messages.get("api.no.exchange.found", API_NAME));
         }
 
@@ -189,7 +226,7 @@ public class FixerService implements BusinessService {
      */
     @Deprecated
     @Override
-    public ServiceResponse<List<Exchange>> getQuoteRate(String baseCode, String[] quoteCodes, Double amount, Date valDate) {
+    public List<Exchange> getQuoteRate(String baseCode, String[] quoteCodes, Double amount, Date valDate) throws NoSuchDataException {
         return getQuoteRate(baseCode, quoteCodes);
     }
 

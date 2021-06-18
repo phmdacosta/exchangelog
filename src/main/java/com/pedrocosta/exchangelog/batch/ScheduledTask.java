@@ -292,6 +292,7 @@ public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcesso
     public I read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
         if (!executed) {
             this.executed = true;
+            Log.info(this, Messages.get("task.reading", getProjectEngine()));
             return doRead();
         }
         return null;
@@ -299,11 +300,13 @@ public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcesso
 
     @Override
     public O process(I i) throws Exception {
+        Log.info(this, Messages.get("task.processing"));
         return doProcess(i);
     }
 
     @Override
     public void write(List<? extends O> list) throws Exception {
+        Log.info(this, Messages.get("task.writing"));
         if (!list.isEmpty()) {
             O o = list.stream().findFirst().get();
             doWrite(o);
@@ -318,17 +321,17 @@ public abstract class ScheduledTask<I, O> implements ItemReader<I>, ItemProcesso
 
     @Override
     public ScheduledTask<I, O> clone() throws CloneNotSupportedException {
-        ScheduledTask<I, O> cloned = (ScheduledTask<I, O>) super.clone();
-        cloned.setContext(this.getContext());
-        cloned.setServiceFactory(this.getServiceFactory());
-        cloned.setJobBuilderFactory(this.getJobBuilderFactory());
-        cloned.setStepBuilderFactory(this.getStepBuilderFactory());
-        cloned.setJobLauncher(this.getJobLauncher());
-        cloned.setSchedBatchJob(this.getSchedBatchJob().clone());
-        cloned.setStartLimit(this.getStartLimit());
-        cloned.setChunk(this.getChunk());
-        cloned.setListener(this.getListener());
-        return cloned;
+//        ScheduledTask<I, O> cloned = (ScheduledTask<I, O>) super.clone();
+//        cloned.setContext(this.getContext());
+//        cloned.setServiceFactory(this.getServiceFactory());
+//        cloned.setJobBuilderFactory(this.getJobBuilderFactory());
+//        cloned.setStepBuilderFactory(this.getStepBuilderFactory());
+//        cloned.setJobLauncher(this.getJobLauncher());
+//        cloned.setSchedBatchJob(this.getSchedBatchJob().clone());
+//        cloned.setStartLimit(this.getStartLimit());
+//        cloned.setChunk(this.getChunk());
+//        cloned.setListener(this.getListener());
+        return (ScheduledTask<I, O>) super.clone();
     }
 
     @Override

@@ -1,12 +1,16 @@
 package com.pedrocosta.exchangelog.controller;
 
+import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.services.WebService;
 import com.pedrocosta.exchangelog.utils.DateUtils;
 import com.pedrocosta.exchangelog.utils.GsonUtils;
+import com.pedrocosta.exchangelog.utils.Log;
+import com.pedrocosta.exchangelog.utils.Messages;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,27 +33,48 @@ public class HomeController {
 
     @RequestMapping("/")
     public String index() {
-
         return "index";
     }
 
     @RequestMapping(value = "/now", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String now(@RequestParam String from, @RequestParam(required = false) String[] to,
+    public String now(@RequestParam String from,
+                      @RequestParam(required = false) String[] to,
                       @RequestParam(required = false) double amount) {
-        ServiceResponse<List<Exchange>> result = service.getQuoteRate(
-                from, to, amount);
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
+
+        try {
+            result.setObject(service.getQuoteRate(from, to, amount));
+        }
+        catch (NoSuchDataException e) {
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.no.exch.found"));
+        }
+
+//        ServiceResponse<List<Exchange>> result = service.getQuoteRate(
+//                from, to, amount);
         String json = gsonUtils.toJson(result);
-        System.out.println(json);
+        Log.info(this, json);
         return json;
     }
 
     @RequestMapping(value = "/backdated", produces = MediaType.APPLICATION_JSON_VALUE)
     public String backdated(@RequestParam String from, @RequestParam(required = false) String[] to,
                             @RequestParam String date, @RequestParam(required = false) double amount) {
-        ServiceResponse<List<Exchange>> result = service.getQuoteRate(
-                from, to, amount, DateUtils.stringToDate(date));
+        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
+
+        try {
+            result.setObject(service.getQuoteRate(from, to, amount,
+                    DateUtils.stringToDate(date)));
+        }
+        catch (NoSuchDataException e) {
+            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+                    Messages.get("error.no.exch.found"));
+        }
+
+//        ServiceResponse<List<Exchange>> result = service.getQuoteRate(
+//                from, to, amount, DateUtils.stringToDate(date));
         String json = gsonUtils.toJson(result);
-        System.out.println(json);
+        Log.info(this, json);
         return json;
     }
 

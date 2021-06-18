@@ -3,7 +3,6 @@ package com.pedrocosta.exchangelog.batch;
 import com.pedrocosta.exchangelog.models.ScheduledJob;
 import com.pedrocosta.exchangelog.services.ScheduledBatchJobService;
 import com.pedrocosta.exchangelog.services.ServiceFactory;
-import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
@@ -71,7 +70,7 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
         try {
             jobNames = jobExplorer.getJobNames();
         } catch (Exception e) {
-            Log.error(this, e);
+            Log.warn(this, e.getMessage());
         }
 
         for (String jobName : jobNames) {
@@ -115,13 +114,16 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
         taskRegistrar.setScheduler(taskExecutor());
         ScheduledBatchJobService service =
                 (ScheduledBatchJobService) serviceFactory.create(ScheduledBatchJobService.class);
-        ServiceResponse<List<String>> jobNamesResp = service.findAllJobNames();
-        if (!jobNamesResp.isSuccess())
-            return;
+        List<String> jobNames = service.findAllJobNames();
 
-        for (String jobName : jobNamesResp.getObject()) {
-            ServiceResponse<ScheduledJob> batchJobResp = service.findBatchJob(jobName);
-            ScheduledJob batchJob = batchJobResp.getObject();
+//        ServiceResponse<List<String>> jobNamesResp = service.findAllJobNames();
+//        if (!jobNamesResp.isSuccess())
+//            return;
+
+        for (String jobName : jobNames) {
+//            ServiceResponse<ScheduledJob> batchJobResp = service.findBatchJob(jobName);
+//            ScheduledJob batchJob = batchJobResp.getObject();
+            ScheduledJob batchJob = service.findBatchJob(jobName);
 
             // Ignore any disabled job
             if (batchJob == null || !batchJob.isEnabled()) {
@@ -142,14 +144,16 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
             taskRegistrar.addTriggerTask(
                     () -> {
                         try {
-                            ServiceResponse<TaskChain> taskChainResp
-                                    = service.findScheduledChain(jobName);
+//                            ServiceResponse<TaskChain> taskChainResp
+//                                    = service.findScheduledChain(jobName);
+//
+//                            if (!taskChainResp.isSuccess())
+//                                throw new NullPointerException(
+//                                        taskChainResp.getMessage());
 
-                            if (!taskChainResp.isSuccess())
-                                throw new NullPointerException(
-                                        taskChainResp.getMessage());
-
-                            taskChainResp.getObject().execute();
+                            TaskChain taskChain = service.findScheduledChain(jobName);
+                            if (!taskChain.isEmpty())
+                                taskChain.execute();
 
                         } catch (JobExecutionAlreadyRunningException
                                 | JobRestartException

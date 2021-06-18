@@ -1,11 +1,12 @@
 package com.pedrocosta.exchangelog.services;
 
+import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import org.codehaus.jettison.json.JSONException;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,62 +35,119 @@ public abstract class BaseService implements BusinessService {
     }
 
     @Override
-    public ServiceResponse<List<Currency>> loadCurrencies() throws JSONException {
+    public List<Currency> loadCurrencies() throws JSONException, NoSuchDataException {
         // First get currencies from database
         CurrencyService ccyService = (CurrencyService) factory.create(Currency.class);
-        ServiceResponse<List<Currency>> result = ccyService.findAll();
+//        ServiceResponse<List<Currency>> result = ccyService.findAll();
+        List<Currency> result = ccyService.findAll();
 
-        if (!result.isSuccess()) {
+        if (result.isEmpty()) {
             // If no currency found in database, retrieve currencies from API
-            BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
-            ServiceResponse<List<Currency>> apiResponse = apiService.loadCurrencies();
-
-            if (apiResponse.isSuccess()) { // Saving currencies got by API
-                ServiceResponse<List<Currency>> respSave =
-                        ccyService.saveAll(apiResponse.getObject());
-
-                if (!respSave.isSuccess()) {
-                    // Could not save, return generic server error
-                    return ServiceResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
-                            messages.getMessage("error.no.ccy.found"));
-                }
-                result = ServiceResponse.<List<Currency>>createSuccess()
-                        .setObject(respSave.getObject());
-
-            } else { // If no currency found in API, return error
-                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                        messages.getMessage("error.no.ccy.found"));
+            try {
+                BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
+                List<Currency> apiCurrencies = apiService.loadCurrencies();
+                result = ccyService.saveAll(apiCurrencies);
+            } catch (NoSuchDataException | SaveDataException e) {
+                throw new NoSuchDataException(e);
             }
         }
+
+//        try {
+//            result = ccyService.findAll();
+//        } catch (NoSuchDataException noSuchDataEx) {
+//            // If no currency found in database, retrieve currencies from API
+//            BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
+//            List<Currency> apiCurrencies = apiService.loadCurrencies();
+//            try {
+//                result = ccyService.saveAll(apiCurrencies);
+//            } catch (SaveDataException saveException) {
+//                throw new NoSuchDataException(saveException);
+//            }
+//        }
+
+//        if (!result.isEmpty()) {
+//            // If no currency found in database, retrieve currencies from API
+//            BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
+////            ServiceResponse<List<Currency>> apiResponse = apiService.loadCurrencies();
+//            List<Currency> apiCurrencies = apiService.loadCurrencies();
+//
+//            if (apiCurrencies.isEmpty()) {
+//                throw new ServiceException(messages.getMessage("error.no.ccy.found"));
+//            }
+//
+//            result = ccyService.saveAll(apiCurrencies);
+//
+////            if (!apiCurrencies.isEmpty()) { // Saving currencies got by API
+////                result = ccyService.saveAll(apiCurrencies);
+////
+//////                if (!respSave.isSuccess()) {
+//////                    // Could not save, return generic server error
+//////                    throw new ServiceException(messages.getMessage("error.no.ccy.found"));
+////////                    return ServiceResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
+////////                            messages.getMessage("error.no.ccy.found"));
+//////                }
+//////                result = ServiceResponse.<List<Currency>>createSuccess()
+//////                        .setObject(respSave.getObject());
+////
+////            } else { // If no currency found in API, return error
+////
+//////                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+//////                        messages.getMessage("error.no.ccy.found"));
+////            }
+//        }
 
         return result;
     }
 
-    public ServiceResponse<Currency> loadCurrency(String code) throws JSONException {
+    public Currency loadCurrency(String code) throws JSONException, NoSuchDataException {
         // First get currency from database
         CurrencyService ccyService = (CurrencyService) factory.create(Currency.class);
-        ServiceResponse<Currency> result = ccyService.find(code);
+        Currency result = ccyService.find(code);
 
-        if (!result.isSuccess()) {
+        if (result == null) {
             // If no currency found in database, retrieve it from API
-            BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
-            ServiceResponse<Currency> apiResponse = apiService.loadCurrency(code);
-
-            if (apiResponse.isSuccess()) { // Saving currency got by API
-                ServiceResponse<Currency> respSave = ccyService.save(apiResponse.getObject());
-                if (!respSave.isSuccess()) {
-                    // Could not save, return generic server error
-                    return ServiceResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
-                            messages.getMessage("error.ccy.not.found", code));
-                }
-                result = ServiceResponse.<Currency>createSuccess()
-                        .setObject(respSave.getObject());
-
-            } else { // If no currency found in API, return error
-                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-                        messages.getMessage("error.ccy.not.found", code));
+            try {
+                Currency apiCurrency = ((BusinessService) factory.create(getProjectEngine()))
+                        .loadCurrency(code);
+                result = ccyService.save(apiCurrency);
+            } catch (NoSuchDataException | SaveDataException e) {
+                throw new NoSuchDataException(e);
             }
         }
+
+//        try {
+//            result = ccyService.find(code);
+//        } catch (NoSuchDataException e) {
+//            // If no currency found in database, retrieve it from API
+//            Currency apiCurrency = ((BusinessService) factory.create(getProjectEngine()))
+//                    .loadCurrency(code);
+//            try {
+//                result = ccyService.save(apiCurrency);
+//            } catch (SaveDataException saveDataException) {
+//                throw new NoSuchDataException(saveDataException);
+//            }
+//        }
+
+//        if (result == null) {
+//            // If no currency found in database, retrieve it from API
+//            BusinessService apiService = (BusinessService) factory.create(getProjectEngine());
+//            ServiceResponse<Currency> apiResponse = apiService.loadCurrency(code);
+//
+//            if (apiResponse.isSuccess()) { // Saving currency got by API
+//                ServiceResponse<Currency> respSave = ccyService.save(apiResponse.getObject());
+//                if (!respSave.isSuccess()) {
+//                    // Could not save, return generic server error
+//                    return ServiceResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
+//                            messages.getMessage("error.ccy.not.found", code));
+//                }
+//                result = ServiceResponse.<Currency>createSuccess()
+//                        .setObject(respSave.getObject());
+//
+//            } else { // If no currency found in API, return error
+//                result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
+//                        messages.getMessage("error.ccy.not.found", code));
+//            }
+//        }
 
         return result;
     }
