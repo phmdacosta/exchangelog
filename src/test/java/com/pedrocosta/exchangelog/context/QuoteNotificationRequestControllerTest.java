@@ -63,6 +63,7 @@ public class QuoteNotificationRequestControllerTest {
                 .setPeriod(1)
                 .setPeriodType(PeriodType.YEARS.name());
 //        quoteNotificationRequest.setId(NOTIFICATION_ID);
+        quoteNotificationRequest.setId(notificationId);
         quoteNotificationRequest.setMeans(NotificationMeans.EMAIL);
         quoteNotificationRequest.setName(NOTIFICATION_NAME);
         quoteNotificationRequest.setEnabled(true);
@@ -104,7 +105,7 @@ public class QuoteNotificationRequestControllerTest {
     @Order(2)
     public void test_getQuoteNotificationById_success() {
         String resp = controller.getQuoteNotification(notificationId,
-                null, null);
+                null);
         ServiceResponse<?> servResp =
                 gsonUtils.fromJson(resp, ServiceResponse.class);
         assert servResp.isSuccess();
@@ -114,7 +115,7 @@ public class QuoteNotificationRequestControllerTest {
     @Test
     @Order(2)
     public void test_getQuoteNotificationByName_success() {
-        String resp = controller.getQuoteNotification(0, NOTIFICATION_NAME, null);
+        String resp = controller.getQuoteNotification(0, NOTIFICATION_NAME);
         ServiceResponse<?> servResp =
                 gsonUtils.fromJson(resp, ServiceResponse.class);
         assert servResp.isSuccess();
@@ -124,7 +125,7 @@ public class QuoteNotificationRequestControllerTest {
     @Test
     @Order(2)
     public void test_getQuoteNotificationByLogicalOperator_success() {
-        String resp = controller.getQuoteNotification(0, null,
+        String resp = controller.getQuoteNotificationByLogicalOperator(
                 ValueLogical.GREATER_AND_EQUALS.getOperator());
         ServiceResponse<?> servResp =
                 gsonUtils.fromJson(resp, ServiceResponse.class);
