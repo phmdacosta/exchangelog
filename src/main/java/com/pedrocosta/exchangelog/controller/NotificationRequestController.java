@@ -13,9 +13,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -35,7 +33,7 @@ public class NotificationRequestController {
         this.gsonUtils = gsonUtils;
     }
 
-    @RequestMapping(value = "/quoteNotifRequest/save", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/quoteNotifRequest/save", produces = MediaType.APPLICATION_JSON_VALUE)
     public String saveQuoteNotificationRequest(@RequestBody String notReqJson) {
         Log.info(this, "Body: " + notReqJson);
 
@@ -71,7 +69,7 @@ public class NotificationRequestController {
         return gsonUtils.toJson(response);
     }
 
-    @RequestMapping(value = "/quoteNotifRequest/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/quoteNotifRequest/get", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getQuoteNotification(@RequestParam(name = "id") long id,
                                        @RequestParam(name = "name") String name) {
 
@@ -102,7 +100,7 @@ public class NotificationRequestController {
         return gsonUtils.toJson(response);
     }
 
-    @RequestMapping(value = "/quoteNotifRequest/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/quoteNotifRequest/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getQuoteNotificationByLogicalOperator(
             @RequestParam(name = "logicalOperator") String logicalOperator) {
 
@@ -126,7 +124,7 @@ public class NotificationRequestController {
         return gsonUtils.toJson(response);
     }
 
-    @RequestMapping(value = "/quoteNotifRequest/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/quoteNotifRequest/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getAllQuoteNotifications(@RequestBody String userJson) {
         Log.info(this, "Body: " + userJson);
 
