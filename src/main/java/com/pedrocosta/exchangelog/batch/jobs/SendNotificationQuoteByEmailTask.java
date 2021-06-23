@@ -50,15 +50,6 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
                     continue;
                 }
 
-//                ServiceResponse<Exchange> responseExch = exchangeService.findLast(
-//                        notReqExch.getBaseCurrency(), notReqExch.getQuoteCurrency());
-//
-//                if (!responseExch.isSuccess()) {
-//                    Log.warn(this, responseExch.getMessage());
-//                    continue;
-//                }
-//
-//                Exchange mostCurrentExch = responseExch.getObject();
                 Exchange mostCurrentExch = exchangeService.findLast(
                         notReqExch.getBaseCurrency(), notReqExch.getQuoteCurrency());
                 // Check if target logic was reached
