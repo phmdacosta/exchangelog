@@ -9,7 +9,6 @@ import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.GsonUtils;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
-import org.codehaus.jettison.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -23,14 +22,14 @@ import java.util.List;
  * @version 1.0
  */
 @Controller
-public class NotificationRequestController {
+public class NotificationRequestController extends BaseController {
 
-    private final ServiceFactory serviceFactory;
-    private final GsonUtils gsonUtils;
+    private QuoteNotificationRequestService quoteNotifReqService;
 
     public NotificationRequestController(ServiceFactory serviceFactory, GsonUtils gsonUtils) {
-        this.serviceFactory = serviceFactory;
-        this.gsonUtils = gsonUtils;
+        super(serviceFactory, gsonUtils);
+        this.quoteNotifReqService = (QuoteNotificationRequestService)
+                getServiceFactory().create(QuoteNotificationRequestService.class);
     }
 
     @PostMapping(value = "/quoteNotifRequest/save", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,7 +37,7 @@ public class NotificationRequestController {
         Log.info(this, "Body: " + notReqJson);
 
         if (notReqJson == null || notReqJson.isBlank()) {
-            return getMissingBodyResponseError();
+            return getMissingBodyResponseErrorJson();
         }
 
         ServiceResponse<QuoteNotificationRequest> response =
@@ -46,16 +45,15 @@ public class NotificationRequestController {
 
         try {
             QuoteNotificationRequest quoteNotificationRequest =
-                    gsonUtils.fromJson(notReqJson, QuoteNotificationRequest.class);
-
-            QuoteNotificationRequestService service = (QuoteNotificationRequestService)
-                    serviceFactory.create(QuoteNotificationRequest.class);
-            response.setObject(service.save(quoteNotificationRequest));
+                    fromJson(notReqJson, QuoteNotificationRequest.class);
+            response.setObject(quoteNotifReqService.save(quoteNotificationRequest));
 
         } catch (NullPointerException | InvalidParameterException e) {
+            Log.error(this, e);
             response = ServiceResponse.<QuoteNotificationRequest>createError(
                     HttpStatus.INTERNAL_SERVER_ERROR).setException(e);
         } catch (SaveDataException e) {
+            Log.error(this, e);
             response = ServiceResponse.<QuoteNotificationRequest>createError(
                     HttpStatus.BAD_REQUEST).setException(e);
         } finally {
@@ -66,7 +64,7 @@ public class NotificationRequestController {
             }
         }
 
-        return gsonUtils.toJson(response);
+        return toJson(response);
     }
 
     @GetMapping(value = "/quoteNotifRequest/get", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -75,18 +73,16 @@ public class NotificationRequestController {
 
         ServiceResponse<QuoteNotificationRequest> response = ServiceResponse
                 .createSuccess(HttpStatus.OK);
-        QuoteNotificationRequestService service = (QuoteNotificationRequestService)
-                serviceFactory.create(QuoteNotificationRequest.class);
 
         if (id > 0) {
-            response.setObject(service.find(id));
+            response.setObject(quoteNotifReqService.find(id));
             if (response.getObject() == null) {
                 response = ServiceResponse.createError(HttpStatus.NOT_FOUND,
                         Messages.get("error.notif.req.not.found", String.valueOf(id)));
             }
         }
         else if (name != null && !name.isBlank()) {
-            response.setObject(service.find(name));
+            response.setObject(quoteNotifReqService.find(name));
             if (response.getObject() == null) {
                 response = ServiceResponse.createError(HttpStatus.NOT_FOUND,
                         Messages.get("error.notif.req.not.found", name));
@@ -97,7 +93,7 @@ public class NotificationRequestController {
                     Messages.get("could.not.find", "notification request"));
         }
 
-        return gsonUtils.toJson(response);
+        return toJson(response);
     }
 
     @GetMapping(value = "/quoteNotifRequest/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -106,22 +102,20 @@ public class NotificationRequestController {
 
         ServiceResponse<List<QuoteNotificationRequest>> response = ServiceResponse
                 .createSuccess(HttpStatus.OK);
-        QuoteNotificationRequestService service = (QuoteNotificationRequestService)
-                serviceFactory.create(QuoteNotificationRequest.class);
 
         if (logicalOperator == null || logicalOperator.isBlank()) {
             response = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
                     Messages.get("could.not.find", "notification request"));
-            return gsonUtils.toJson(response);
+            return toJson(response);
         }
 
-        response.setObject(service.findAllByLogicalOperator(logicalOperator));
+        response.setObject(quoteNotifReqService.findAllByLogicalOperator(logicalOperator));
         if (response.getObject() == null) {
             response = ServiceResponse.createError(HttpStatus.NOT_FOUND,
                     Messages.get("error.notif.req.not.found", logicalOperator));
         }
 
-        return gsonUtils.toJson(response);
+        return toJson(response);
     }
 
     @GetMapping(value = "/quoteNotifRequest/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -129,18 +123,15 @@ public class NotificationRequestController {
         Log.info(this, "Body: " + userJson);
 
         if (userJson == null || userJson.isBlank()) {
-            return getMissingBodyResponseError();
+            return getMissingBodyResponseErrorJson();
         }
 
         ServiceResponse<List<QuoteNotificationRequest>> response =
                 ServiceResponse.createSuccess();
 
-        QuoteNotificationRequestService service = (QuoteNotificationRequestService)
-                serviceFactory.create(QuoteNotificationRequest.class);
-
         try {
-            User user = gsonUtils.fromJson(userJson, User.class);
-            response.setObject(service.findAll(user));
+            User user = fromJson(userJson, User.class);
+            response.setObject(quoteNotifReqService.findAll(user));
 
             if (response.getObject().isEmpty())
                 response = ServiceResponse.createError(HttpStatus.NOT_FOUND);
@@ -156,12 +147,6 @@ public class NotificationRequestController {
                         "could.not.find", "quote notification"));
         }
 
-        return gsonUtils.toJson(response);
-    }
-
-    private String getMissingBodyResponseError() {
-        return gsonUtils.toJson(ServiceResponse.createError(
-                HttpStatus.BAD_REQUEST,
-                Messages.get("error.request.body")));
+        return toJson(response);
     }
 }

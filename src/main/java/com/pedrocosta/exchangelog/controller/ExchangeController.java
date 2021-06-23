@@ -1,6 +1,5 @@
 package com.pedrocosta.exchangelog.controller;
 
-import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.services.ExchangeService;
@@ -8,13 +7,11 @@ import com.pedrocosta.exchangelog.services.ServiceFactory;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.DateUtils;
 import com.pedrocosta.exchangelog.utils.GsonUtils;
-import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
@@ -28,14 +25,13 @@ import java.util.List;
  * @version 1.0
  */
 @Controller
-public class ExchangeController {
+public class ExchangeController extends BaseController {
 
     private ExchangeService exchangeService;
-    private GsonUtils gsonUtils;
 
     public ExchangeController(ServiceFactory serviceFactory, GsonUtils gsonUtils) {
-        this.exchangeService = (ExchangeService) serviceFactory.create(Exchange.class);
-        this.gsonUtils = gsonUtils;
+        super(serviceFactory, gsonUtils);
+        this.exchangeService = (ExchangeService) getServiceFactory().create(Exchange.class);
     }
 
     @GetMapping(value = "/now", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,8 +42,7 @@ public class ExchangeController {
                 .setObject(new ArrayList<>());
 
         if (isValidParameters(from)) {
-            return toJson(ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-                    Messages.get("error.request.param")));
+            return getWrongParamsResponseErrorJson();
         }
 
         if (to == null || to.length == 0) {
@@ -83,8 +78,7 @@ public class ExchangeController {
 
         Date valDate = DateUtils.stringToDate(date);
         if (isValidParameters(from) && valDate != null) {
-            return toJson(ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-                    Messages.get("error.request.param")));
+            return getWrongParamsResponseErrorJson();
         }
 
         if (to == null || to.length == 0) {
@@ -111,20 +105,5 @@ public class ExchangeController {
         }
 
         return toJson(result);
-    }
-
-    private String toJson(ServiceResponse<?> response) {
-        String json = gsonUtils.toJson(response);
-        Log.info(this, json);
-        return json;
-    }
-
-    private boolean isValidParameters(Object ... params) {
-        for (Object p : params) {
-            if (p == null) {
-                return false;
-            }
-        }
-        return true;
     }
 }
