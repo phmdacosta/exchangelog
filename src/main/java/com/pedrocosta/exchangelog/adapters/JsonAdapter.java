@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import com.pedrocosta.exchangelog.exceptions.NotSupportedException;
 import com.pedrocosta.exchangelog.utils.GsonUtils;
 import com.pedrocosta.exchangelog.utils.Log;
 
@@ -27,8 +28,13 @@ public abstract class JsonAdapter<T> extends TypeAdapter<T> {
     @Override
     public void write(JsonWriter writer, T t) throws IOException {
         writer.beginObject();
-        writeJson(writer, t);
-        writer.endObject();
+        try {
+            writeJson(writer, t);
+        } catch (NotSupportedException e) {
+            Log.error(this, e);
+        } finally {
+            writer.endObject();
+        }
     }
 
     @Override
@@ -42,14 +48,18 @@ public abstract class JsonAdapter<T> extends TypeAdapter<T> {
         T obj = null;
         try {
             obj = readJson(reader);
+        } catch (NotSupportedException e) {
+            Log.error(this, e);
         } catch (Exception e) {
             Log.warn(this, e.getMessage());
+        } finally {
+            reader.endObject();
         }
-        reader.endObject();
+
         return obj;
     }
 
-    protected abstract void writeJson(JsonWriter writer, T obj) throws IOException;
+    protected abstract void writeJson(JsonWriter writer, T obj) throws IOException, NotSupportedException;
 
-    protected abstract T readJson(JsonReader reader) throws IOException;
+    protected abstract T readJson(JsonReader reader) throws IOException, NotSupportedException;
 }

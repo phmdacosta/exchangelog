@@ -1,8 +1,8 @@
 package com.pedrocosta.exchangelog.adapters;
 
-import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.pedrocosta.exchangelog.exceptions.NotSupportedException;
 import com.pedrocosta.exchangelog.services.ServiceResponse;
 import com.pedrocosta.exchangelog.utils.GsonUtils;
 import org.springframework.stereotype.Component;
@@ -27,13 +27,18 @@ public class ServiceResponseAdapter extends JsonAdapter<ServiceResponse<?>> {
             writer.jsonValue(getGsonUtils().toJson(obj.getObject()));
         } else {
             writer.name("label");
-            writer.value(obj.getMessage());
+            if (obj.getMessage().isBlank() &&
+                    !obj.getException().getMessage().isBlank()) {
+                writer.value(obj.getException().getMessage());
+            } else {
+                writer.value(obj.getMessage());
+            }
         }
     }
 
     @Override
-    protected ServiceResponse<?> readJson(JsonReader reader) throws IOException {
-        throw new IllegalStateException("There is no support for deserializing " +
+    protected ServiceResponse<?> readJson(JsonReader reader) throws IOException, NotSupportedException {
+        throw new NotSupportedException("There is no support for deserializing " +
                 "transformation result objects at the moment");
     }
 }

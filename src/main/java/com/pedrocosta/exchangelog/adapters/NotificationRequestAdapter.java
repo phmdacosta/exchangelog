@@ -26,7 +26,7 @@ public abstract class NotificationRequestAdapter<T extends NotificationRequest> 
         writer.beginObject();
         writeParent(writer, notificationRequest);
         writeJson(writer, notificationRequest);
-//        writeNested(writer, notificationRequest);
+//        writeNested(writer, notificationRequest); TODO back when implemented user
         writer.endObject();
     }
 
@@ -60,7 +60,7 @@ public abstract class NotificationRequestAdapter<T extends NotificationRequest> 
                 token = reader.peek();
                 notifReq.setEnabled(reader.nextBoolean());
                 break;
-//            case USER:
+//            case USER: TODO back when implemented user
 //                token = reader.peek();
 //                User user = getGsonUtils().fromJson(reader, User.class);
 //                notifReq.setUser(user);
