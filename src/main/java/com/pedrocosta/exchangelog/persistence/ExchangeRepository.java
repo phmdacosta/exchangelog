@@ -5,6 +5,7 @@ import com.pedrocosta.exchangelog.models.Exchange;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +22,18 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
      * @return Found {@link Exchange} instance.
      */
     Exchange findByBaseCurrencyAndQuoteCurrencyAndValueDate(Currency baseCcy, Currency quoteCcy, Date valueDate);
+
+    /**
+     * Search in database for exchange by its base currency, quote currency and value date.
+     *
+     * @param baseCcy   Exchange's base currency
+     * @param quoteCcy  Exchange's quote currency
+     * @param valueDate Exchange's value date
+     * @param rate      Exchange's Rate
+     *
+     * @return Found {@link Exchange} instance.
+     */
+    Exchange findByBaseCurrencyAndQuoteCurrencyAndValueDateAndRate(Currency baseCcy, Currency quoteCcy, Date valueDate, BigDecimal rate);
 
     /**
      * Search in database for exchanges by its base currency and quote values
@@ -51,6 +64,15 @@ public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
      * @return Exchange with maximum rate.
      */
     Exchange findByValueDateBetweenOrderByRateDesc(Date valueDateStart, Date valueDateEnd);
+
+    /**
+     * Search in database for exchanges by its base currency.
+     *
+     * @param baseCcy   Exchange's base currency
+     *
+     * @return List of found {@link Exchange} instance.
+     */
+    List<Exchange> findAllByBaseCurrency(Currency baseCcy);
 
     /**
      * Search in database for exchanges by its base currency and value date.

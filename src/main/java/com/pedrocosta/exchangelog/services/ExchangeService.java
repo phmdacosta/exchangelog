@@ -38,17 +38,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
     @Override
     @Nullable
     public Exchange find(long id) {
-//        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
-//                .setObject(repository.findById(id).orElse(null));
-//        Exchange result = repository.findById(id).orElse(null);
-
-//        if (result == null) {
-//            String arg = "with id " + id;
-//            throw new NoSuchDataException(Messages.get("error.exch.not.found", arg));
-////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-////                    Messages.get("error.exch.not.found", arg));
-//        }
-
         return repository.findById(id).orElse(null);
     }
 
@@ -62,18 +51,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Nullable
     public List<Exchange> find(@NotNull Currency ccy, Date valueDate) {
-//        ServiceResponse<List<Exchange>> result =
-//                ServiceResponse.<List<Exchange>>createSuccess()
-//                        .setObject(repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate));
-//        List<Exchange> result = repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate);
-
-//        if (result == null || result.isEmpty()) {
-//            String arg = "of " + ccy.getCode() + " in " + valueDate;
-//            throw new NoSuchDataException(Messages.get("error.exch.not.found", arg));
-////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-////                    Messages.get("error.exch.not.found", arg));
-//        }
-
+        handleCurrency(ccy);
         return repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate);
     }
 
@@ -88,21 +66,45 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Nullable
     public Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate) {
-//        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
-//                .setObject(repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
-//                    ccy1, ccy2, valueDate));
-//        Exchange result = repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
-//                ccy1, ccy2, valueDate);
+        return find(ccy1, ccy2, valueDate, null);
+    }
 
-//        if (result == null) {
-//            String arg = ccy1.getCode() + "/" + ccy2.getCode() + " in " + valueDate;
-//            throw new NoSuchDataException(Messages.get("error.exch.not.found", arg));
-////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-////                    Messages.get("error.exch.not.found", arg));
-//        }
+    /**
+     * Find a specific exchange based on parameters in database.
+     *
+     * @param ccy1      Base currency of exchange
+     * @param ccy2      Quote currency of exchange
+     * @param valueDate Valuation date of rate
+     * @param amount    Amount of base currency
+     *
+     * @return  Found exchange. Null if not found.
+     */
+    @Nullable
+    public Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate, double amount) {
+        return find(ccy1, ccy2, valueDate, BigDecimal.valueOf(amount));
+    }
 
-        return repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
+    /**
+     * Find a specific exchange based on parameters in database.
+     *
+     * @param ccy1      Base currency of exchange
+     * @param ccy2      Quote currency of exchange
+     * @param valueDate Valuation date of rate
+     * @param amount    Amount of base currency
+     *
+     * @return  Found exchange. Null if not found.
+     */
+    @Nullable
+    public Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate, BigDecimal amount) {
+        handleCurrency(ccy1);
+        handleCurrency(ccy2);
+
+        Exchange exchange =  repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
                 ccy1, ccy2, valueDate);
+        if (amount != null && !BigDecimal.ZERO.equals(amount)) {
+            exchange.setRate(exchange.getRate().multiply(amount));
+        }
+        return exchange;
     }
 
     /**
@@ -115,21 +117,42 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Nullable
     public Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2) {
-//        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
-//                .setObject(repository.findFirstByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
-//                    ccy1, ccy2));
-//        Exchange result = repository.findFirstByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
-//                ccy1, ccy2);
+        return findLast(ccy1, ccy2, null);
+    }
 
-//        if (result == null) {
-//            String arg = ccy1.getCode() + "/" + ccy2.getCode();
-//            throw new NoSuchDataException(Messages.get("error.exch.not.found", arg));
-////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-////                    Messages.get("error.exch.not.found", arg));
-//        }
+    /**
+     * Find the last exchange in database.
+     *
+     * @param ccy1      Base currency of exchange
+     * @param ccy2      Quote currency of exchange
+     * @param amount    Amount of ccy1.
+     *
+     * @return  Found exchange. Null if not found.
+     */
+    @Nullable
+    public Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2, double amount) {
+        return findLast(ccy1, ccy2, BigDecimal.valueOf(amount));
+    }
 
-        return repository.findFirstByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
+    /**
+     * Find the last exchange in database.
+     *
+     * @param ccy1      Base currency of exchange
+     * @param ccy2      Quote currency of exchange
+     * @param amount    Amount of ccy1.
+     *
+     * @return  Found exchange. Null if not found.
+     */
+    @Nullable
+    public Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2, BigDecimal amount) {
+        handleCurrency(ccy1);
+        handleCurrency(ccy2);
+        Exchange exchange = repository.findFirstByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
                 ccy1, ccy2);
+        if (amount != null && !BigDecimal.ZERO.equals(amount)) {
+            exchange.setRate(exchange.getRate().multiply(amount));
+        }
+        return exchange;
     }
 
     /**
@@ -142,21 +165,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Nullable
     public Exchange findWithMinRate(Date startValueDate, Date endValueDate) {
-//        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
-//                .setObject(repository.findByValueDateBetweenOrderByRateAsc(
-//                        startValueDate, endValueDate));
-
-//        Exchange result = repository.findByValueDateBetweenOrderByRateAsc(
-//                startValueDate, endValueDate);
-
-//        if (result == null) {
-//            throw new NoSuchDataException(Messages.get("error.exch.not.found.in.dates",
-//                    String.valueOf(startValueDate), String.valueOf(endValueDate)));
-////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-////                    Messages.get("error.exch.not.found.in.dates",
-////                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
-//        }
-
         return repository.findByValueDateBetweenOrderByRateAsc(
                 startValueDate, endValueDate);
     }
@@ -171,16 +179,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Nullable
     public Exchange findWithMaxRate(Date startValueDate, Date endValueDate) {
-//        ServiceResponse<Exchange> result = ServiceResponse.<Exchange>createSuccess()
-//                .setObject(repository.findByValueDateBetweenOrderByRateDesc(
-//                        startValueDate, endValueDate));
-
-//        if (result.getObject() == null) {
-//            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-//                    Messages.get("error.exch.not.found.in.dates",
-//                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
-//        }
-
         return repository.findByValueDateBetweenOrderByRateDesc(
                 startValueDate, endValueDate);
     }
@@ -192,18 +190,78 @@ public class ExchangeService implements RepositoryService<Exchange> {
      */
     @Override
     public List<Exchange> findAll() {
-//        ServiceResponse<List<Exchange>> result =
-//                ServiceResponse.<List<Exchange>>createSuccess()
-//                        .setObject(repository.findAll());
-//        List<Exchange> result = repository.findAll();
+        return repository.findAll();
+    }
 
-//        if (result.isEmpty()) {
-//            throw new NoSuchDataException(Messages.get("error.no.exch.found"));
-////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-////                    Messages.get("error.no.exch.found"));
+    /**
+     * List all exchanges from database between a period of time.
+     *
+     * @param base  Base currency of exchange
+     *
+     * @return  List of found exchanges. Empty list if not found.
+     */
+    public List<Exchange> findAll(Currency base) {
+        return findAll(base, null, null);
+    }
+
+    /**
+     * List all exchanges from database between a period of time.
+     *
+     * @param base      Base currency of exchange
+     * @param amount    Amount of base currency
+     *
+     * @return  List of found exchanges. Empty list if not found.
+     */
+    public List<Exchange> findAll(Currency base, double amount) {
+        return findAll(base, null, BigDecimal.valueOf(amount));
+    }
+
+    /**
+     * Find exchanges based on parameters in database.
+     *
+     * @param ccy       Base currency of exchange
+     * @param valueDate Valuation date of rate
+     * @param amount    Amount of base currency
+     *
+     * @return  Found exchange. Null if not found.
+     */
+    @Nullable
+    public List<Exchange> findAll(@NotNull Currency ccy, Date valueDate, double amount) {
+        return findAll(ccy, valueDate, BigDecimal.valueOf(amount));
+    }
+
+    /**
+     * Find exchanges based on parameters in database.
+     *
+     * @param ccy       Base currency of exchange
+     * @param valueDate Valuation date of rate
+     * @param amount    Amount of base currency
+     *
+     * @return  Found exchange. Null if not found.
+     */
+    @Nullable
+    public List<Exchange> findAll(@NotNull Currency ccy, Date valueDate, BigDecimal amount) {
+        handleCurrency(ccy);
+
+//        if (base == null) {
+//            return new ArrayList<>();
 //        }
 
-        return repository.findAll();
+        List<Exchange> result;
+
+        if (valueDate != null) {
+            result = repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate);
+        } else {
+            result = repository.findAllByBaseCurrency(ccy);
+        }
+
+        if (amount != null && !BigDecimal.ZERO.equals(amount)) {
+            for (Exchange exchange : result) {
+                exchange.setRate(exchange.getRate().multiply(amount));
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -215,21 +273,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @return  List of found exchanges. Empty list if not found.
      */
     public List<Exchange> findAll(Date startValueDate, Date endValueDate) {
-//        ServiceResponse<List<Exchange>> result =
-//                ServiceResponse.<List<Exchange>>createSuccess()
-//                        .setObject(repository.findAllByValueDateBetween(
-//                                startValueDate, endValueDate));
-//        List<Exchange> result =repository.findAllByValueDateBetween(
-//                startValueDate, endValueDate);
-
-//        if (result == null || result.isEmpty()) {
-//            throw new NoSuchDataException(Messages.get("error.exch.not.found.in.dates",
-//                    String.valueOf(startValueDate), String.valueOf(endValueDate)));
-////            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-////                    Messages.get("error.exch.not.found.in.dates",
-////                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
-//        }
-
         return repository.findAllByValueDateBetween(
                 startValueDate, endValueDate);
     }
@@ -243,17 +286,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @return List of found exchanges. Empty list if not found.
      */
     public List<Exchange> findAllOrderByValueDate(Date startValueDate, Date endValueDate) {
-//        ServiceResponse<List<Exchange>> result =
-//                ServiceResponse.<List<Exchange>>createSuccess()
-//                        .setObject(repository.findAllByValueDateBetweenOrderByValueDateDesc(
-//                                startValueDate, endValueDate));
-//
-//        if (result.getObject() == null) {
-//            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-//                    Messages.get("error.exch.not.found.in.dates",
-//                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
-//        }
-
         return repository.findAllByValueDateBetweenOrderByValueDateDesc(
                 startValueDate, endValueDate);
     }
@@ -269,7 +301,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @return List of found exchanges. Empty list if not found.
      */
     public List<Exchange> findAllOrderedByRate(Date startValueDate, Date endValueDate, DatabaseOrder order) {
-//        ServiceResponse<List<Exchange>> result = ServiceResponse.createSuccess();
         List<Exchange> result = new ArrayList<>();
 
         if (DatabaseOrder.DESC == order) {
@@ -279,12 +310,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
             result = repository.findAllByValueDateBetweenOrderByRateAsc(
                     startValueDate, endValueDate);
         }
-
-//        if (result.getObject() == null) {
-//            result = ServiceResponse.createError(HttpStatus.NOT_FOUND,
-//                    Messages.get("error.exch.not.found.in.dates",
-//                        String.valueOf(startValueDate), String.valueOf(endValueDate)));
-//        }
 
         return result;
     }
@@ -307,13 +332,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
     @Override
     @Transactional
     public Exchange save(Exchange exchange) throws SaveDataException {
-        // Check currencies
-//        if (exchange.getBaseCurrency() == null || exchange.getQuoteCurrency() == null) {
-//            throw new ServiceException(Messages.get("error.exch.save.wrong.ccy"));
-////            return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-////                    Messages.get("error.exch.save.wrong.ccy"));
-//        }
-
         try {
             CurrencyService ccyServ = (CurrencyService) serviceFactory.create(Currency.class);
             if (exchange.getBaseCurrency().getId() == 0) {
@@ -323,12 +341,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
                             Messages.get("error.ccy.not.found",
                                     exchange.getBaseCurrency().getCode()));
                 }
-//            ServiceResponse<Currency> baseCcyResp = ccyServ.find(exchange
-//                    .getBaseCurrency().getCode());
-//                if (!baseCcyResp.isSuccess()) {
-//                    return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-//                            Messages.get("error.exch.save.wrong.ccy"));
-//                }
                 exchange.getBaseCurrency().setId(baseCcy.getId());
             }
             if (exchange.getQuoteCurrency().getId() == 0) {
@@ -338,12 +350,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
                             Messages.get("error.ccy.not.found",
                                     exchange.getQuoteCurrency().getCode()));
                 }
-//                ServiceResponse<Currency> quoteCcyResp = ccyServ.find(exchange
-//                        .getQuoteCurrency().getCode());
-//                if (!quoteCcyResp.isSuccess()) {
-//                    return ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-//                            Messages.get("error.exch.save.wrong.ccy"));
-//                }
                 exchange.getQuoteCurrency().setId(quoteCcy.getId());
             }
         } catch (NoSuchDataException | NullPointerException e) {
@@ -359,31 +365,15 @@ public class ExchangeService implements RepositoryService<Exchange> {
             if (dbExch != null) {
                 exchange.setId(dbExch.getId());
             }
-//            ServiceResponse<Exchange> lastExchResp = find(exchange.getBaseCurrency(),
-//                    exchange.getQuoteCurrency(), exchange.getValueDate());
-            // If exchange exists, we get its id to update
-//            if (lastExchResp.isSuccess()) {
-//                exchange.setId(lastExchResp.getObject().getId());
-//            }
         }
 
         // Execute save
         Exchange result = repository.save(exchange);
-//        ServiceResponse<Exchange> result =
-//                ServiceResponse.<Exchange>createSuccess(HttpStatus.CREATED)
-//                        .setObject(repository.save(exchange));
         if (result.getId() == 0) {
             throw new SaveDataException(Messages.get("error.exch.not.saved",
                     exchange.getBaseCurrency().getCode(),
                     exchange.getQuoteCurrency().getCode()));
         }
-
-//        if (result.getObject() == null || result.getObject().getId() == 0) {
-//            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-//                    Messages.get("error.exch.not.saved",
-//                        exchange.getBaseCurrency().getCode(),
-//                            exchange.getQuoteCurrency().getCode()));
-//        }
 
         return result;
     }
@@ -436,8 +426,6 @@ public class ExchangeService implements RepositoryService<Exchange> {
     @Override
     @Transactional
     public List<Exchange> saveAll(Collection<Exchange> exchanges) throws SaveDataException {
-//        ServiceResponse<List<Exchange>> result =
-//                ServiceResponse.<List<Exchange>>createSuccess(HttpStatus.CREATED);
         List<Exchange> saved = new ArrayList<>();
         List<Exchange> notSaved = new ArrayList<>();
 
@@ -448,46 +436,20 @@ public class ExchangeService implements RepositoryService<Exchange> {
             } catch (SaveDataException e) {
                 notSaved.add(exchange);
             }
-//            ServiceResponse<Exchange> resultSingleSave = save(exchange);
-
-//            if (!resultSingleSave.isSuccess()) {
-//                notSaved.add(exchange);
-//            } else {
-//                saved.add(resultSingleSave.getObject());
-//            }
         }
 
         if (!notSaved.isEmpty()) {
             throw new SaveDataException(
                     Messages.get("error.some.exch.not.saved", notSaved.toString()));
-//            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-//                    Messages.get("error.some.exch.not.saved", notSaved.toString()));
         }
 
         return saved;
     }
-//    public ServiceResponse<List<Exchange>> saveAll(Collection<Exchange> exchanges) {
-//        ServiceResponse<List<Exchange>> result =
-//                ServiceResponse.<List<Exchange>>createSuccess(HttpStatus.CREATED)
-//                        .setObject(repository.saveAll(exchanges));
-//
-//        if (result.getObject() == null || result.getObject().isEmpty()) {
-//            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST,
-//                    Messages.get("error.not.saved", "any exchange"));
-//        }
-//        else if(result.getObject().size() != exchanges.size()) {
-//            result = ServiceResponse.createError(HttpStatus.BAD_REQUEST);
-//            List<Exchange> notSaved = new ArrayList<>();
-//            ServiceResponse<List<Exchange>> auxResult = result;
-//            exchanges.forEach(exchange -> {
-//                if (!auxResult.getObject().contains(exchange)) {
-//                    notSaved.add(exchange);
-//                }
-//            });
-//            String msg = Messages.get("error.some.exch.not.saved", notSaved.toString());
-//            result.setMessage(msg);
-//        }
-//
-//        return result;
-//    }
+
+    private void handleCurrency(Currency currency) {
+        if (currency.getId() == 0) {
+            currency = ((CurrencyService) serviceFactory.create(Currency.class))
+                    .find(currency.getCode());
+        }
+    }
 }
