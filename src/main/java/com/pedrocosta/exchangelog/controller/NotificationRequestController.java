@@ -28,8 +28,8 @@ public class NotificationRequestController extends BaseController {
 
     public NotificationRequestController(ServiceFactory serviceFactory, GsonUtils gsonUtils) {
         super(serviceFactory, gsonUtils);
-        this.quoteNotifReqService = (QuoteNotificationRequestService)
-                getServiceFactory().create(QuoteNotificationRequestService.class);
+        this.quoteNotifReqService = getServiceFactory()
+                .create(QuoteNotificationRequestService.class);
     }
 
     @PostMapping(value = "/quoteNotifRequest/save", produces = MediaType.APPLICATION_JSON_VALUE)

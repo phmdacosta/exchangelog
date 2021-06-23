@@ -27,13 +27,8 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
 
     @Override
     public List<QuoteNotificationRequest> doRead() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        QuoteNotificationRequestService service = (QuoteNotificationRequestService)
-                getServiceFactory().create(QuoteNotificationRequestService.class);
-        //        ServiceResponse<List<QuoteNotificationRequest>> response = service
-//                .findAllByLogicalOperator(ValueLogical.MINIMUM.getOperator());
-//        if (!response.isSuccess()) {
-//            Log.error(this, response.getMessage());
-//        }
+        QuoteNotificationRequestService service = getServiceFactory()
+                .create(QuoteNotificationRequestService.class);
         return service.findAllByLogicalOperator(ValueLogical.MINIMUM.getOperator());
     }
 
@@ -43,8 +38,7 @@ public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationR
 
         if (!notificationRequests.isEmpty()) {
             notificationRequests.forEach(notifReq -> {
-                ExchangeService exchService = (ExchangeService)
-                        getServiceFactory().create(ExchangeService.class);
+                ExchangeService exchService = getServiceFactory().create(ExchangeService.class);
 
                 Date endDate = new Date();
                 // Getting start date

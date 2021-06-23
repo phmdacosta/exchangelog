@@ -30,10 +30,6 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
         } catch (NoSuchDataException e) {
             Log.warn(this, e.getMessage());
         }
-//        ServiceResponse<List<Currency>> response = apiService.loadCurrencies();
-//        if (response.isSuccess()) {
-//            currencies = response.getObject();
-//        }
         return currencies;
     }
 
@@ -41,8 +37,7 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
     public List<Currency> doProcess(List<Currency> currencies) throws Exception {
         List<Currency> currenciesToSave = new ArrayList<>(currencies.size());
 
-        CurrencyService service = (CurrencyService) getServiceFactory()
-                .create(CurrencyService.class);
+        CurrencyService service = getServiceFactory().create(CurrencyService.class);
         final List<Currency> existingCcyList = service.findAll();
         if (existingCcyList.isEmpty()) {
             currenciesToSave = currencies;
@@ -55,29 +50,6 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
             });
         }
 
-//        try {
-//            final List<Currency> existingCcyList = service.findAll();
-//            List<Currency> auxCurrenciesToSave = currenciesToSave;
-//            currencies.forEach(ccy -> {
-//                if (!existingCcyList.contains(ccy)) {
-//                    auxCurrenciesToSave.add(ccy);
-//                }
-//            });
-//        } catch (ServiceException e) {
-//            Log.error(this, e);
-//            currenciesToSave = currencies;
-//        }
-//        final ServiceResponse<List<Currency>> response = service.findAll();
-//        if (!response.isSuccess()) {
-//            currenciesToSave = currencies;
-//        } else {
-//            List<Currency> auxCurrenciesToSave = currenciesToSave;
-//            currencies.forEach(ccy -> {
-//                if (response.getObject().contains(ccy)) {
-//                    auxCurrenciesToSave.add(ccy);
-//                }
-//            });
-//        }
         return currenciesToSave;
     }
 
@@ -87,19 +59,9 @@ public class UpdateCurrenciesTask extends ScheduledTask<List<Currency>, List<Cur
                 getProjectEngine()));
 
         try {
-            ((CurrencyService) getServiceFactory()
-                    .create(CurrencyService.class)).saveAll(list);
+            getServiceFactory().create(CurrencyService.class).saveAll(list);
         } catch (SaveDataException e) {
             Log.error(this, e);
         }
-//        ServiceResponse<List<Currency>> response = service.saveAll(list);
-//
-//        if (response.getObject() != null) {
-//            Log.info(this, Messages.get("total.saved",
-//                    String.valueOf(response.getObject().size())));
-//        }
-//        if (!response.isSuccess()) {
-//            Log.error(this, response.getMessage());
-//        }
     }
 }

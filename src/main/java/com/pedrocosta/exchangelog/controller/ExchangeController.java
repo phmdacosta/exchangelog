@@ -31,7 +31,7 @@ public class ExchangeController extends BaseController {
 
     public ExchangeController(ServiceFactory serviceFactory, GsonUtils gsonUtils) {
         super(serviceFactory, gsonUtils);
-        this.exchangeService = (ExchangeService) getServiceFactory().create(Exchange.class);
+        this.exchangeService = getServiceFactory().create(ExchangeService.class);
     }
 
     @GetMapping(value = "/now", produces = MediaType.APPLICATION_JSON_VALUE)

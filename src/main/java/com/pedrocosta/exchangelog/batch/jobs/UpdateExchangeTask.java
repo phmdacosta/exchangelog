@@ -39,7 +39,7 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
         }
 
         if (!rates.isEmpty()) {
-            BusinessService batchService = (BusinessService) getServiceFactory().create(BackOfficeService.class);
+            BusinessService batchService = getServiceFactory().create(BackOfficeService.class);
             try {
                 Currency base = batchService.loadCurrency(baseCcyCode);
 
@@ -142,8 +142,7 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
         }
 
         // Calculate rate for others currencies as base
-        BackOfficeService batchService =
-                (BackOfficeService) getServiceFactory().create(BackOfficeService.class);
+        BackOfficeService batchService = getServiceFactory().create(BackOfficeService.class);
         newList = batchService.calculateOthersQuotes(newList);
 
         return newList;
@@ -151,17 +150,7 @@ public class UpdateExchangeTask extends ScheduledTask<List<Exchange>, List<Excha
 
     @Override
     public void doWrite(List<Exchange> list) throws Exception {
-        ((ExchangeService) getServiceFactory().create(ExchangeService.class))
-                .saveAll(list);
-//        ServiceResponse<List<Exchange>> response = exchService.saveAll(list);
-//
-//        if (response.getObject() != null) {
-//            Log.info(this, Messages.get("total.saved",
-//                    String.valueOf(response.getObject().size())));
-//        }
-//        if (!response.isSuccess()) {
-//            Log.error(this, response.getMessage());
-//        }
+        getServiceFactory().create(ExchangeService.class).saveAll(list);
     }
 
     /**

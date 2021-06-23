@@ -112,17 +112,10 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.setScheduler(taskExecutor());
-        ScheduledBatchJobService service =
-                (ScheduledBatchJobService) serviceFactory.create(ScheduledBatchJobService.class);
+        ScheduledBatchJobService service = serviceFactory.create(ScheduledBatchJobService.class);
         List<String> jobNames = service.findAllJobNames();
 
-//        ServiceResponse<List<String>> jobNamesResp = service.findAllJobNames();
-//        if (!jobNamesResp.isSuccess())
-//            return;
-
         for (String jobName : jobNames) {
-//            ServiceResponse<ScheduledJob> batchJobResp = service.findBatchJob(jobName);
-//            ScheduledJob batchJob = batchJobResp.getObject();
             ScheduledJob batchJob = service.findBatchJob(jobName);
 
             // Ignore any disabled job
@@ -144,13 +137,6 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
             taskRegistrar.addTriggerTask(
                     () -> {
                         try {
-//                            ServiceResponse<TaskChain> taskChainResp
-//                                    = service.findScheduledChain(jobName);
-//
-//                            if (!taskChainResp.isSuccess())
-//                                throw new NullPointerException(
-//                                        taskChainResp.getMessage());
-
                             TaskChain taskChain = service.findScheduledChain(jobName);
                             if (!taskChain.isEmpty())
                                 taskChain.execute();

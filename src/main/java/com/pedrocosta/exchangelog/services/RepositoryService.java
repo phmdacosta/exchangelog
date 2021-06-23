@@ -1,6 +1,5 @@
 package com.pedrocosta.exchangelog.services;
 
-import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 
 import java.util.Collection;

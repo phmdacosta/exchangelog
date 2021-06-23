@@ -8,6 +8,7 @@ import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.Messages;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class BaseController {
@@ -18,6 +19,11 @@ public class BaseController {
     public BaseController(ServiceFactory serviceFactory, GsonUtils gsonUtils) {
         this.serviceFactory = serviceFactory;
         this.gsonUtils = gsonUtils;
+    }
+
+    @RequestMapping("/")
+    public String index() {
+        return "index";
     }
 
     protected ServiceFactory getServiceFactory() {

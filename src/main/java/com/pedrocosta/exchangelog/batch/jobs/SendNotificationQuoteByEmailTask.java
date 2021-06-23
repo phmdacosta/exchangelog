@@ -28,14 +28,8 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
 
     @Override
     public List<QuoteNotificationRequest> doRead() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-
-        QuoteNotificationRequestService service = (QuoteNotificationRequestService)
-                getServiceFactory().create(QuoteNotificationRequestService.class);
-//        ServiceResponse<List<QuoteNotificationRequest>> response = service.findAll();
-//        if (!response.isSuccess()) {
-//            Log.error(this, response.getMessage());
-//        }
-        return service.findAll();
+        return getServiceFactory().create(QuoteNotificationRequestService.class)
+                .findAll();
     }
 
     @Override
@@ -44,8 +38,8 @@ public class SendNotificationQuoteByEmailTask extends ScheduledTask<List<QuoteNo
         List<QuoteNotificationRequest> notificationsToLaunch = new ArrayList<>();
 
         for (QuoteNotificationRequest notifReq : notifRequests) {
-            ExchangeService exchangeService = (ExchangeService)
-                    getServiceFactory().create(ExchangeService.class);
+            ExchangeService exchangeService = getServiceFactory()
+                    .create(ExchangeService.class);
             Exchange notReqExch = notifReq.getExchange();
 
             if (notReqExch != null) {

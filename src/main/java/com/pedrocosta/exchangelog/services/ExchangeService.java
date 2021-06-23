@@ -1,33 +1,18 @@
 package com.pedrocosta.exchangelog.services;
 
-import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
-import com.pedrocosta.exchangelog.persistence.ExchangeRepository;
 import com.pedrocosta.exchangelog.utils.DatabaseOrder;
-import com.pedrocosta.exchangelog.utils.Messages;
 import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Service
-public class ExchangeService implements RepositoryService<Exchange> {
-
-    private final ExchangeRepository repository;
-    private final ServiceFactory serviceFactory;
-
-    public ExchangeService(ExchangeRepository repository, ServiceFactory serviceFactory) {
-        this.repository = repository;
-        this.serviceFactory = serviceFactory;
-    }
+public interface ExchangeService extends RepositoryService<Exchange> {
 
     /**
      * Find a exchanges based on it ID.
@@ -36,10 +21,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @return  Found exchange. Null if not found.
      */
     @Override
-    @Nullable
-    public Exchange find(long id) {
-        return repository.findById(id).orElse(null);
-    }
+    @Nullable Exchange find(long id);
 
     /**
      * Find exchanges based on parameters in database.
@@ -49,11 +31,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public List<Exchange> find(@NotNull Currency ccy, Date valueDate) {
-        handleCurrency(ccy);
-        return repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate);
-    }
+    @Nullable List<Exchange> find(@NotNull Currency ccy, Date valueDate);
 
     /**
      * Find a specific exchange based on parameters in database.
@@ -64,10 +42,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate) {
-        return find(ccy1, ccy2, valueDate, null);
-    }
+    @Nullable Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate);
 
     /**
      * Find a specific exchange based on parameters in database.
@@ -79,10 +54,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate, double amount) {
-        return find(ccy1, ccy2, valueDate, BigDecimal.valueOf(amount));
-    }
+    @Nullable Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate, double amount);
 
     /**
      * Find a specific exchange based on parameters in database.
@@ -94,18 +66,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate, BigDecimal amount) {
-        handleCurrency(ccy1);
-        handleCurrency(ccy2);
-
-        Exchange exchange =  repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
-                ccy1, ccy2, valueDate);
-        if (amount != null && !BigDecimal.ZERO.equals(amount)) {
-            exchange.setRate(exchange.getRate().multiply(amount));
-        }
-        return exchange;
-    }
+    @Nullable Exchange find(@NotNull Currency ccy1, @NotNull Currency ccy2, Date valueDate, BigDecimal amount);
 
     /**
      * Find the last exchange in database.
@@ -115,10 +76,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2) {
-        return findLast(ccy1, ccy2, null);
-    }
+    @Nullable Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2);
 
     /**
      * Find the last exchange in database.
@@ -129,10 +87,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2, double amount) {
-        return findLast(ccy1, ccy2, BigDecimal.valueOf(amount));
-    }
+    @Nullable Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2, double amount);
 
     /**
      * Find the last exchange in database.
@@ -143,17 +98,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2, BigDecimal amount) {
-        handleCurrency(ccy1);
-        handleCurrency(ccy2);
-        Exchange exchange = repository.findFirstByBaseCurrencyAndQuoteCurrencyOrderByValueDateDesc(
-                ccy1, ccy2);
-        if (amount != null && !BigDecimal.ZERO.equals(amount)) {
-            exchange.setRate(exchange.getRate().multiply(amount));
-        }
-        return exchange;
-    }
+    @Nullable Exchange findLast(@NotNull Currency ccy1, @NotNull Currency ccy2, BigDecimal amount);
 
     /**
      * Find exchange with minimum rate in a period from database.
@@ -163,11 +108,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange findWithMinRate(Date startValueDate, Date endValueDate) {
-        return repository.findByValueDateBetweenOrderByRateAsc(
-                startValueDate, endValueDate);
-    }
+    @Nullable Exchange findWithMinRate(Date startValueDate, Date endValueDate);
 
     /**
      * Find exchange with maximum rate in a period from database.
@@ -177,21 +118,14 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  Found exchange. Null if not found.
      */
-    @Nullable
-    public Exchange findWithMaxRate(Date startValueDate, Date endValueDate) {
-        return repository.findByValueDateBetweenOrderByRateDesc(
-                startValueDate, endValueDate);
-    }
+    @Nullable Exchange findWithMaxRate(Date startValueDate, Date endValueDate);
 
     /**
      * List all exchanges from database.
      *
      * @return  List of found exchanges. Empty list if not found.
      */
-    @Override
-    public List<Exchange> findAll() {
-        return repository.findAll();
-    }
+    @Override List<Exchange> findAll();
 
     /**
      * List all exchanges from database between a period of time.
@@ -200,9 +134,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  List of found exchanges. Empty list if not found.
      */
-    public List<Exchange> findAll(Currency base) {
-        return findAll(base, null, null);
-    }
+    List<Exchange> findAll(Currency base);
 
     /**
      * List all exchanges from database between a period of time.
@@ -212,9 +144,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  List of found exchanges. Empty list if not found.
      */
-    public List<Exchange> findAll(Currency base, double amount) {
-        return findAll(base, null, BigDecimal.valueOf(amount));
-    }
+    List<Exchange> findAll(Currency base, double amount);
 
     /**
      * Find exchanges based on parameters in database.
@@ -223,12 +153,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @param valueDate Valuation date of rate
      * @param amount    Amount of base currency
      *
-     * @return  Found exchange. Null if not found.
+     * @return  List of found exchanges. Empty list if not found.
      */
-    @Nullable
-    public List<Exchange> findAll(@NotNull Currency ccy, Date valueDate, double amount) {
-        return findAll(ccy, valueDate, BigDecimal.valueOf(amount));
-    }
+    List<Exchange> findAll(@NotNull Currency ccy, Date valueDate, double amount);
 
     /**
      * Find exchanges based on parameters in database.
@@ -237,32 +164,9 @@ public class ExchangeService implements RepositoryService<Exchange> {
      * @param valueDate Valuation date of rate
      * @param amount    Amount of base currency
      *
-     * @return  Found exchange. Null if not found.
+     * @return  List of found exchanges. Empty list if not found.
      */
-    @Nullable
-    public List<Exchange> findAll(@NotNull Currency ccy, Date valueDate, BigDecimal amount) {
-        handleCurrency(ccy);
-
-//        if (base == null) {
-//            return new ArrayList<>();
-//        }
-
-        List<Exchange> result;
-
-        if (valueDate != null) {
-            result = repository.findAllByBaseCurrencyAndValueDate(ccy, valueDate);
-        } else {
-            result = repository.findAllByBaseCurrency(ccy);
-        }
-
-        if (amount != null && !BigDecimal.ZERO.equals(amount)) {
-            for (Exchange exchange : result) {
-                exchange.setRate(exchange.getRate().multiply(amount));
-            }
-        }
-
-        return result;
-    }
+    List<Exchange> findAll(@NotNull Currency ccy, Date valueDate, BigDecimal amount);
 
     /**
      * List all exchanges from database between a period of time.
@@ -272,10 +176,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return  List of found exchanges. Empty list if not found.
      */
-    public List<Exchange> findAll(Date startValueDate, Date endValueDate) {
-        return repository.findAllByValueDateBetween(
-                startValueDate, endValueDate);
-    }
+    List<Exchange> findAll(Date startValueDate, Date endValueDate);
 
     /**
      * List all exchanges from database between a period of time.
@@ -285,10 +186,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return List of found exchanges. Empty list if not found.
      */
-    public List<Exchange> findAllOrderByValueDate(Date startValueDate, Date endValueDate) {
-        return repository.findAllByValueDateBetweenOrderByValueDateDesc(
-                startValueDate, endValueDate);
-    }
+    List<Exchange> findAllOrderByValueDate(Date startValueDate, Date endValueDate);
 
     /**
      * Find all exchanges ordered by minimum rate in a period from database.
@@ -300,19 +198,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *
      * @return List of found exchanges. Empty list if not found.
      */
-    public List<Exchange> findAllOrderedByRate(Date startValueDate, Date endValueDate, DatabaseOrder order) {
-        List<Exchange> result = new ArrayList<>();
-
-        if (DatabaseOrder.DESC == order) {
-            result = repository.findAllByValueDateBetweenOrderByRateDesc(
-                    startValueDate, endValueDate);
-        } else {
-            result = repository.findAllByValueDateBetweenOrderByRateAsc(
-                    startValueDate, endValueDate);
-        }
-
-        return result;
-    }
+    List<Exchange> findAllOrderedByRate(Date startValueDate, Date endValueDate, DatabaseOrder order);
 
     /**
      * Save a {@link Exchange} object.
@@ -329,54 +215,7 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If error, throws {@link SaveDataException} with error message.
      * @throws SaveDataException if error
      */
-    @Override
-    @Transactional
-    public Exchange save(Exchange exchange) throws SaveDataException {
-        try {
-            CurrencyService ccyServ = (CurrencyService) serviceFactory.create(Currency.class);
-            if (exchange.getBaseCurrency().getId() == 0) {
-                Currency baseCcy = ccyServ.find(exchange.getBaseCurrency().getCode());
-                if (baseCcy == null) {
-                    throw new NoSuchDataException(
-                            Messages.get("error.ccy.not.found",
-                                    exchange.getBaseCurrency().getCode()));
-                }
-                exchange.getBaseCurrency().setId(baseCcy.getId());
-            }
-            if (exchange.getQuoteCurrency().getId() == 0) {
-                Currency quoteCcy = ccyServ.find(exchange.getQuoteCurrency().getCode());
-                if (quoteCcy == null) {
-                    throw new NoSuchDataException(
-                            Messages.get("error.ccy.not.found",
-                                    exchange.getQuoteCurrency().getCode()));
-                }
-                exchange.getQuoteCurrency().setId(quoteCcy.getId());
-            }
-        } catch (NoSuchDataException | NullPointerException e) {
-            throw new SaveDataException(Messages.get("error.exch.save.wrong.ccy"), e);
-        }
-
-        if (exchange.getId() == 0) {
-            // Search for existing exchange
-            Exchange dbExch = repository.findByBaseCurrencyAndQuoteCurrencyAndValueDate(
-                    exchange.getBaseCurrency(), exchange.getQuoteCurrency(),
-                    exchange.getValueDate());
-            // If exchange exists, we get its id to update
-            if (dbExch != null) {
-                exchange.setId(dbExch.getId());
-            }
-        }
-
-        // Execute save
-        Exchange result = repository.save(exchange);
-        if (result.getId() == 0) {
-            throw new SaveDataException(Messages.get("error.exch.not.saved",
-                    exchange.getBaseCurrency().getCode(),
-                    exchange.getQuoteCurrency().getCode()));
-        }
-
-        return result;
-    }
+    @Override Exchange save(Exchange exchange) throws SaveDataException;
 
     /**
      * Save a new {@link Exchange} object.
@@ -391,10 +230,8 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If error, throws {@link SaveDataException} with error message.
      * @throws SaveDataException if error
      */
-    public Exchange save(@NotNull Currency ccy1, @NotNull Currency ccy2,
-                                          BigDecimal rate, @NotNull Date valueDate) throws SaveDataException {
-        return save(new Exchange(ccy1, ccy2, rate, valueDate));
-    }
+    Exchange save(@NotNull Currency ccy1, @NotNull Currency ccy2,
+                                          BigDecimal rate, @NotNull Date valueDate) throws SaveDataException;
 
     /**
      * Save a new {@link Exchange} object.
@@ -409,10 +246,8 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If error, throws {@link SaveDataException} with error message.
      * @throws SaveDataException if error
      */
-    public Exchange save(@NotNull Currency ccy1, @NotNull Currency ccy2,
-                                          Double rate,  @NotNull Date valueDate) throws SaveDataException {
-        return save(ccy1, ccy2, BigDecimal.valueOf(rate), valueDate);
-    }
+    Exchange save(@NotNull Currency ccy1, @NotNull Currency ccy2,
+                                          Double rate,  @NotNull Date valueDate) throws SaveDataException;
 
     /**
      * Save all {@link Exchange} objects in a list.
@@ -423,33 +258,5 @@ public class ExchangeService implements RepositoryService<Exchange> {
      *         If error, throws {@link SaveDataException} with error message.
      * @throws SaveDataException if error
      */
-    @Override
-    @Transactional
-    public List<Exchange> saveAll(Collection<Exchange> exchanges) throws SaveDataException {
-        List<Exchange> saved = new ArrayList<>();
-        List<Exchange> notSaved = new ArrayList<>();
-
-        for (Exchange exchange : exchanges) {
-            try {
-                Exchange savedExch = save(exchange);
-                saved.add(savedExch);
-            } catch (SaveDataException e) {
-                notSaved.add(exchange);
-            }
-        }
-
-        if (!notSaved.isEmpty()) {
-            throw new SaveDataException(
-                    Messages.get("error.some.exch.not.saved", notSaved.toString()));
-        }
-
-        return saved;
-    }
-
-    private void handleCurrency(Currency currency) {
-        if (currency.getId() == 0) {
-            currency = ((CurrencyService) serviceFactory.create(Currency.class))
-                    .find(currency.getCode());
-        }
-    }
+    @Override List<Exchange> saveAll(Collection<Exchange> exchanges) throws SaveDataException;
 }

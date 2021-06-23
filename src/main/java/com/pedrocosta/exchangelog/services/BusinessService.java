@@ -1,5 +1,6 @@
 package com.pedrocosta.exchangelog.services;
 
+import com.pedrocosta.exchangelog.exceptions.ApiException;
 import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
@@ -39,5 +40,5 @@ public interface BusinessService extends CoreService {
      * @return List of {@link Exchange} objects.
      * @throws NoSuchDataException if not found
      */
-    List<Exchange> getQuoteRate(String baseCode, String[] quoteCodes, Double amount, Date valDate) throws NoSuchDataException;
+    List<Exchange> getQuoteRate(String baseCode, String[] quoteCodes, Double amount, Date valDate) throws NoSuchDataException, ApiException;
 }

@@ -29,15 +29,17 @@ public class ServiceFactory {
     /**
      * Create a new instance of service based on class parameter.
      *
-     * @param clazz It can be service's class itself or any other class of the same prefix
+     * @param clazz Service's class itself or any other class of the same prefix
+     * @param <T>   Type of service
      *
-     * @return {@link CoreService} instance.
+     * @return  Service instance
      */
-    public CoreService create(Class clazz) {
-        if (!clazz.getSimpleName().endsWith(SUFFIX)) {
-            return create(clazz.getSimpleName());
+    public <T> T create(Class<T> clazz) {
+        if (!clazz.getSimpleName().endsWith(SUFFIX)
+                || !clazz.getSimpleName().endsWith(SUFFIX.concat("Impl")) ) {
+            return (T) create(clazz.getSimpleName());
         }
-        return (CoreService) context.getBean(clazz);
+        return (T) context.getBean(clazz);
     }
 
     /**
@@ -61,6 +63,8 @@ public class ServiceFactory {
                 break;
             } catch (ClassNotFoundException e) {
                 // Continue to search
+            } catch (ClassCastException e) {
+                Log.error(this, e);
             }
         }
 
