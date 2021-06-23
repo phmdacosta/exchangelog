@@ -16,6 +16,10 @@ public class Currency implements Cloneable {
 
 	public Currency() {}
 
+	public Currency(String code) {
+		this(code, null);
+	}
+
 	public Currency(String code, String name) {
 		setCode(code);
 		setName(name);
