@@ -2,7 +2,6 @@ package com.pedrocosta.exchangelog.batch.jobs;
 
 import com.pedrocosta.exchangelog.batch.ScheduledTask;
 import com.pedrocosta.exchangelog.exceptions.NoSuchDataException;
-import com.pedrocosta.exchangelog.exceptions.ServiceException;
 import com.pedrocosta.exchangelog.models.Currency;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.services.BackOfficeService;
@@ -10,7 +9,6 @@ import com.pedrocosta.exchangelog.services.BusinessService;
 import com.pedrocosta.exchangelog.services.ExchangeService;
 import com.pedrocosta.exchangelog.utils.Defaults;
 import com.pedrocosta.exchangelog.utils.Log;
-import com.pedrocosta.exchangelog.utils.Messages;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import org.codehaus.jettison.json.JSONException;
 import org.springframework.batch.item.NonTransientResourceException;
