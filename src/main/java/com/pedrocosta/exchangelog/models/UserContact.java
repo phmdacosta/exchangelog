@@ -22,33 +22,37 @@ public class UserContact implements Cloneable {
         return id;
     }
 
-    public void setId(long id) {
+    public UserContact setId(long id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public UserContact setName(String name) {
         this.name = name;
+        return this;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public UserContact setValue(String value) {
         this.value = value;
+        return this;
     }
 
     public ContactTypes getType() {
         return type;
     }
 
-    public void setType(ContactTypes type) {
+    public UserContact setType(ContactTypes type) {
         this.type = type;
         setName(type.name().toLowerCase());
+        return this;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class UserContact implements Cloneable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserContact that = (UserContact) o;
-        return id == that.id &&
+        return id == that.id ||
                 Objects.equals(name, that.name);
     }
 

@@ -99,7 +99,8 @@ public class User implements Cloneable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id;
+        return id == user.id
+                || Objects.equals(name, user.name);
     }
 
     @Override

@@ -45,7 +45,7 @@ public class Person implements Cloneable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return id == person.id && Objects.equals(name, person.name);
+        return id == person.id || Objects.equals(name, person.name);
     }
 
     @Override
