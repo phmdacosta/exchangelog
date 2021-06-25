@@ -6,7 +6,6 @@ import com.google.gson.stream.JsonWriter;
 import com.pedrocosta.exchangelog.models.Exchange;
 import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
 import com.pedrocosta.exchangelog.utils.DateUtils;
-import com.pedrocosta.exchangelog.utils.GsonUtils;
 
 import java.io.IOException;
 
@@ -20,9 +19,9 @@ public class QuoteNotificationRequestAdapter extends NotificationRequestAdapter<
     protected final String PERIOD = "period";
     protected final String PERIOD_TYPE = "period_type";
 
-    public QuoteNotificationRequestAdapter(GsonUtils gsonUtils) {
-        super(gsonUtils);
-    }
+//    public QuoteNotificationRequestAdapter(GsonUtils gsonUtils) {
+//        super(gsonUtils);
+//    }
 
     @Override
     protected void writeJson(JsonWriter writer, QuoteNotificationRequest quoteNotifReq) throws IOException {

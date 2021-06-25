@@ -3,31 +3,42 @@ package com.pedrocosta.exchangelog.adapters;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import com.pedrocosta.exchangelog.exceptions.NotSupportedException;
 import com.pedrocosta.exchangelog.models.NotificationRequest;
 import com.pedrocosta.exchangelog.models.User;
-import com.pedrocosta.exchangelog.utils.GsonUtils;
 import com.pedrocosta.exchangelog.utils.notifications.NotificationMeans;
 
 import java.io.IOException;
 
-public abstract class NotificationRequestAdapter<T extends NotificationRequest> extends JsonAdapter<T> {
+public class NotificationRequestAdapter<T extends NotificationRequest> extends JsonAdapter<T> {
     protected final String ID = "id";
     protected final String NAME = "name";
     protected final String MEANS = "means";
     protected final String ENABLED = "enabled";
     protected final String USER = "user";
 
-    public NotificationRequestAdapter(GsonUtils gsonUtils) {
-        super(gsonUtils);
-    }
-
     @Override
     public void write(JsonWriter writer, T notificationRequest) throws IOException {
         writer.beginObject();
         writeParent(writer, notificationRequest);
         writeJson(writer, notificationRequest);
-//        writeNested(writer, notificationRequest); TODO back when implemented user
+        writeNested(writer, notificationRequest); //TODO back when implemented user
         writer.endObject();
+    }
+
+    @Override
+    protected void writeJson(JsonWriter writer, T obj) throws IOException, NotSupportedException {
+        // Empty. Done by writeParent().
+    }
+
+    @Override
+    protected T readJson(JsonReader reader) throws IOException, NotSupportedException {
+        T notificationRequest = (T) new NotificationRequest();
+        String fieldName = "";
+        while (reader.hasNext()) {
+            readParent(reader, fieldName, notificationRequest);
+        }
+        return notificationRequest;
     }
 
     protected void readParent(JsonReader reader, String fieldName, T notifReq) throws IOException {
@@ -60,11 +71,11 @@ public abstract class NotificationRequestAdapter<T extends NotificationRequest> 
                 token = reader.peek();
                 notifReq.setEnabled(reader.nextBoolean());
                 break;
-//            case USER: TODO back when implemented user
-//                token = reader.peek();
-//                User user = getGsonUtils().fromJson(reader, User.class);
-//                notifReq.setUser(user);
-//                break;
+            case USER: //TODO back when implemented user
+                token = reader.peek();
+                User user = getGsonUtils().fromJson(reader, User.class);
+                notifReq.setUser(user);
+                break;
             default:
                 reader.skipValue();
         }

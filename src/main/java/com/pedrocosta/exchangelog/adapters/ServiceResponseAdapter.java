@@ -12,9 +12,9 @@ import java.io.IOException;
 @Component
 public class ServiceResponseAdapter extends JsonAdapter<ServiceResponse<?>> {
 
-    public ServiceResponseAdapter(GsonUtils gsonUtils) {
-        super(gsonUtils);
-    }
+//    public ServiceResponseAdapter(GsonUtils gsonUtils) {
+//        super(gsonUtils);
+//    }
 
     @Override
     protected void writeJson(JsonWriter writer, ServiceResponse<?> obj) throws IOException {

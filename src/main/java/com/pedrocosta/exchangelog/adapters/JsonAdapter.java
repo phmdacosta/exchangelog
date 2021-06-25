@@ -17,9 +17,13 @@ import java.io.IOException;
 public abstract class JsonAdapter<T> extends TypeAdapter<T> {
     private final GsonUtils gsonUtils;
 
-    public JsonAdapter(GsonUtils gsonUtils) {
-        this.gsonUtils = gsonUtils;
+    public JsonAdapter() {
+        gsonUtils = new GsonUtils(new AdapterFactory());
     }
+
+//    public JsonAdapter(GsonUtils gsonUtils) {
+//        this.gsonUtils = gsonUtils;
+//    }
 
     public GsonUtils getGsonUtils() {
         return gsonUtils;

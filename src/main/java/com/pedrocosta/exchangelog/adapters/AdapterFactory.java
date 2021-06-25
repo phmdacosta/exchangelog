@@ -86,12 +86,12 @@ public class AdapterFactory {
                         Class.forName(getAdapterName(pack.getName(), clazz, type));
                 if (adapterClass.getConstructors().length > 0) {
                     Class<?>[] paramTypes = adapterClass.getConstructors()[0].getParameterTypes();
-                    if (paramTypes.length > 0) {
-                        adapter = adapterClass.getConstructor(paramTypes)
-                                .newInstance(new GsonUtils(new AdapterFactory()));
-                    } else {
+//                    if (paramTypes.length > 0) {
+//                        adapter = adapterClass.getConstructor(paramTypes)
+//                                .newInstance(new GsonUtils(new AdapterFactory()));
+//                    } else {
                         adapter = adapterClass.getConstructor(new Class[0]).newInstance();
-                    }
+//                    }
                 }
                 break;
             } catch (Exception e) {
