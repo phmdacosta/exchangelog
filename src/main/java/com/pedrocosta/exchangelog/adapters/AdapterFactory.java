@@ -1,8 +1,10 @@
 package com.pedrocosta.exchangelog.adapters;
 
+import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
 import com.pedrocosta.exchangelog.utils.AppProperties;
-import com.pedrocosta.exchangelog.utils.GsonUtils;
 import com.pedrocosta.exchangelog.utils.Log;
 import com.pedrocosta.exchangelog.utils.PackageUtils;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Component
-public class AdapterFactory {
+public class AdapterFactory implements TypeAdapterFactory {
     private static final String ADAPTER_SUFFIX = "Adapter";
     private static final String ADAPTER_PACKAGE = "adapters";
     private static final String PROJECT_PACKAGE = "project.package";
@@ -82,23 +84,45 @@ public class AdapterFactory {
 
         for (Package pack : subPackages) {
             try {
-                Class<TypeAdapter<T>> adapterClass = (Class<TypeAdapter<T>>)
-                        Class.forName(getAdapterName(pack.getName(), clazz, type));
-                if (adapterClass.getConstructors().length > 0) {
-                    Class<?>[] paramTypes = adapterClass.getConstructors()[0].getParameterTypes();
-//                    if (paramTypes.length > 0) {
-//                        adapter = adapterClass.getConstructor(paramTypes)
-//                                .newInstance(new GsonUtils(new AdapterFactory()));
-//                    } else {
-                        adapter = adapterClass.getConstructor(new Class[0]).newInstance();
-//                    }
+                adapter = findAdapter(getAdapterName(pack.getName(), clazz, type));
+                if (adapter != null) {
+                    break;
                 }
-                break;
             } catch (Exception e) {
                 Log.warn(this, e.getMessage());
             }
         }
 
         return adapter;
+    }
+
+    private <T> TypeAdapter<T> findAdapter(String name) throws ClassNotFoundException {
+        TypeAdapter<T> adapter = null;
+        try {
+            Class<TypeAdapter<T>> adapterClass = (Class<TypeAdapter<T>>) Class.forName(name);
+            if (adapterClass.getConstructors().length > 0) {
+                Class<?>[] paramTypes = adapterClass.getConstructors()[0].getParameterTypes();
+//                    if (paramTypes.length > 0) {
+//                        adapter = adapterClass.getConstructor(paramTypes)
+//                                .newInstance(new GsonUtils(new AdapterFactory()));
+//                    } else {
+                adapter = adapterClass.getConstructor(new Class[0]).newInstance();
+//                    }
+            }
+        } catch (Exception e) {
+            Log.warn(this, e.getMessage());
+        }
+        return adapter;
+    }
+
+    @Override
+    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+        try {
+            return findAdapter(typeToken.getType().getTypeName()
+                    .concat(getAdapterSuffix()));
+        } catch (Exception e) {
+            Log.warn(this, e.getMessage());
+        }
+        return null;
     }
 }
