@@ -26,4 +26,8 @@ public enum ContactTypes {
     public NotificationMeans getMeans() {
         return means;
     }
+
+    public static ContactTypes get(String name) {
+        return valueOf(name.toUpperCase());
+    }
 }

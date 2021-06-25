@@ -12,7 +12,8 @@ import java.security.InvalidParameterException;
 public class GsonUtils {
 
     private final AdapterFactory adapterFactory;
-    private Gson gson;
+//    private Gson gson;
+    private GsonBuilder builder;
 
     public GsonUtils(AdapterFactory adapterFactory) {
         this.adapterFactory = adapterFactory;
@@ -67,21 +68,22 @@ public class GsonUtils {
     }
 
     private <T> Gson createGson(Class<T> classOfT, TypeAdapter adapter, String type) throws NullPointerException, InvalidParameterException {
-        if (gson == null) {
-            GsonBuilder builder = new GsonBuilder()
+        if (builder == null) {
+            builder = new GsonBuilder()
                     .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-            gson = builder.create();
+        }
 
-            if (adapter == null && adapterFactory != null) {
-                adapter = adapterFactory.create(classOfT, type);
-            }
+        Gson gson = builder.create();
 
-            if (adapter != null) {
-                gson = builder.registerTypeAdapter(classOfT, adapter).create();
-            } else {
-                Log.warn(this, Messages.get("error.adapter.not.found",
-                        classOfT.getSimpleName(), type));
-            }
+        if (adapter == null && adapterFactory != null) {
+            adapter = adapterFactory.create(classOfT, type);
+        }
+
+        if (adapter != null) {
+            gson = builder.registerTypeAdapter(classOfT, adapter).create();
+        } else {
+            Log.warn(this, Messages.get("error.adapter.not.found",
+                    classOfT.getSimpleName(), type));
         }
 
         return gson;
