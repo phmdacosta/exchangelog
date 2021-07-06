@@ -21,23 +21,19 @@ public abstract class JsonAdapter<T> extends TypeAdapter<T> {
         gsonUtils = new GsonUtils(new AdapterFactory());
     }
 
-//    public JsonAdapter(GsonUtils gsonUtils) {
-//        this.gsonUtils = gsonUtils;
-//    }
-
     public GsonUtils getGsonUtils() {
         return gsonUtils;
     }
 
     @Override
     public void write(JsonWriter writer, T t) throws IOException {
-        writer.beginObject();
+        beginWriter(writer);
         try {
             writeJson(writer, t);
         } catch (NotSupportedException e) {
             Log.error(this, e);
         } finally {
-            writer.endObject();
+            endWriter(writer);
         }
     }
 
@@ -48,7 +44,7 @@ public abstract class JsonAdapter<T> extends TypeAdapter<T> {
             return null;
         }
 
-        reader.beginObject();
+        beginReader(reader);
         T obj = null;
         try {
             obj = readJson(reader);
@@ -57,13 +53,31 @@ public abstract class JsonAdapter<T> extends TypeAdapter<T> {
         } catch (Exception e) {
             Log.warn(this, e.getMessage());
         } finally {
-            reader.endObject();
+            endReader(reader);
         }
 
         return obj;
     }
 
+    protected void beginWriter(JsonWriter writer) throws IOException {
+        writer.beginObject();
+    }
+
+    protected void endWriter(JsonWriter writer) throws IOException {
+        writer.endObject();
+    }
+
+    protected void beginReader(JsonReader reader) throws IOException {
+        reader.beginObject();
+    }
+
+    protected void endReader(JsonReader reader) throws IOException {
+        reader.endObject();
+    }
+
     protected abstract void writeJson(JsonWriter writer, T obj) throws IOException, NotSupportedException;
 
     protected abstract T readJson(JsonReader reader) throws IOException, NotSupportedException;
+
+//    protected abstract T readEach(String name, T t) throws IOException, NotSupportedException;
 }

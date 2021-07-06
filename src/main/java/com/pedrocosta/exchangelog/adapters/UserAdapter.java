@@ -26,14 +26,15 @@ public class UserAdapter extends JsonAdapter<User>{
         writer.name(USER_NAME);
         writer.value(user.getName());
         writer.name(CONTACTS);
-        writer.beginArray();
-        for (UserContact contact : user.getContacts()) {
-            writer.beginObject();
-            writer.name(contact.getName());
-            writer.value(contact.getValue());
-            writer.endObject();
-        }
-        writer.endArray();
+        writer.value(getGsonUtils().toJson(user.getContacts()));
+//        writer.beginArray();
+//        for (UserContact contact : user.getContacts()) {
+//            writer.beginObject();
+//            writer.name(contact.getName());
+//            writer.value(contact.getValue());
+//            writer.endObject();
+//        }
+//        writer.endArray();
         writer.name(NAME);
         writer.value(user.getPerson().getName());
     }
