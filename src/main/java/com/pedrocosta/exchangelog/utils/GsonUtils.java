@@ -73,19 +73,20 @@ public class GsonUtils {
                     .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
         }
 
-        Gson gson = builder.create();
-
         if (adapter == null && adapterFactory != null) {
-            adapter = adapterFactory.create(classOfT, type);
+            if (type != null && !type.isBlank()) {
+                adapter = adapterFactory.create(classOfT, type);
+                if (adapter != null) {
+                    builder.registerTypeAdapter(classOfT, adapter);
+                } else {
+                    Log.warn(this, Messages.get("error.adapter.not.found",
+                            classOfT.getSimpleName(), type));
+                }
+            } else {
+                builder.registerTypeAdapterFactory(adapterFactory);
+            }
         }
 
-        if (adapter != null) {
-            gson = builder.registerTypeAdapter(classOfT, adapter).create();
-        } else {
-            Log.warn(this, Messages.get("error.adapter.not.found",
-                    classOfT.getSimpleName(), type));
-        }
-
-        return gson;
+        return builder.create();
     }
 }

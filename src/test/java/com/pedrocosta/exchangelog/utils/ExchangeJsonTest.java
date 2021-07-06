@@ -40,7 +40,7 @@ public class ExchangeJsonTest {
 
     @Test
     public void testJsonCreationFromObject() {
-        String generateJson = gsonUtils.toJson(exchange, new ExchangeAdapter());
+        String generateJson = gsonUtils.toJson(exchange);
         assert jsonForExchangeSerialize().equals(generateJson);
     }
 
