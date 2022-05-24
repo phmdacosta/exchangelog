@@ -44,14 +44,25 @@ public class AdapterFactory implements TypeAdapterFactory {
      * @return Adapter complete name with package.
      */
     protected final <T> String getAdapterName(String packageName, Class<T> clazz, String type) {
-        String typeCap = "";
+        return getAdapterName(packageName, clazz.getSimpleName(), type);
+    }
 
+    /**
+     * Build adapter class name with its package.
+     * @param packageName   Name of package of adapter classes
+     * @param simpleName    Simple name of the object's class to be deserialized
+     * @param type          If we use different types of adapters with different implementation,
+     *                      use this parameter to define which type are looking for
+     * @param <T>           Type class of object to be deserialized
+     *
+     * @return  Adapter complete name with package.
+     */
+    protected final <T> String getAdapterName(String packageName, String simpleName, String type) {
+        String typeCap = "";
         if (type != null && !type.isBlank()) {
             typeCap = StringUtils.capitalize(type);
         }
-
-        return packageName + "." + typeCap + clazz.getSimpleName()
-                + getAdapterSuffix();
+        return packageName + "." + typeCap + simpleName + getAdapterSuffix();
     }
 
     /**
@@ -96,6 +107,29 @@ public class AdapterFactory implements TypeAdapterFactory {
         return adapter;
     }
 
+    @Override
+    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
+        TypeAdapter<T> adapter = null;
+
+        // Look for all subpackages into service
+        List<Package> subPackages = PackageUtils.getSubPackages(getAdapterPackage());
+        String[] names = typeToken.getType().getTypeName().split("\\.");
+        String simpleName = names[names.length - 1];
+
+        for (Package pack : subPackages) {
+            try {
+                adapter = findAdapter(getAdapterName(pack.getName(), simpleName, null));
+                if (adapter != null) {
+                    break;
+                }
+            } catch (Exception e) {
+                Log.warn(this, e.getMessage());
+            }
+        }
+
+        return adapter;
+    }
+
     private <T> TypeAdapter<T> findAdapter(String name) throws ClassNotFoundException {
         TypeAdapter<T> adapter = null;
         try {
@@ -113,16 +147,5 @@ public class AdapterFactory implements TypeAdapterFactory {
             Log.warn(this, e.getMessage());
         }
         return adapter;
-    }
-
-    @Override
-    public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-        try {
-            return findAdapter(typeToken.getType().getTypeName()
-                    .concat(getAdapterSuffix()));
-        } catch (Exception e) {
-            Log.warn(this, e.getMessage());
-        }
-        return null;
     }
 }

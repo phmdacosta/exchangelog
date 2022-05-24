@@ -1,9 +1,7 @@
 package com.pedrocosta.exchangelog.utils;
 
 import com.pedrocosta.exchangelog.adapters.AdapterFactory;
-import com.pedrocosta.exchangelog.models.Currency;
-import com.pedrocosta.exchangelog.models.Exchange;
-import com.pedrocosta.exchangelog.models.QuoteNotificationRequest;
+import com.pedrocosta.exchangelog.models.*;
 import com.pedrocosta.exchangelog.utils.notifications.NotificationMeans;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +40,21 @@ public class QuoteNotificationRequestJsonTest {
         quoteNotificationRequest.setMeans(NotificationMeans.EMAIL);
         quoteNotificationRequest.setName("Test Notification");
         quoteNotificationRequest.setEnabled(true);
-//        quoteNotificationRequest.setUser(new User());
+        quoteNotificationRequest.setUser(new User()
+                .setId(123)
+                .setName("persontest")
+                .setPassword("123456test!")
+                .addContact(new UserContact()
+                        .setId(1)
+                        .setType(ContactTypes.EMAIL)
+                        .setValue("test@test.com"))
+                .addContact(new UserContact()
+                        .setId(2)
+                        .setType(ContactTypes.PHONE)
+                        .setValue("11111111"))
+                .setPerson(new Person()
+                        .setId(55)
+                        .setName("Person Test")));
     }
 
     @Test
@@ -78,10 +90,18 @@ public class QuoteNotificationRequestJsonTest {
             ",\"end_date\":\"2021-06-08\"" +
             ",\"period\":1" +
             ",\"period_type\":\"YEARS\"" +
-//            ",\"user\":" +
-//            "{" +
-//                "\"contacts\":[]" +
-//            "}" +
+            ",\"user\":{" +
+                "\"username\":\"persontest\"" +
+                ",\"contacts\":[" +
+                    "{" +
+                        "\"email\":\"test@test.com\"" +
+                    "}" +
+                    ",{" +
+                        "\"phone\":\"11111111\"" +
+                    "}" +
+                "]" +
+                ",\"name\":\"Person Test\"" +
+            "}" +
         "}";
 
         return result;
@@ -108,11 +128,18 @@ public class QuoteNotificationRequestJsonTest {
                         ",\"name\":\"Test Notification\"" +
                         ",\"means\":\"EMAIL\"" +
                         ",\"enabled\":true" +
-//                        ",\"user\":" +
-//                        "{" +
-//                            "\"id\":93" +
-//                            "\"contacts\":[]" +
-//                        "}" +
+                        ",\"user\":{" +
+                            "\"username\":\"persontest\"" +
+                            ",\"contacts\":[" +
+                                "{" +
+                                    "\"email\":\"test@test.com\"" +
+                                "}" +
+                                ",{" +
+                                    "\"phone\":\"11111111\"" +
+                                "}" +
+                            "]" +
+                            ",\"name\":\"Person Test\"" +
+                        "}" +
                 "}";
 
         return result;

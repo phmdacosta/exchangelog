@@ -26,7 +26,7 @@ public class UserAdapter extends JsonAdapter<User>{
         writer.name(USER_NAME);
         writer.value(user.getName());
         writer.name(CONTACTS);
-        writer.value(getGsonUtils().toJson(user.getContacts()));
+        writer.jsonValue(getGsonUtils().toJson(user.getContacts()));
 //        writer.beginArray();
 //        for (UserContact contact : user.getContacts()) {
 //            writer.beginObject();
