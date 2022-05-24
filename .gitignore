@@ -1,12 +1,13 @@
 # Compiled class file
 *.class
 HELP.md
-target/
+**/target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
 # Log file
+**/logs/
 *.log
 ### STS ###
 .apt_generated
@@ -16,6 +17,11 @@ target/
 .settings
 .springBeans
 .sts4-cache
+
+### Maven ###
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
 
 ### IntelliJ IDEA ###
 .idea
