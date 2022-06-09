@@ -1,0 +1,52 @@
+package com.pedrocosta.exchangelog.base.controller;
+
+import com.pedrocosta.exchangelog.base.ServiceFactory;
+import com.pedrocosta.exchangelog.base.ServiceResponse;
+import com.pedrocosta.utils.jsonmanager.JsonUtils;
+import com.pedrocosta.utils.output.Log;
+import com.pedrocosta.utils.output.Messages;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class BaseController {
+
+    private final ServiceFactory serviceFactory;
+    private final JsonUtils jsonUtils;
+
+    public BaseController(ServiceFactory serviceFactory, JsonUtils jsonUtils) {
+        this.serviceFactory = serviceFactory;
+        this.jsonUtils = jsonUtils;
+    }
+
+    @RequestMapping("/")
+    public String index() {
+        return "";
+    }
+
+    protected ServiceFactory getServiceFactory() {
+        return serviceFactory;
+    }
+
+    protected String toJson(ServiceResponse<?> response) {
+        String json = jsonUtils.toJson(response);
+        Log.info(this, "Generated: " + json);
+        return json;
+    }
+
+    protected <T> T fromJson(String json, Class<T> tClass) {
+        Log.info(this, "Loading: " + json);
+        return jsonUtils.fromJson(json, tClass);
+    }
+
+    protected boolean isValidParameters(Object ... params) {
+        for (Object p : params) {
+            if (p == null)
+                return false;
+            if (p instanceof String && ((String) p).isBlank())
+                return false;
+        }
+        return true;
+    }
+}
