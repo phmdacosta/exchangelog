@@ -57,7 +57,7 @@ public class NotificationServiceTest {
         });
         verify(repository).save(notif);
 
-        String expectedMessage = "Could not save notification request.";
+        String expectedMessage = "Could not register notification.";
         assert exception.getMessage().contains(expectedMessage);
     }
 
@@ -106,7 +106,7 @@ public class NotificationServiceTest {
         });
         verify(repository).saveAll(paramList);
 
-        String expectedMessage = "Could not save the following notifications: ";
+        String expectedMessage = "Could not register notifications.";
 
         assert exception.getMessage().contains(expectedMessage);
         assert resultList.equals(exception.getData());

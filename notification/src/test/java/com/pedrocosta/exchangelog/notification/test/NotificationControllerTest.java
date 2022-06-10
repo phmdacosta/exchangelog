@@ -97,7 +97,7 @@ public class NotificationControllerTest {
                 .andDo(print())
                 .andExpect(status().is(400))
                 .andExpect(content().string(
-                        containsString("Missing body.")));
+                        containsString("Required request body is missing.")));
     }
 
     @Test
@@ -198,6 +198,6 @@ public class NotificationControllerTest {
                 .andDo(print())
                 .andExpect(status().is(400))
                 .andExpect(content().string(
-                        containsString("Missing body.")));
+                        containsString("Required request body is missing.")));
     }
 }
