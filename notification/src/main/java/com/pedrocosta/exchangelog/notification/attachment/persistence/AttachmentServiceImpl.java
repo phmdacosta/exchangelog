@@ -1,6 +1,6 @@
 package com.pedrocosta.exchangelog.notification.attachment.persistence;
 
-import com.pedrocosta.exchangelog.base.exceptions.SaveDataException;
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.notification.attachment.Attachment;
 import org.springframework.stereotype.Service;
 

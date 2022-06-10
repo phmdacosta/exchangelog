@@ -5,6 +5,7 @@ import com.pedrocosta.utils.jsonmanager.JsonUtils;
 import com.pedrocosta.utils.jsonmanager.adapter.JsonReadAdapter;
 import com.pedrocosta.utils.jsonmanager.adapter.JsonWriteAdapter;
 import com.pedrocosta.utils.jsonmanager.adapter.UtilsTypeAdapter;
+import com.pedrocosta.utils.jsonmanager.adapter.annotation.JsonAdapter;
 import com.pedrocosta.utils.jsonmanager.stream.JsonReader;
 import com.pedrocosta.utils.jsonmanager.stream.JsonWriter;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.util.Set;
 
 @Component
+@JsonAdapter(type = Notification.class)
 public class NotificationAdapter extends UtilsTypeAdapter<Notification> {
 
     protected final String ID = "id";

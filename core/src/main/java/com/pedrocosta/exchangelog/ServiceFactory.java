@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.base;
+package com.pedrocosta.exchangelog;
 
 import com.pedrocosta.utils.PackageUtils;
 import com.pedrocosta.utils.output.Log;

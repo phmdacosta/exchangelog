@@ -1,6 +1,6 @@
-package com.pedrocosta.exchangelog.base;
+package com.pedrocosta.exchangelog;
 
-import com.pedrocosta.exchangelog.base.exceptions.SaveDataException;
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 
 import java.util.Collection;
 import java.util.List;

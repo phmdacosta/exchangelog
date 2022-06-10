@@ -1,9 +1,8 @@
 package com.pedrocosta.exchangelog.notification.persistence;
 
-import com.pedrocosta.exchangelog.base.exceptions.SaveDataException;
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.notification.Notification;
 import com.pedrocosta.utils.output.Messages;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

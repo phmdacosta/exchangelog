@@ -1,6 +1,6 @@
 package com.pedrocosta.exchangelog.notification;
 
-import com.pedrocosta.exchangelog.base.BaseConfig;
+import com.pedrocosta.exchangelog.BaseConfig;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration

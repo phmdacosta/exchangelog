@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.base.utils;
+package com.pedrocosta.exchangelog.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;

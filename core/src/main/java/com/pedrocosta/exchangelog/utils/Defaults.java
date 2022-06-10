@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.base.utils;
+package com.pedrocosta.exchangelog.utils;
 
 import java.math.RoundingMode;
 import java.util.Locale;

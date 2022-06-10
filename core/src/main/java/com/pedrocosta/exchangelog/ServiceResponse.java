@@ -1,7 +1,6 @@
-package com.pedrocosta.exchangelog.base;
+package com.pedrocosta.exchangelog;
 
 import com.google.gson.annotations.Expose;
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;

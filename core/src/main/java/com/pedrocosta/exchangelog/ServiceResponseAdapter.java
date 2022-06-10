@@ -1,8 +1,6 @@
-package com.pedrocosta.exchangelog.base;
+package com.pedrocosta.exchangelog;
 
 import com.pedrocosta.utils.exception.NotSupportedException;
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
-import com.pedrocosta.utils.jsonmanager.adapter.JsonWriteAdapter;
 import com.pedrocosta.utils.jsonmanager.adapter.WriteTypeAdapter;
 import com.pedrocosta.utils.jsonmanager.stream.JsonWriter;
 import org.springframework.stereotype.Component;

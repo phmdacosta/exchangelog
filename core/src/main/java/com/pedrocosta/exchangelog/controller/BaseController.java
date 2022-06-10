@@ -1,11 +1,9 @@
-package com.pedrocosta.exchangelog.base.controller;
+package com.pedrocosta.exchangelog.controller;
 
-import com.pedrocosta.exchangelog.base.ServiceFactory;
-import com.pedrocosta.exchangelog.base.ServiceResponse;
+import com.pedrocosta.exchangelog.ServiceFactory;
+import com.pedrocosta.exchangelog.ServiceResponse;
 import com.pedrocosta.utils.jsonmanager.JsonUtils;
 import com.pedrocosta.utils.output.Log;
-import com.pedrocosta.utils.output.Messages;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 

@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.base.exceptions;
+package com.pedrocosta.exchangelog.exceptions;
 
 /**
  * Exception for any error that happens in api requesters.

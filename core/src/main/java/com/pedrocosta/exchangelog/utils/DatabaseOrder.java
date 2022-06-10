@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.base.utils;
+package com.pedrocosta.exchangelog.utils;
 
 /**
  * @author Pedro H M da Costa

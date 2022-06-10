@@ -1,6 +1,6 @@
 package com.pedrocosta.exchangelog.notification.test;
 
-import com.pedrocosta.exchangelog.base.exceptions.SaveDataException;
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.notification.Notification;
 import com.pedrocosta.exchangelog.notification.persistence.NotificationRepository;
 import com.pedrocosta.exchangelog.notification.persistence.NotificationService;

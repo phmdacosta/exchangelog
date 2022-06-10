@@ -1,11 +1,11 @@
 package com.pedrocosta.exchangelog.notification;
 
-import com.pedrocosta.exchangelog.base.ServiceFactory;
-import com.pedrocosta.exchangelog.base.ServiceResponse;
-import com.pedrocosta.exchangelog.base.controller.BaseController;
-import com.pedrocosta.exchangelog.base.exceptions.BaseControllerAdvice;
-import com.pedrocosta.exchangelog.base.exceptions.RestApiException;
-import com.pedrocosta.exchangelog.base.exceptions.SaveDataException;
+import com.pedrocosta.exchangelog.ServiceFactory;
+import com.pedrocosta.exchangelog.ServiceResponse;
+import com.pedrocosta.exchangelog.controller.BaseController;
+import com.pedrocosta.exchangelog.exceptions.BaseControllerAdvice;
+import com.pedrocosta.exchangelog.exceptions.RestApiException;
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.notification.persistence.NotificationService;
 import com.pedrocosta.exchangelog.notification.sender.NotificationSender;
 import com.pedrocosta.exchangelog.notification.sender.NotificationSenderFactory;

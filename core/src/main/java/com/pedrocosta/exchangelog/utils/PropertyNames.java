@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.base.utils;
+package com.pedrocosta.exchangelog.utils;
 
 public interface PropertyNames {
     String PROJECT_ENGINE = "project.engine";
