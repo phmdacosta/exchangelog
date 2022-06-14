@@ -1,6 +1,6 @@
 package com.pedrocosta.exchangelog.notification;
 
-import com.pedrocosta.utils.output.Log;
+import com.pedrocosta.springutils.output.Log;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 

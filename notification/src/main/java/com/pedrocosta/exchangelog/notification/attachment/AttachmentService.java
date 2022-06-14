@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.notification.attachment.persistence;
+package com.pedrocosta.exchangelog.notification.attachment;
 
 import com.pedrocosta.exchangelog.RepositoryService;
 import com.pedrocosta.exchangelog.notification.attachment.Attachment;

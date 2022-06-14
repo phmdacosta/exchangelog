@@ -3,8 +3,9 @@ package com.pedrocosta.exchangelog.notification.test;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.notification.Notification;
 import com.pedrocosta.exchangelog.notification.persistence.NotificationRepository;
-import com.pedrocosta.exchangelog.notification.persistence.NotificationService;
-import com.pedrocosta.exchangelog.notification.persistence.NotificationServiceImpl;
+import com.pedrocosta.exchangelog.notification.NotificationService;
+import com.pedrocosta.exchangelog.notification.impl.NotificationServiceImpl;
+import com.pedrocosta.exchangelog.notification.sender.NotificationSenderFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -23,13 +24,15 @@ public class NotificationServiceTest {
 
     @Mock
     private NotificationRepository repository;
+    @Mock
+    private NotificationSenderFactory senderFactory;
     private NotificationService service;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        service = new NotificationServiceImpl(repository);
+        service = new NotificationServiceImpl(repository,senderFactory,null);
 
         notification = new Notification();
         notification.setId(1L);

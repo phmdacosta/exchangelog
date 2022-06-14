@@ -1,6 +1,6 @@
 package com.pedrocosta.exchanglog.base.test;
 
-import com.pedrocosta.utils.output.Messages;
+import com.pedrocosta.springutils.output.Messages;
 import org.junit.jupiter.api.Test;
 
 public class MessagesTest {

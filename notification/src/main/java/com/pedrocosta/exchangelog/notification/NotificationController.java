@@ -1,17 +1,13 @@
 package com.pedrocosta.exchangelog.notification;
 
 import com.pedrocosta.exchangelog.ServiceFactory;
-import com.pedrocosta.exchangelog.ServiceResponse;
+import com.pedrocosta.exchangelog.RestResponse;
 import com.pedrocosta.exchangelog.controller.BaseController;
-import com.pedrocosta.exchangelog.exceptions.BaseControllerAdvice;
 import com.pedrocosta.exchangelog.exceptions.RestApiException;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
-import com.pedrocosta.exchangelog.notification.persistence.NotificationService;
-import com.pedrocosta.exchangelog.notification.sender.NotificationSender;
-import com.pedrocosta.exchangelog.notification.sender.NotificationSenderFactory;
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
-import com.pedrocosta.utils.output.Log;
-import com.pedrocosta.utils.output.Messages;
+import com.pedrocosta.exchangelog.utils.JsonUtils;
+import com.pedrocosta.springutils.output.Log;
+import com.pedrocosta.springutils.output.Messages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +20,10 @@ import java.util.List;
 public class NotificationController extends BaseController {
 
     private final NotificationService notificationService;
-    private final NotificationSenderFactory notificationSenderFactory;
 
-    public NotificationController(ServiceFactory serviceFactory,
-                                  JsonUtils jsonUtils,
-                                  NotificationSenderFactory notificationSenderFactory, BaseControllerAdvice ca) {
+    public NotificationController(ServiceFactory serviceFactory, JsonUtils jsonUtils) {
         super(serviceFactory, jsonUtils);
         this.notificationService = serviceFactory.create(NotificationService.class);
-        this.notificationSenderFactory = notificationSenderFactory;
     }
 
     @GetMapping(value = "/notificationMeans", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,14 +32,14 @@ public class NotificationController extends BaseController {
         for (Mean mean : Mean.values()) {
             meanNames.add(mean.name());
         }
-        return toJson(ServiceResponse.<List<String>>createSuccess().setObject(meanNames));
+        return toJson(RestResponse.<List<String>>createSuccess().setObject(meanNames));
     }
 
     @PostMapping(value = "/pushNotification",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public String pushNotification(@RequestBody String json) throws RestApiException {
-        ServiceResponse<Object> response = ServiceResponse.createSuccess();
+        RestResponse<Object> response = RestResponse.createSuccess();
         Notification notification;
         try {
             notification = fromJson(json, Notification.class);
@@ -58,12 +50,7 @@ public class NotificationController extends BaseController {
         }
 
         try {
-            Notification saved = notificationService.save(notification);
-            //Try to send
-            NotificationSender sender = notificationSenderFactory.create(
-                    Mean.get(notification.getMean()));
-            sender.setNotification(saved);
-            sender.send();
+            notificationService.saveAndNotify(notification);
         } catch (SaveDataException e) {
             Log.error(this, e);
             throw new RestApiException(HttpStatus.INTERNAL_SERVER_ERROR,
@@ -78,7 +65,7 @@ public class NotificationController extends BaseController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public String pushNotifications(@RequestBody String json) {
-        ServiceResponse<Object> response = ServiceResponse.createSuccess();
+        RestResponse<Object> response = RestResponse.createSuccess();
         List<Notification> notifications;
         try {
             notifications = Arrays.asList(fromJson(json, Notification[].class));
@@ -89,18 +76,11 @@ public class NotificationController extends BaseController {
         }
 
         try {
-            List<Notification> saved = notificationService.saveAll(notifications);
-            //Try to send
-            for (Notification toSend : saved) {
-                NotificationSender sender = notificationSenderFactory.create(
-                        Mean.valueOf(toSend.getMean()));
-                sender.setNotification(toSend);
-                sender.send();
-            }
+            notificationService.saveAndNotifyAll(notifications);
         } catch (SaveDataException e) {
             Log.error(this, e);
             List<Notification> notSaved = (List<Notification>) e.getData();
-            response = ServiceResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
+            response = RestResponse.createError(HttpStatus.INTERNAL_SERVER_ERROR,
                     e.getMessage());
             response.setObject(notSaved);
             throw new RestApiException(response);

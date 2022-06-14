@@ -1,13 +1,14 @@
 package com.pedrocosta.exchangelog.notification.sender;
 
-import com.pedrocosta.utils.output.Log;
+import com.pedrocosta.exchangelog.notification.Notification;
+import com.pedrocosta.springutils.output.Log;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppNotificationSender extends NotificationSender {
+public class AppNotificationSender implements NotificationSender {
 
     @Override
-    public void execute() {
+    public void send(Notification notification) {
         Log.info(this, "Push notification to App");
         // TODO Implement app notification send
     }

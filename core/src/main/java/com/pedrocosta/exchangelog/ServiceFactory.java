@@ -1,8 +1,8 @@
 package com.pedrocosta.exchangelog;
 
-import com.pedrocosta.utils.PackageUtils;
-import com.pedrocosta.utils.output.Log;
-import com.pedrocosta.utils.output.Messages;
+import com.pedrocosta.springutils.PackageUtils;
+import com.pedrocosta.springutils.output.Log;
+import com.pedrocosta.springutils.output.Messages;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;

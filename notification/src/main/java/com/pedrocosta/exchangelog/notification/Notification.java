@@ -13,8 +13,6 @@ public class Notification implements Serializable, Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "mean_id", referencedColumnName = "id", nullable = false)
     private String mean;
     @Column(name = "sender_service")
     private String from;

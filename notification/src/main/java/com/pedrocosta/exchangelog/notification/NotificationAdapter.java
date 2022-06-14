@@ -1,13 +1,10 @@
 package com.pedrocosta.exchangelog.notification;
 
-import com.pedrocosta.utils.exception.NotSupportedException;
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
-import com.pedrocosta.utils.jsonmanager.adapter.JsonReadAdapter;
-import com.pedrocosta.utils.jsonmanager.adapter.JsonWriteAdapter;
-import com.pedrocosta.utils.jsonmanager.adapter.UtilsTypeAdapter;
-import com.pedrocosta.utils.jsonmanager.adapter.annotation.JsonAdapter;
-import com.pedrocosta.utils.jsonmanager.stream.JsonReader;
-import com.pedrocosta.utils.jsonmanager.stream.JsonWriter;
+import com.pedrocosta.springutils.exception.NotSupportedException;
+import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapter;
+import com.pedrocosta.springutils.jsonmanager.adapter.annotation.JsonAdapter;
+import com.pedrocosta.springutils.jsonmanager.stream.JsonReader;
+import com.pedrocosta.springutils.jsonmanager.stream.JsonWriter;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,7 +13,6 @@ import java.util.Set;
 @Component
 @JsonAdapter(type = Notification.class)
 public class NotificationAdapter extends UtilsTypeAdapter<Notification> {
-
     protected final String ID = "id";
     protected final String MEAN = "mean";
     protected final String FROM = "from";

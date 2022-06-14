@@ -4,9 +4,8 @@ import com.google.gson.TypeAdapter;
 import com.pedrocosta.exchangelog.notification.Mean;
 import com.pedrocosta.exchangelog.notification.Notification;
 import com.pedrocosta.exchangelog.notification.NotificationAdapter;
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
-import com.pedrocosta.utils.jsonmanager.adapter.UtilsTypeAdapter;
-import com.pedrocosta.utils.jsonmanager.adapter.UtilsTypeAdapterFactory;
+import com.pedrocosta.exchangelog.utils.JsonUtils;
+import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

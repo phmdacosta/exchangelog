@@ -2,16 +2,22 @@ package com.pedrocosta.exchangelog.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-import com.pedrocosta.utils.jsonmanager.adapter.JsonAdapter;
-import com.pedrocosta.utils.jsonmanager.stream.JsonReader;
-import com.pedrocosta.utils.output.Log;
+import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapterFactory;
+import com.pedrocosta.springutils.jsonmanager.stream.JsonReader;
+import com.pedrocosta.springutils.output.Log;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
 
 @Component
-public class JsonUtils extends com.pedrocosta.utils.jsonmanager.JsonUtils {
+public class JsonUtils extends com.pedrocosta.springutils.jsonmanager.JsonUtils {
+
+    @Override
+    public JsonUtils setTypeAdapterFactory(UtilsTypeAdapterFactory typeAdapterFactory) {
+        super.setTypeAdapterFactory(typeAdapterFactory);
+        return this;
+    }
 
     public final String toJson(Object obj, String type) throws NullPointerException, InvalidParameterException {
         return toJson(obj, null, type);

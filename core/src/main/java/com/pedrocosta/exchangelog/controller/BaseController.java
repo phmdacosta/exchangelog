@@ -1,9 +1,9 @@
 package com.pedrocosta.exchangelog.controller;
 
 import com.pedrocosta.exchangelog.ServiceFactory;
-import com.pedrocosta.exchangelog.ServiceResponse;
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
-import com.pedrocosta.utils.output.Log;
+import com.pedrocosta.exchangelog.RestResponse;
+import com.pedrocosta.exchangelog.utils.JsonUtils;
+import com.pedrocosta.springutils.output.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -27,7 +27,7 @@ public class BaseController {
         return serviceFactory;
     }
 
-    protected String toJson(ServiceResponse<?> response) {
+    protected String toJson(RestResponse<?> response) {
         String json = jsonUtils.toJson(response);
         Log.info(this, "Generated: " + json);
         return json;

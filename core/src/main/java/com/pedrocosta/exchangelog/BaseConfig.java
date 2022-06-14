@@ -1,10 +1,10 @@
 package com.pedrocosta.exchangelog;
 
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
-import com.pedrocosta.utils.jsonmanager.adapter.AdapterFinder;
-import com.pedrocosta.utils.jsonmanager.adapter.UtilsTypeAdapter;
-import com.pedrocosta.utils.jsonmanager.adapter.UtilsTypeAdapterFactory;
-import com.pedrocosta.utils.output.Log;
+import com.pedrocosta.exchangelog.utils.JsonUtils;
+import com.pedrocosta.springutils.jsonmanager.adapter.AdapterFinder;
+import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapter;
+import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapterFactory;
+import com.pedrocosta.springutils.output.Log;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

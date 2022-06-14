@@ -1,7 +1,9 @@
-package com.pedrocosta.exchangelog.notification.attachment.persistence;
+package com.pedrocosta.exchangelog.notification.attachment.impl;
 
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.notification.attachment.Attachment;
+import com.pedrocosta.exchangelog.notification.attachment.AttachmentService;
+import com.pedrocosta.exchangelog.notification.attachment.persistence.AttachmentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -10,7 +12,7 @@ import java.util.List;
 @Service
 public final class AttachmentServiceImpl implements AttachmentService {
 
-    private AttachmentRepository repository;
+    private final AttachmentRepository repository;
 
     public AttachmentServiceImpl(AttachmentRepository repository) {
         this.repository = repository;

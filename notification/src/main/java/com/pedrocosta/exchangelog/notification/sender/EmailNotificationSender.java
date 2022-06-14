@@ -1,12 +1,13 @@
 package com.pedrocosta.exchangelog.notification.sender;
 
+import com.pedrocosta.exchangelog.notification.Notification;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmailNotificationSender extends NotificationSender {
+public class EmailNotificationSender implements NotificationSender {
 
     private final JavaMailSender mailSender;
     private final Environment environment;
@@ -17,15 +18,15 @@ public class EmailNotificationSender extends NotificationSender {
     }
 
     @Override
-    public void execute() {
+    public void send(Notification notification) {
         SimpleMailMessage message = new SimpleMailMessage();
-        if (getNotification().getFrom() == null) {
-            getNotification().setFrom(environment.getProperty("mail.default.address"));
+        if (notification.getFrom() == null) {
+            notification.setFrom(environment.getProperty("mail.default.address"));
         }
-        message.setFrom(getNotification().getFrom());
-        message.setTo(getNotification().getTo().toArray(new String[0]));
-        message.setSubject(getNotification().getSubject());
-        message.setText(getNotification().getMessage());
+        message.setFrom(notification.getFrom());
+        message.setTo(notification.getTo().toArray(new String[0]));
+        message.setSubject(notification.getSubject());
+        message.setText(notification.getMessage());
         mailSender.send(message);
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class ServiceResponse<T> {
+public class RestResponse<T> {
 
     private LocalDateTime timestamp;
     private HttpStatus code;
@@ -18,7 +18,7 @@ public class ServiceResponse<T> {
     @Expose(serialize = false)
     private Exception exception;
 
-    private ServiceResponse() {
+    private RestResponse() {
         this.setTimestamp(LocalDateTime.now());
         this.setSuccess(true);
         this.setCode(HttpStatus.OK);
@@ -26,7 +26,7 @@ public class ServiceResponse<T> {
         this.setExecTime(new Date());
     }
 
-    private ServiceResponse(HttpStatus code) {
+    private RestResponse(HttpStatus code) {
         this();
         this.setCode(code);
     }
@@ -35,10 +35,10 @@ public class ServiceResponse<T> {
      * Create a a {@linkplain HttpStatus#OK OK}
      * success response with empty message.
      *
-     * @param <T>   {@link ServiceResponse} type
+     * @param <T>   {@link RestResponse} type
      * @return  Success response
      */
-    public static <T> ServiceResponse<T> createSuccess() {
+    public static <T> RestResponse<T> createSuccess() {
         return createSuccess(HttpStatus.OK, "");
     }
 
@@ -46,10 +46,10 @@ public class ServiceResponse<T> {
      * Create a success response.
      *
      * @param code  {@link HttpStatus} code
-     * @param <T>   {@link ServiceResponse} type
+     * @param <T>   {@link RestResponse} type
      * @return  Success response
      */
-    public static <T> ServiceResponse<T> createSuccess(HttpStatus code) {
+    public static <T> RestResponse<T> createSuccess(HttpStatus code) {
         return createSuccess(code, "");
     }
 
@@ -58,21 +58,21 @@ public class ServiceResponse<T> {
      *
      * @param code      {@link HttpStatus} code
      * @param message   Success message
-     * @param <T>       {@link ServiceResponse} type
+     * @param <T>       {@link RestResponse} type
      * @return  Success response
      */
-    public static <T> ServiceResponse<T> createSuccess(HttpStatus code, String message) {
-        return new ServiceResponse<T>(code).setMessage(message);
+    public static <T> RestResponse<T> createSuccess(HttpStatus code, String message) {
+        return new RestResponse<T>(code).setMessage(message);
     }
 
     /**
      * Create a {@linkplain HttpStatus#BAD_REQUEST BAD_REQUEST}
      * error response with empty message.
      *
-     * @param <T>   {@link ServiceResponse} type
+     * @param <T>   {@link RestResponse} type
      * @return  Error response
      */
-    public static <T> ServiceResponse<T> createError() {
+    public static <T> RestResponse<T> createError() {
         return createError(HttpStatus.BAD_REQUEST, "");
     }
 
@@ -80,10 +80,10 @@ public class ServiceResponse<T> {
      * Create a error response with empty message.
      *
      * @param code  {@link HttpStatus} code
-     * @param <T>   {@link ServiceResponse} type
+     * @param <T>   {@link RestResponse} type
      * @return  Error response
      */
-    public static <T> ServiceResponse<T> createError(HttpStatus code) {
+    public static <T> RestResponse<T> createError(HttpStatus code) {
         return createError(code, "");
     }
 
@@ -92,11 +92,11 @@ public class ServiceResponse<T> {
      *
      * @param code      {@link HttpStatus} code
      * @param message   Error message
-     * @param <T>       {@link ServiceResponse} type
+     * @param <T>       {@link RestResponse} type
      * @return  Error response
      */
-    public static <T> ServiceResponse<T> createError(HttpStatus code, String message) {
-        return new ServiceResponse<T>(code)
+    public static <T> RestResponse<T> createError(HttpStatus code, String message) {
+        return new RestResponse<T>(code)
                 .setSuccess(false)
                 .setMessage(message);
     }
@@ -104,14 +104,14 @@ public class ServiceResponse<T> {
     /**
      * Update http code and message with a new error object.
      *
-     * @param error {@link ServiceResponse} error object with new info.
+     * @param error {@link RestResponse} error object with new info.
      *
      * @return
-     *          {@link ServiceResponse} object with error info.
+     *          {@link RestResponse} object with error info.
      *          If parameter is not a error, it will return previous object without changes.
      *          If parameter is {@code null}, it will return previous object without changes.
      */
-    public ServiceResponse<T> fromError(ServiceResponse<?> error) {
+    public RestResponse<T> fromError(RestResponse<?> error) {
         if (error == null) return this;
         if (error.isSuccess()) return this;
         this.setSuccess(false);
@@ -134,7 +134,7 @@ public class ServiceResponse<T> {
         return exception;
     }
 
-    public ServiceResponse<T> setException(Exception ex) {
+    public RestResponse<T> setException(Exception ex) {
         this.exception = ex;
         return this;
     }
@@ -143,7 +143,7 @@ public class ServiceResponse<T> {
         return code;
     }
 
-    public ServiceResponse<T> setCode(HttpStatus code) {
+    public RestResponse<T> setCode(HttpStatus code) {
         this.code = code;
         return this;
     }
@@ -152,7 +152,7 @@ public class ServiceResponse<T> {
         return message;
     }
 
-    public ServiceResponse<T> setMessage(String message) {
+    public RestResponse<T> setMessage(String message) {
         this.message = message;
         return this;
     }
@@ -161,7 +161,7 @@ public class ServiceResponse<T> {
         return object;
     }
 
-    public ServiceResponse<T> setObject(T object) {
+    public RestResponse<T> setObject(T object) {
         this.object = object;
         return this;
     }
@@ -170,7 +170,7 @@ public class ServiceResponse<T> {
         return execTime;
     }
 
-    public ServiceResponse<T> setExecTime(Date execTime) {
+    public RestResponse<T> setExecTime(Date execTime) {
         this.execTime = execTime;
         return this;
     }
@@ -182,7 +182,7 @@ public class ServiceResponse<T> {
         return success;
     }
 
-    public ServiceResponse<T> setSuccess(boolean success) {
+    public RestResponse<T> setSuccess(boolean success) {
         this.success = success;
         return this;
     }

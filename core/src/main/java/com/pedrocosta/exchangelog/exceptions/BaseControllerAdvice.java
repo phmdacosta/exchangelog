@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog.exceptions;
 
-import com.pedrocosta.exchangelog.ServiceResponse;
-import com.pedrocosta.utils.jsonmanager.JsonUtils;
+import com.pedrocosta.exchangelog.RestResponse;
+import com.pedrocosta.exchangelog.utils.JsonUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -32,7 +32,7 @@ public class BaseControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<String> handleException(Exception exception) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ServiceResponse<?> response =  ServiceResponse.createError(status, exception.getMessage());
+        RestResponse<?> response =  RestResponse.createError(status, exception.getMessage());
         return new ResponseEntity<>(jsonUtils.toJson(response), status);
     }
 
@@ -47,7 +47,7 @@ public class BaseControllerAdvice {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException() {
-        ServiceResponse<?> response =  ServiceResponse.createError(
+        RestResponse<?> response =  RestResponse.createError(
                 HttpStatus.BAD_REQUEST, "Required request body is missing.");
         return new ResponseEntity<>(jsonUtils.toJson(response), HttpStatus.BAD_REQUEST);
     }
@@ -63,7 +63,7 @@ public class BaseControllerAdvice {
      */
     @ExceptionHandler(WrongParametersException.class)
     public ResponseEntity<String> handleWrongParametersException(HttpServletResponse servletResponse) {
-        ServiceResponse<?> response =  ServiceResponse.createError(
+        RestResponse<?> response =  RestResponse.createError(
                 HttpStatus.BAD_REQUEST, "Wrong parameters.");
         servletResponse.setStatus(response.getCode().value());
         return new ResponseEntity<>(jsonUtils.toJson(response), HttpStatus.BAD_REQUEST);
@@ -80,7 +80,7 @@ public class BaseControllerAdvice {
      */
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<String> handleRestApiException(RestApiException exception) {
-        ServiceResponse<?> response =  ServiceResponse.createError(
+        RestResponse<?> response =  RestResponse.createError(
                 exception.getResponseMessage().getCode(), exception.getMessage());
         return new ResponseEntity<>(jsonUtils.toJson(response), response.getCode());
     }

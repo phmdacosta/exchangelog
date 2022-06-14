@@ -1,33 +1,33 @@
 package com.pedrocosta.exchangelog.exceptions;
 
-import com.pedrocosta.exchangelog.ServiceResponse;
+import com.pedrocosta.exchangelog.RestResponse;
 import org.springframework.http.HttpStatus;
 
 public class RestApiException extends RuntimeException {
 
-    private ServiceResponse<Object> responseMessage;
+    private RestResponse<Object> responseMessage;
 
     public RestApiException(HttpStatus httpStatus, String message) {
         super(message);
-        setResponseMessage(ServiceResponse.createError(httpStatus, message));
+        setResponseMessage(RestResponse.createError(httpStatus, message));
     }
 
     public RestApiException(HttpStatus httpStatus, Object obj) {
         super("");
-        setResponseMessage(ServiceResponse.createError(httpStatus));
+        setResponseMessage(RestResponse.createError(httpStatus));
         getResponseMessage().setObject(obj);
     }
 
-    public RestApiException(ServiceResponse<Object> serviceResponse) {
-        super(serviceResponse.getMessage());
-        setResponseMessage(serviceResponse);
+    public RestApiException(RestResponse<Object> restResponse) {
+        super(restResponse.getMessage());
+        setResponseMessage(restResponse);
     }
 
-    public ServiceResponse<Object> getResponseMessage() {
+    public RestResponse<Object> getResponseMessage() {
         return responseMessage;
     }
 
-    public void setResponseMessage(ServiceResponse<Object> responseMessage) {
+    public void setResponseMessage(RestResponse<Object> responseMessage) {
         this.responseMessage = responseMessage;
     }
 
