@@ -1,6 +1,6 @@
-package com.pedrocosta.exchangelog.exceptions;
+package com.pedrocosta.exchangelog.api.exceptions;
 
-import com.pedrocosta.exchangelog.RestResponse;
+import com.pedrocosta.exchangelog.api.RestResponse;
 import org.springframework.http.HttpStatus;
 
 public class RestApiException extends RuntimeException {

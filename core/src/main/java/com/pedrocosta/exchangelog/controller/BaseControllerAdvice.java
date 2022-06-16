@@ -1,6 +1,8 @@
-package com.pedrocosta.exchangelog.exceptions;
+package com.pedrocosta.exchangelog.controller;
 
-import com.pedrocosta.exchangelog.RestResponse;
+import com.pedrocosta.exchangelog.api.RestResponse;
+import com.pedrocosta.exchangelog.api.exceptions.RestApiException;
+import com.pedrocosta.exchangelog.exceptions.WrongParametersException;
 import com.pedrocosta.exchangelog.utils.JsonUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

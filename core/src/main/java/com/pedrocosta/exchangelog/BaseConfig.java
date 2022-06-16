@@ -5,16 +5,23 @@ import com.pedrocosta.springutils.jsonmanager.adapter.AdapterFinder;
 import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapter;
 import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapterFactory;
 import com.pedrocosta.springutils.output.Log;
+import com.pedrocosta.springutils.output.MessageLocaleResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
 public class BaseConfig {
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        return new MessageLocaleResolver();
+    }
 
     @Bean
     public <T> UtilsTypeAdapterFactory typeAdapterFactory() {

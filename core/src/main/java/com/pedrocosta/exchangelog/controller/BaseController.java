@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog.controller;
 
 import com.pedrocosta.exchangelog.ServiceFactory;
-import com.pedrocosta.exchangelog.RestResponse;
+import com.pedrocosta.exchangelog.api.RestResponse;
 import com.pedrocosta.exchangelog.utils.JsonUtils;
 import com.pedrocosta.springutils.output.Log;
 import org.springframework.stereotype.Controller;

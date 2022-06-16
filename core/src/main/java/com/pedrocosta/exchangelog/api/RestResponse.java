@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog;
+package com.pedrocosta.exchangelog.api;
 
 import com.google.gson.annotations.Expose;
 import org.springframework.http.HttpStatus;

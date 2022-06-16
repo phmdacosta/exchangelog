@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog;
+package com.pedrocosta.exchangelog.api;
 
 import com.pedrocosta.springutils.exception.NotSupportedException;
 import com.pedrocosta.springutils.jsonmanager.adapter.WriteTypeAdapter;
