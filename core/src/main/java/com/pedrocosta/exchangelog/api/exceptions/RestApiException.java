@@ -3,6 +3,15 @@ package com.pedrocosta.exchangelog.api.exceptions;
 import com.pedrocosta.exchangelog.api.RestResponse;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Exception for rest api errors.
+ * <br>
+ * It will be caught by {@linkplain com.pedrocosta.exchangelog.controller.BaseControllerAdvice BaseControllerAdvice}
+ * that generates a JSON response.
+ *
+ * @author Pedro H. M . da Costa
+ * @since 1.0
+ */
 public class RestApiException extends RuntimeException {
 
     private RestResponse<Object> responseMessage;

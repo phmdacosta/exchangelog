@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog.exceptions;
 
 /**
- * Exception for any error that happens in api requesters.
+ * Exception for any error that happens in third party api requesters.
  *
  * @author Pedro H M da Costa
  * @version 1.0

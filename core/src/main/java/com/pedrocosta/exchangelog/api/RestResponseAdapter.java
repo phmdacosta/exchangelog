@@ -7,6 +7,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * JSON adapter for {@link RestResponse}
+ * <br>
+ * <b>This adapter doesn't support JSON deserialization.</b>
+ *
+ * @author Pedro H. M . da Costa
+ * @since 1.0
+ */
 @Component
 public class RestResponseAdapter extends WriteTypeAdapter<RestResponse<?>> {
 

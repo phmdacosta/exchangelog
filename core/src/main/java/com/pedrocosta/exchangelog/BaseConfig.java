@@ -1,5 +1,6 @@
 package com.pedrocosta.exchangelog;
 
+import com.pedrocosta.exchangelog.api.RestResponse;
 import com.pedrocosta.exchangelog.utils.JsonUtils;
 import com.pedrocosta.springutils.jsonmanager.adapter.AdapterFinder;
 import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapter;
@@ -15,6 +16,12 @@ import org.springframework.web.servlet.LocaleResolver;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base configuration for all common configs.
+ *
+ * @author Pedro H. M . da Costa
+ * @since 1.0
+ */
 @Configuration
 public class BaseConfig {
 

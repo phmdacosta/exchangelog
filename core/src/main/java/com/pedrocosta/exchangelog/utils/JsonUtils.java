@@ -2,6 +2,7 @@ package com.pedrocosta.exchangelog.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.pedrocosta.exchangelog.api.RestResponse;
 import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapterFactory;
 import com.pedrocosta.springutils.jsonmanager.stream.JsonReader;
 import com.pedrocosta.springutils.output.Log;
@@ -10,6 +11,12 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 
+/**
+ * Utility class to serialize JSON.
+ *
+ * @author Pedro H. M . da Costa
+ * @since 1.0
+ */
 @Component
 public class JsonUtils extends com.pedrocosta.springutils.jsonmanager.JsonUtils {
 

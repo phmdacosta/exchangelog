@@ -6,6 +6,13 @@ import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+/**
+ * Response for REST API service controllers.
+ * @param <T>   Type of object to return in rest service.
+ *
+ * @author Pedro H. M . da Costa
+ * @since 1.0
+ */
 public class RestResponse<T> {
 
     private LocalDateTime timestamp;

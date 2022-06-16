@@ -7,6 +7,11 @@ import com.pedrocosta.springutils.output.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * Base controller.
+ * @author Pedro H. M . da Costa
+ * @since 1.0
+ */
 @Controller
 public class BaseController {
 

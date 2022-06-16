@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Factory for services.
+ *
+ * @author Pedro H. M . da Costa
+ * @since 1.0
+ */
 @Component
 public class ServiceFactory {
 
