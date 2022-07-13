@@ -10,7 +10,11 @@ import java.util.Objects;
 public class UserContact implements Cloneable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator( name = "user_contact_seq",
+            sequenceName = "user_contact_seq",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_contact_seq")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
     private String value;

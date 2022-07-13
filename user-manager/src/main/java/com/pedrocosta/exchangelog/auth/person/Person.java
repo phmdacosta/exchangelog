@@ -9,7 +9,11 @@ import java.util.Objects;
 public class Person implements Cloneable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator( name = "user_person_seq",
+            sequenceName = "user_person_seq",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_person_seq")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
 

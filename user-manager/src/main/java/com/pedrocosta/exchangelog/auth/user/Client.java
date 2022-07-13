@@ -7,7 +7,11 @@ import java.util.Objects;
 public class Client implements Cloneable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator( name = "user_client_seq",
+            sequenceName = "user_client_seq",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_client_seq")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String apiKey;
 

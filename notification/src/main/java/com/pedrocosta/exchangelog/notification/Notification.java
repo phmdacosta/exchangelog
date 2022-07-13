@@ -21,6 +21,7 @@ public class Notification implements Serializable, Cloneable {
     @Column(name = "mail_address")
     private Set<String> to;
     private String subject;
+    //TODO: body may be big, must be saved as BLOB
     private String message;
     @OneToMany(mappedBy = "notification",
             fetch = FetchType.LAZY,

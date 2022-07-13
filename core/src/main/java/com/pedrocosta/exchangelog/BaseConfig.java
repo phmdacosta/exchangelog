@@ -7,12 +7,15 @@ import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapter;
 import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapterFactory;
 import com.pedrocosta.springutils.output.Log;
 import com.pedrocosta.springutils.output.MessageLocaleResolver;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,5 +60,13 @@ public class BaseConfig {
     @Bean
     public ServiceFactory serviceFactory(ApplicationContext context, Environment env) {
         return new ServiceFactory(context, env);
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+                .setConnectTimeout(Duration.ofMillis(3000))
+                .setReadTimeout(Duration.ofMillis(3000))
+                .build();
     }
 }

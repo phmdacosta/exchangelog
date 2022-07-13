@@ -9,7 +9,11 @@ import java.util.List;
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator( name = "user_role_seq",
+            sequenceName = "user_role_seq",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_role_seq")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
 

@@ -3,18 +3,29 @@ package com.pedrocosta.exchangelog.auth.user;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.person.Person;
 import com.pedrocosta.exchangelog.auth.role.Role;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
-public class User implements Cloneable {
+public class User implements UserDetails, Cloneable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator( name = "user_seq",
+            sequenceName = "user_seq",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String username;
     private String password;
+    private boolean expired = false;
+    private boolean locked = false;
+    private boolean enabled = false;
 
     //Foreign objects
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -29,6 +40,13 @@ public class User implements Cloneable {
     public User() {
         this.contacts = new ArrayList<>();
         this.roles = new HashSet<>();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+        return authorities;
     }
 
     public long getId() {
@@ -56,6 +74,26 @@ public class User implements Cloneable {
     public User setPassword(String password) {
         this.password = password;
         return this;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return !expired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
     public List<UserContact> getContacts() {
@@ -101,6 +139,26 @@ public class User implements Cloneable {
 
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    public boolean isExpired() {
+        return expired;
+    }
+
+    public void setExpired(boolean expired) {
+        this.expired = expired;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override

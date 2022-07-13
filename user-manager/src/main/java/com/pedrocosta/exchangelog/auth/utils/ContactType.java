@@ -9,4 +9,7 @@ public enum ContactType {
     public static ContactType get(String name) {
         return valueOf(name.toUpperCase());
     }
+    public boolean matches(String name) {
+        return this.name().equalsIgnoreCase(name);
+    }
 }

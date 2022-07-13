@@ -1,8 +1,14 @@
 package com.pedrocosta.exchangelog.auth.user;
 
 import com.pedrocosta.exchangelog.annotation.View;
+import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
+import com.pedrocosta.exchangelog.auth.utils.ContactType;
+import com.pedrocosta.exchangelog.auth.utils.Route;
+import com.pedrocosta.exchangelog.auth.validation.EmailValidator;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
+import com.pedrocosta.springutils.output.Log;
 import com.pedrocosta.springutils.viewmapper.ViewMapper;
+import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = Route.API)
 public class UserController {
     private final UserService service;
 
@@ -37,31 +43,14 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
 
-        User user = service.find(username);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        UserDto dto = ViewMapper.map(user, UserDto.class);
-        return ResponseEntity.ok(dto);
-    }
-
-    @PostMapping(value = "/user/new",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> newUser(@RequestBody @View(UserCreationDto.class) User user) {
-
-        if (user == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
         ResponseEntity<UserDto> response;
         try {
-            User saved = service.save(user);
-            UserDto view = ViewMapper.map(saved, UserDto.class);
-            response = ResponseEntity.ok(view);
-        } catch (SaveDataException e) {
-            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            User user = service.find(username);
+            UserDto dto = ViewMapper.map(user, UserDto.class);
+            response = ResponseEntity.ok(dto);
+        } catch (NotFoundException e) {
+            Log.error(this, e);
+            response = ResponseEntity.notFound().build();
         }
 
         return response;
