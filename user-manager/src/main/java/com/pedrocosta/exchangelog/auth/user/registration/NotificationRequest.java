@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class ConfirmationMail implements Serializable {
+public class NotificationRequest implements Serializable {
     private String mean;
     private String from;
     private Set<String> to;
@@ -63,8 +63,8 @@ public class ConfirmationMail implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ConfirmationMail)) return false;
-        ConfirmationMail that = (ConfirmationMail) o;
+        if (!(o instanceof NotificationRequest)) return false;
+        NotificationRequest that = (NotificationRequest) o;
         return Objects.equals(getMean(), that.getMean()) && Objects.equals(getFrom(), that.getFrom()) && Objects.equals(getTo(), that.getTo()) && Objects.equals(getSubject(), that.getSubject()) && Objects.equals(getBody(), that.getBody());
     }
 
