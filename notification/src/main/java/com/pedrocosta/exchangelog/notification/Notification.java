@@ -1,6 +1,7 @@
 package com.pedrocosta.exchangelog.notification;
 
 import com.pedrocosta.exchangelog.notification.attachment.Attachment;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ public class Notification implements Serializable, Cloneable {
     private Set<String> to;
     private String subject;
     //TODO: body may be big, must be saved as BLOB
+    @Type(type="text")
     private String message;
     @OneToMany(mappedBy = "notification",
             fetch = FetchType.LAZY,
