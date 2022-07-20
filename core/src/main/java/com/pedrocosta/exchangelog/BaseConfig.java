@@ -7,6 +7,7 @@ import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapter;
 import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapterFactory;
 import com.pedrocosta.springutils.output.Log;
 import com.pedrocosta.springutils.output.MessageLocaleResolver;
+import com.pedrocosta.springutils.viewmapper.ViewMapper;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -68,5 +69,10 @@ public class BaseConfig {
                 .setConnectTimeout(Duration.ofMillis(3000))
                 .setReadTimeout(Duration.ofMillis(3000))
                 .build();
+    }
+
+    @Bean
+    public ViewMapper mapper() {
+        return new ViewMapper();
     }
 }

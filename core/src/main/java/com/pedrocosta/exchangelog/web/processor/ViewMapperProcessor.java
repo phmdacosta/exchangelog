@@ -21,8 +21,11 @@ import java.util.Collections;
 
 public class ViewMapperProcessor extends RequestResponseBodyMethodProcessor {
 
-    public ViewMapperProcessor(ObjectMapper objectMapper) {
+    private final ViewMapper mapper;
+
+    public ViewMapperProcessor(ObjectMapper objectMapper, ViewMapper mapper) {
         super(Collections.singletonList(new MappingJackson2HttpMessageConverter(objectMapper)));
+        this.mapper = mapper;
     }
 
     @Override
@@ -44,6 +47,6 @@ public class ViewMapperProcessor extends RequestResponseBodyMethodProcessor {
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         Object view = super.resolveArgument(parameter, mavContainer, webRequest, binderFactory);
-        return ViewMapper.map(view, parameter.getParameterType());
+        return this.mapper.map(view, parameter.getParameterType());
     }
 }
