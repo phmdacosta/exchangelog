@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.user.registration.token;
+package com.pedrocosta.exchangelog.auth.registration.token;
 
 import com.pedrocosta.exchangelog.auth.user.User;
 
