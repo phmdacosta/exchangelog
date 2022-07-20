@@ -14,8 +14,8 @@ import java.util.Set;
 public class UserDto {
     @MappingField(name = "username")
     private String username;
-    @MappingField(name = "person")
-    private PersonDto person;
+    private String firstName;
+    private String lastName;
     @MappingCollection(name = "contacts", resultElementClass = UserContactDto.class)
     private List<UserContactDto> contacts;
     @MappingCollection(name = "roles", resultElementClass = RoleDto.class)
@@ -29,12 +29,20 @@ public class UserDto {
         this.username = username;
     }
 
-    public PersonDto getPerson() {
-        return person;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setPerson(PersonDto person) {
-        this.person = person;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public List<UserContactDto> getContacts() {
