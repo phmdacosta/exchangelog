@@ -1,21 +1,21 @@
 package com.pedrocosta.exchangelog.auth.user;
 
 import com.pedrocosta.exchangelog.auth.api.NotificationRestService;
-import com.pedrocosta.exchangelog.auth.registration.NotificationRequest;
-import com.pedrocosta.exchangelog.auth.registration.token.ConfirmationToken;
-import com.pedrocosta.exchangelog.auth.registration.token.ConfirmationTokenService;
+import com.pedrocosta.exchangelog.auth.user.registration.NotificationRequest;
+import com.pedrocosta.exchangelog.auth.user.registration.token.ConfirmationToken;
+import com.pedrocosta.exchangelog.auth.user.registration.token.ConfirmationTokenService;
 import com.pedrocosta.exchangelog.auth.role.Role;
 import com.pedrocosta.exchangelog.auth.role.RoleRepository;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.utils.TokenProperties;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
+import com.pedrocosta.springutils.AppProperties;
 import com.pedrocosta.springutils.output.Log;
 import com.pedrocosta.springutils.output.Messages;
 import com.pedrocosta.utils.mailsender.FileParser;
 import com.pedrocosta.utils.mailsender.HtmlFileParser;
 import javassist.NotFoundException;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,17 +34,15 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
     private final NotificationRestService notifRestService;
-    private final Environment env;
 
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
                            BCryptPasswordEncoder passwordEncoder, ConfirmationTokenService confirmationTokenService,
-                           NotificationRestService notifRestService, Environment env) {
+                           NotificationRestService notifRestService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.confirmationTokenService = confirmationTokenService;
         this.notifRestService = notifRestService;
-        this.env = env;
     }
 
     @Override
@@ -137,7 +135,7 @@ public class UserServiceImpl implements UserService {
         LocalDateTime creationTime = LocalDateTime.now();
         confirmationToken.setCreatedTime(creationTime);
 
-        String propExpirationTime = env.getProperty(TokenProperties.EXPIRATION_TIME);
+        String propExpirationTime = AppProperties.get(TokenProperties.EXPIRATION_TIME);
         if (propExpirationTime != null) {
             LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(Long.parseLong(propExpirationTime));
             confirmationToken.setExpiredTime(expirationTime);
@@ -148,7 +146,7 @@ public class UserServiceImpl implements UserService {
         confirmationTokenService.save(confirmationToken);
 
         // Send confirmation e-mail
-        String body = buildEmail(user.getFirstName(), "http://localhost:8087/api/registration/confirm?token=" + token);
+        String body = buildEmail(user.getPerson().getName(), "http://localhost:8087/api/registration/confirm?token=" + token);
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.setMean("EMAIL");
         notificationRequest.setFrom("teste@mail.com");
@@ -199,7 +197,6 @@ public class UserServiceImpl implements UserService {
         return new HtmlFileParser(FileParser.class.getClassLoader().getResourceAsStream("page/emailBody.html"))
                 .addParameter("personName", name)
                 .addParameter("confirmationLink", link)
-                .addParameter("expireMinutes", env.getProperty(TokenProperties.EXPIRATION_TIME))
                 .read();
     }
 }

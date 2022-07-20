@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.registration;
+package com.pedrocosta.exchangelog.auth.user.registration;
 
 import com.pedrocosta.exchangelog.annotation.View;
 import com.pedrocosta.exchangelog.auth.user.User;

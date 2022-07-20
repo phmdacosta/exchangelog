@@ -22,21 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class ViewMapperTest {
 
     private User userModel;
-    private ViewMapper mapper;
 
     @BeforeEach
     public void setUp() throws Exception {
-        mapper = new ViewMapper();
-
         userModel = new User();
         userModel.setId(1);
         userModel.setUsername("MyUserName");
         userModel.setPassword("MyP@ssword123");
-//        Person person = new Person();
-//        person.setFirstName("Person Name");
-//        userModel.setPerson(person);
-        userModel.setFirstName("Person First Name");
-        userModel.setLastName("Person Last Name");
+        Person person = new Person();
+        person.setName("Person Name");
+        userModel.setPerson(person);
         //Contacts
         UserContact userContact1 = new UserContact();
         userContact1.setId(1);
@@ -57,10 +52,9 @@ public class ViewMapperTest {
 
     @Test
     public void test_UserDtoMappingFromUserModel() throws Exception {
-        UserDto userDto = mapper.map(userModel, UserDto.class);
+        UserDto userDto = ViewMapper.map(userModel, UserDto.class);
         assertEquals(userDto.getUsername(), userModel.getUsername());
-        assertEquals(userDto.getFirstName(), userModel.getFirstName());
-        assertEquals(userDto.getLastName(), userModel.getLastName());
+        assertEquals(userDto.getPerson().getName(), userModel.getPerson().getName());
         for (UserContactDto contactDto : userDto.getContacts()) {
             List<UserContact> found = userModel.getContacts().stream()
                     .filter(_contact -> _contact.getName().equals(contactDto.getName())
@@ -80,10 +74,8 @@ public class ViewMapperTest {
     public void test_UserModelMappingFromUserDto() throws Exception {
         UserDto userDto = new UserDto();
         userDto.setUsername(userModel.getUsername());
-//        userDto.setPerson(new PersonDto());
-//        userDto.getPerson().setName(userModel.getFirstName());
-        userDto.setFirstName(userModel.getFirstName());
-        userDto.setLastName(userModel.getLastName());
+        userDto.setPerson(new PersonDto());
+        userDto.getPerson().setName(userModel.getPerson().getName());
         userDto.setContacts(new ArrayList<>());
         UserContactDto contactDto1 = new UserContactDto();
         contactDto1.setName(userModel.getContacts().get(0).getName());
@@ -98,10 +90,9 @@ public class ViewMapperTest {
         roleDto.setName(userModel.getRoles().iterator().next().getName());
         userDto.getRoles().add(roleDto);
 
-        User user = mapper.map(userDto, User.class);
+        User user = ViewMapper.map(userDto, User.class);
         assertEquals(user.getUsername(), userDto.getUsername());
-        assertEquals(user.getFirstName(), userDto.getFirstName());
-        assertEquals(user.getLastName(), userDto.getLastName());
+        assertEquals(user.getPerson().getName(), userDto.getPerson().getName());
         for (UserContact contact : user.getContacts()) {
             List<UserContactDto> found = userDto.getContacts().stream()
                     .filter(_contactDto -> _contactDto.getName().equals(contact.getName())

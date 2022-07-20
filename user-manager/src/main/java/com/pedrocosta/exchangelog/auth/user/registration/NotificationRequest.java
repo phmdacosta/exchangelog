@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.registration;
+package com.pedrocosta.exchangelog.auth.user.registration;
 
 import java.io.Serializable;
 import java.util.Arrays;

@@ -21,11 +21,9 @@ import java.util.List;
 @RequestMapping(value = Route.API)
 public class UserController {
     private final UserService service;
-    private final ViewMapper mapper;
 
-    public UserController(UserService service, ViewMapper mapper) {
+    public UserController(UserService service) {
         this.service = service;
-        this.mapper = mapper;
     }
 
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,7 +31,7 @@ public class UserController {
         List<User> users = service.findAll();
         List<UserDto> userViews = new ArrayList<>();
         for (User user : users) {
-            UserDto dto = mapper.map(user, UserDto.class);
+            UserDto dto = ViewMapper.map(user, UserDto.class);
             userViews.add(dto);
         }
         return ResponseEntity.ok(userViews);
@@ -48,7 +46,7 @@ public class UserController {
         ResponseEntity<UserDto> response;
         try {
             User user = service.find(username);
-            UserDto dto = mapper.map(user, UserDto.class);
+            UserDto dto = ViewMapper.map(user, UserDto.class);
             response = ResponseEntity.ok(dto);
         } catch (NotFoundException e) {
             Log.error(this, e);

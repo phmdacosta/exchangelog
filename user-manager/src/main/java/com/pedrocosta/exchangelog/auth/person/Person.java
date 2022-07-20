@@ -3,11 +3,9 @@ package com.pedrocosta.exchangelog.auth.person;
 import com.pedrocosta.exchangelog.auth.user.User;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Person implements Cloneable {
 
     @Id
@@ -17,11 +15,20 @@ public class Person implements Cloneable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_person_seq")
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "first_name")
-    private String firstName;
-    @Column(name = "last_name")
-    private String lastName;
-    private LocalDateTime birthday;
+    private String name;
+
+    //Foreign objects
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name="user_id")
+    private User user;
+
+    public Person() {
+    }
+
+    public Person(String name) {
+        this();
+        this.name = name;
+    }
 
     public long getId() {
         return id;
@@ -32,61 +39,46 @@ public class Person implements Cloneable {
         return this;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public Person setFirstName(String firstName) {
-        this.firstName = firstName;
+    public Person setName(String name) {
+        this.name = name;
         return this;
     }
 
-    public String getLastName() {
-        return lastName;
+    public User getUser() {
+        return user;
     }
 
-    public Person setLastName(String lastName) {
-        this.lastName = lastName;
-        return this;
-    }
-
-    public LocalDateTime getBirthday() {
-        return birthday;
-    }
-
-    public Person setBirthday(LocalDateTime birthday) {
-        this.birthday = birthday;
-        return this;
-    }
-
-    @Override
-    public Person clone() throws CloneNotSupportedException {
-        return (Person) super.clone();
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Person)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return getId() == person.getId()
-                && Objects.equals(getFirstName(), person.getFirstName())
-                && Objects.equals(getLastName(), person.getLastName())
-                && Objects.equals(getBirthday(), person.getBirthday());
+        return id == person.id || Objects.equals(name, person.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName(), getBirthday());
+        return Objects.hash(id, name);
+    }
+
+    @Override
+    protected Person clone() throws CloneNotSupportedException {
+        return (Person) super.clone();
     }
 
     @Override
     public String toString() {
         return "Person{" +
                 "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", birthday=" + birthday +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

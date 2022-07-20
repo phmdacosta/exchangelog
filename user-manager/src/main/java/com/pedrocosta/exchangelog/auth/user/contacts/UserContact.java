@@ -14,6 +14,7 @@ public class UserContact implements Cloneable {
             sequenceName = "user_contact_seq",
             allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_contact_seq")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
     private String value;
@@ -59,15 +60,8 @@ public class UserContact implements Cloneable {
         return user;
     }
 
-    public UserContact setUser(User user) {
+    public void setUser(User user) {
         this.user = user;
-        return this;
-    }
-
-    @Override
-    public UserContact clone() throws CloneNotSupportedException {
-        UserContact userContact = (UserContact) super.clone();
-        return userContact.setUser(this.getUser().clone());
     }
 
     @Override
@@ -82,6 +76,11 @@ public class UserContact implements Cloneable {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, value);
+    }
+
+    @Override
+    protected UserContact clone() throws CloneNotSupportedException {
+        return (UserContact) super.clone();
     }
 
     @Override

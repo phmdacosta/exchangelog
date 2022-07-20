@@ -12,7 +12,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
-public class User extends Person implements UserDetails, Cloneable {
+public class User implements UserDetails, Cloneable {
+
+    @Id
+    @SequenceGenerator( name = "user_seq",
+            sequenceName = "user_seq",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     private String username;
     private String password;
     private boolean expired = false;
@@ -22,6 +30,8 @@ public class User extends Person implements UserDetails, Cloneable {
     //Foreign objects
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserContact> contacts;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Person person;
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Client client;
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -37,6 +47,15 @@ public class User extends Person implements UserDetails, Cloneable {
         List<SimpleGrantedAuthority> authorities = getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
         return authorities;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public User setId(long id) {
+        this.id = id;
+        return this;
     }
 
     public String getUsername() {
@@ -91,6 +110,15 @@ public class User extends Person implements UserDetails, Cloneable {
         return this;
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
+    public User setPerson(Person person) {
+        this.person = person;
+        return this;
+    }
+
     public Client getClient() {
         return client;
     }
@@ -105,9 +133,8 @@ public class User extends Person implements UserDetails, Cloneable {
         return client != null;
     }
 
-    public User setRoles(Set<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
-        return this;
     }
 
     public Set<Role> getRoles() {
@@ -118,64 +145,47 @@ public class User extends Person implements UserDetails, Cloneable {
         return expired;
     }
 
-    public User setExpired(boolean expired) {
+    public void setExpired(boolean expired) {
         this.expired = expired;
-        return this;
     }
 
     public boolean isLocked() {
         return locked;
     }
 
-    public User setLocked(boolean locked) {
+    public void setLocked(boolean locked) {
         this.locked = locked;
-        return this;
     }
 
-    public User setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        return this;
-    }
-
-    @Override
-    public User clone() throws CloneNotSupportedException {
-        User clone = (User) super.clone();
-        return clone.setContacts(new ArrayList<>(this.getContacts()))
-                .setRoles(new HashSet<>(this.getRoles()))
-                .setClient(this.getClient().clone());
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        if (!super.equals(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return isExpired() == user.isExpired()
-                && isLocked() == user.isLocked()
-                && isEnabled() == user.isEnabled()
-                && Objects.equals(getUsername(), user.getUsername())
-                && Objects.equals(getPassword(), user.getPassword())
-                && Objects.equals(getContacts(), user.getContacts())
-                && Objects.equals(isClient(), user.isClient())
-                && Objects.equals(getRoles(), user.getRoles());
+        return id == user.id
+                || Objects.equals(username, user.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-                super.hashCode(), getUsername(), getPassword(), isExpired(),
-                isLocked(), isEnabled(), getContacts(), isClient(), getRoles());
+        return Objects.hash(id, username, contacts);
+    }
+
+    @Override
+    protected User clone() throws CloneNotSupportedException {
+        return (User) super.clone();
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id='" + getId() + '\'' +
-                ", username='" + username + '\'' +
-                ", expired=" + expired +
-                ", locked=" + locked +
-                ", enabled=" + enabled +
+                "id=" + id +
+                ", name='" + username + '\'' +
+                ", client=" + isClient() +
                 '}';
     }
 }
