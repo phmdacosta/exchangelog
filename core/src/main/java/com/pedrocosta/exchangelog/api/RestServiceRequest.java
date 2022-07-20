@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -110,6 +111,7 @@ public class RestServiceRequest<RESP> implements EnvironmentAware, GetServiceReq
 	 * @return {@link RESP} object.
 	 */
 	@Override
+	@Async
 	public RESP get(@NotNull final String function, final String params, final Class<RESP> respClass) {
 		String url = getFullUrl(function, params);
 		Log.info(this, "Calling GET " + url);
@@ -142,6 +144,7 @@ public class RestServiceRequest<RESP> implements EnvironmentAware, GetServiceReq
 	 * @return {@link RESP} object.
 	 */
 	@Override
+	@Async
 	public RESP post(String function, String params, Object body, Class<RESP> respClass) {
 		String url = getFullUrl(function, params);
 		Log.info(this, "Calling POST " + url);
