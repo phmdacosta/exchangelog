@@ -5,7 +5,7 @@ import com.pedrocosta.exchangelog.auth.registration.NotificationRequest;
 import com.pedrocosta.exchangelog.auth.registration.token.ConfirmationToken;
 import com.pedrocosta.exchangelog.auth.registration.token.ConfirmationTokenService;
 import com.pedrocosta.exchangelog.auth.role.Role;
-import com.pedrocosta.exchangelog.auth.role.RoleRepository;
+import com.pedrocosta.exchangelog.auth.role.RoleService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.utils.TokenProperties;
@@ -30,17 +30,17 @@ import java.util.UUID;
 @Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
     private final NotificationRestService notifRestService;
     private final Environment env;
 
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+    public UserServiceImpl(UserRepository userRepository, RoleService roleService,
                            BCryptPasswordEncoder passwordEncoder, ConfirmationTokenService confirmationTokenService,
                            NotificationRestService notifRestService, Environment env) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
         this.confirmationTokenService = confirmationTokenService;
         this.notifRestService = notifRestService;
@@ -58,8 +58,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User find(long id) {
-        return userRepository.findById(id).orElse(null);
+    public User find(long id) throws NotFoundException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Messages.get("not.found",
+                        String.format("user with ID %s", id))));
     }
 
     @Override
@@ -75,8 +77,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Role saveRole(Role role) {
-        return roleRepository.save(role);
+    public Role saveRole(Role role) throws SaveDataException {
+        return roleService.save(role);
     }
 
     @Override
@@ -92,9 +94,7 @@ public class UserServiceImpl implements UserService {
     public void addRoleToUser(String username, String roleName) throws SaveDataException {
         try {
             User user = this.find(username);
-            Role role = roleRepository.findByName(roleName)
-                    .orElseThrow(() -> new NotFoundException(Messages.get("not.found",
-                            String.format("role %s", roleName))));
+            Role role = roleService.findByName(roleName);
             this.addRoleToUser(user, role);
         } catch (NotFoundException e) {
             throw new SaveDataException(e);
