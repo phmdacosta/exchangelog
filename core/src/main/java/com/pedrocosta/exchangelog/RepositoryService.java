@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog;
 
-import com.pedrocosta.exchangelog.api.RestResponse;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
+import javassist.NotFoundException;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +15,6 @@ import java.util.List;
 public interface RepositoryService<T> extends CoreService {
     T save (T obj) throws SaveDataException;
     List<T> saveAll(Collection<T> col) throws SaveDataException;
-    T find(long id);
+    T find(long id) throws NotFoundException;
     List<T> findAll();
 }

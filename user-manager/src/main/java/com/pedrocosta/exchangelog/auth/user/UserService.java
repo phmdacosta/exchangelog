@@ -15,7 +15,7 @@ public interface UserService extends UserDetailsService {
      *                              goes wrong with business saving validation
      */
     User save (User user) throws SaveDataException;
-    User find(long id);
+    User find(long id) throws NotFoundException;
 
     /**
      * Find all users in database
@@ -28,7 +28,7 @@ public interface UserService extends UserDetailsService {
      * @throws NotFoundException    Throw if it doesn't exist
      */
     User find(String username) throws NotFoundException;
-    Role saveRole(Role role);
+    Role saveRole(Role role) throws SaveDataException;
 
     /**
      * Add a role to a user
