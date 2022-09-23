@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Validator class to validate access permission.
+ * @since v1.0 (2022)
+ */
 @Component
 public class RoleAuthorityValidator {
     private final RoleService roleService;
@@ -20,6 +24,12 @@ public class RoleAuthorityValidator {
         this.roleService = roleService;
     }
 
+    /**
+     * Verifies if request URI access is permitted by user ROLE.
+     * @param authentication
+     * @param request
+     * @return True if it is permitted, false otherwise.
+     */
     public boolean accept(Authentication authentication, HttpServletRequest request) {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
@@ -27,8 +37,13 @@ public class RoleAuthorityValidator {
             try {
                 Role role = roleService.findByName(authority.getAuthority());
                 List<Permission> permissions = role.getPermissions();
+                /*
+                Let's use startsWith to accept any sub URI under configured one.
+                Ex: If a role is configured with URI '/abc/function', it must access any process under '/abc/function'
+                (/abc/function/proc01/xpto or /abc/function/proc05/xpto2)
+                 */
                 return permissions.stream().anyMatch(permission ->
-                        permission.getTarget().equals(request.getRequestURI()));
+                        request.getRequestURI().startsWith(permission.getTarget()));
             } catch (NotFoundException ignored) {}
         }
 
