@@ -6,22 +6,22 @@ package com.pedrocosta.exchangelog.exceptions;
  * @author Pedro H M da Costa
  * @version 1.0
  */
-public class ThirdPartyException extends RuntimeException {
+public class ExternalServiceException extends RuntimeException {
     private static final long serialVersionUID = 5664883406782864426L;
 
-    public ThirdPartyException() {
+    public ExternalServiceException() {
         super();
     }
 
-    public ThirdPartyException(String message) {
+    public ExternalServiceException(String message) {
         super(message);
     }
 
-    public ThirdPartyException(Exception e) {
+    public ExternalServiceException(Exception e) {
         super(e);
     }
 
-    public ThirdPartyException(String message, Exception e) {
+    public ExternalServiceException(String message, Exception e) {
         super(message, e);
     }
 }

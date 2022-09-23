@@ -1,5 +1,6 @@
 package com.pedrocosta.exchangelog.api;
 
+import com.pedrocosta.exchangelog.exceptions.ExternalServiceException;
 import com.pedrocosta.springutils.output.Log;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +98,7 @@ public class RestServiceRequest<RESP> implements EnvironmentAware, GetServiceReq
 	 * @return {@link RESP} object.
 	 */
 	@Override
-	public RESP get(String function, final Class<RESP> respClass) {
+	public RESP get(String function, final Class<RESP> respClass) throws ExternalServiceException {
 		return get(function, null, respClass);
 	}
 
@@ -112,12 +113,16 @@ public class RestServiceRequest<RESP> implements EnvironmentAware, GetServiceReq
 	 */
 	@Override
 	@Async
-	public RESP get(@NotNull final String function, final String params, final Class<RESP> respClass) {
+	public RESP get(@NotNull final String function, final String params, final Class<RESP> respClass) throws ExternalServiceException {
 		String url = getFullUrl(function, params);
 		Log.info(this, "Calling GET " + url);
-		ResponseEntity<RESP> respEntity = restTemplate.getForEntity(url, respClass);
-		Log.info(this, "Response: " + respEntity);
-		return respEntity.getBody();
+		try {
+			ResponseEntity<RESP> respEntity = restTemplate.getForEntity(url, respClass);
+			Log.info(this, "Response: " + respEntity);
+			return respEntity.getBody();
+		} catch (Exception e) {
+			throw new ExternalServiceException(e);
+		}
 	}
 
 	/**
@@ -129,7 +134,7 @@ public class RestServiceRequest<RESP> implements EnvironmentAware, GetServiceReq
 	 * @return {@link RESP} object.
 	 */
 	@Override
-	public RESP post(String function, Object body, Class<RESP> respClass) {
+	public RESP post(String function, Object body, Class<RESP> respClass) throws ExternalServiceException {
 		return post(function, null, body, respClass);
 	}
 
@@ -145,12 +150,16 @@ public class RestServiceRequest<RESP> implements EnvironmentAware, GetServiceReq
 	 */
 	@Override
 	@Async
-	public RESP post(String function, String params, Object body, Class<RESP> respClass) {
+	public RESP post(String function, String params, Object body, Class<RESP> respClass) throws ExternalServiceException {
 		String url = getFullUrl(function, params);
 		Log.info(this, "Calling POST " + url);
-		ResponseEntity<RESP> respEntity = restTemplate.postForEntity(url, body, respClass);
-		Log.info(this, "Response: " + respEntity);
-		return respEntity.getBody();
+		try {
+			ResponseEntity<RESP> respEntity = restTemplate.postForEntity(url, body, respClass);
+			Log.info(this, "Response: " + respEntity);
+			return respEntity.getBody();
+		} catch (Exception e) {
+			throw new ExternalServiceException(e);
+		}
 	}
 
 	/**
