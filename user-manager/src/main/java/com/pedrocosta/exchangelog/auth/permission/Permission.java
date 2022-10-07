@@ -3,23 +3,24 @@ package com.pedrocosta.exchangelog.auth.permission;
 import com.pedrocosta.exchangelog.auth.role.Role;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity
-public class Permission {
+@Table(name = "PERMISSION")
+public class Permission implements Cloneable {
 
     @Id
-    @SequenceGenerator( name = "role_perm_seq",
-            sequenceName = "role_perm_seq",
+    @SequenceGenerator( name = "ROLE_PERM_SEQ",
+            sequenceName = "ROLE_PERM_SEQ",
             allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_perm_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ROLE_PERM_SEQ")
     private long id;
     private String name;
-    private String target;
+    private String route;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(mappedBy = "permissions")
     private List<Role> roles;
 
     public long getId() {
@@ -40,12 +41,12 @@ public class Permission {
         return this;
     }
 
-    public String getTarget() {
-        return target;
+    public String getRoute() {
+        return route;
     }
 
-    public Permission setTarget(String target) {
-        this.target = target;
+    public Permission setRoute(String route) {
+        this.route = route;
         return this;
     }
 
@@ -65,13 +66,13 @@ public class Permission {
         Permission that = (Permission) o;
         return getId() == that.getId()
                 && Objects.equals(getName(), that.getName())
-                && Objects.equals(getTarget(), that.getTarget())
+                && Objects.equals(getRoute(), that.getRoute())
                 && Objects.equals(getRoles(), that.getRoles());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getTarget(), getRoles());
+        return Objects.hash(getId(), getName(), getRoute(), getRoles());
     }
 
     @Override
@@ -79,5 +80,21 @@ public class Permission {
         return "Permission{" +
                 "name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public Permission clone() throws CloneNotSupportedException {
+        Permission clone = (Permission) super.clone();
+        try {
+            clone.setRoles(this.getRoles().stream().map(role -> {
+                try {
+                    return role.clone();
+                } catch (CloneNotSupportedException e) {
+                    return null;
+                }
+            }).collect(Collectors.toList()));
+        } catch (Exception ignored) {
+        }
+        return clone;
     }
 }

@@ -36,14 +36,14 @@ public class RoleAuthorityValidator {
         for (GrantedAuthority authority : authorities) {
             try {
                 Role role = roleService.findByName(authority.getAuthority());
-                List<Permission> permissions = role.getPermissions();
+                List<Permission> permissions = roleService.getPermissionsByRole(role);
                 /*
                 Let's use startsWith to accept any sub URI under configured one.
                 Ex: If a role is configured with URI '/abc/function', it must access any process under '/abc/function'
                 (/abc/function/proc01/xpto or /abc/function/proc05/xpto2)
                  */
                 return permissions.stream().anyMatch(permission ->
-                        request.getRequestURI().startsWith(permission.getTarget()));
+                        request.getRequestURI().startsWith(permission.getRoute()));
             } catch (NotFoundException ignored) {}
         }
 

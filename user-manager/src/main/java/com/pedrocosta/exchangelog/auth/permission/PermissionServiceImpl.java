@@ -44,7 +44,14 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public List<Permission> findAllByRole(Role role) {
-        return new ArrayList<>();
+    public Permission findByName(String name) throws NotFoundException {
+        return repository.findByName(name).orElseThrow(() -> new NotFoundException(Messages.get("not.found",
+                String.format("permission %s", name))));
+    }
+
+    @Override
+    public List<Permission> findAllByRole(Role role) throws NotFoundException {
+        return repository.findAllByRoles(role).orElseThrow(() -> new NotFoundException(Messages.get("not.found",
+                String.format("any permission for role %s", role.getName()))));
     }
 }

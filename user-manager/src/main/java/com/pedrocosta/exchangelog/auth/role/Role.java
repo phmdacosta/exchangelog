@@ -9,22 +9,27 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "ROLE")
 public class Role implements Cloneable {
 
     @Id
-    @SequenceGenerator( name = "user_role_seq",
-            sequenceName = "user_role_seq",
+    @SequenceGenerator( name = "USER_ROLE_SEQ",
+            sequenceName = "USER_ROLE_SEQ",
             allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_role_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_ROLE_SEQ")
     private long id;
     @Column(nullable = false, unique = true)
     private String name;
 
     //Foreign objects
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(mappedBy = "roles")
     private List<User> users;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "ROLE_PERMISSIONS",
+            joinColumns = @JoinColumn(name = "ROLE_ID"),
+            inverseJoinColumns = @JoinColumn(name = "PERMISSION_ID")
+    )
     private List<Permission> permissions;
 
     public long getId() {
@@ -66,7 +71,11 @@ public class Role implements Cloneable {
     @Override
     public Role clone() throws CloneNotSupportedException {
         Role clone = (Role) super.clone();
-        return clone.setUsers(new ArrayList<>(this.getUsers()));
+        clone.setPermissions(new ArrayList<>());
+        for (Permission permission : this.getPermissions()) {
+            clone.getPermissions().add(permission.clone());
+        }
+        return clone;
     }
 
     @Override

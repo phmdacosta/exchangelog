@@ -26,12 +26,20 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role save(Role role) throws SaveDataException {
-        return repository.save(role);
+        try {
+            return repository.save(role);
+        } catch (Exception e) {
+            throw new SaveDataException(e);
+        }
     }
 
     @Override
     public List<Role> saveAll(Collection<Role> col) throws SaveDataException {
-        return repository.saveAll(col);
+        try {
+            return repository.saveAll(col);
+        } catch (Exception e) {
+            throw new SaveDataException(e);
+        }
     }
 
     @Override
@@ -53,7 +61,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Permission> getPermissionsByRole(Role role) {
+    public List<Permission> getPermissionsByRole(Role role) throws NotFoundException {
         return permissionService.findAllByRole(role);
     }
 }

@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface RoleService extends RepositoryService<Role> {
     Role findByName(String name) throws NotFoundException;
-    List<Permission> getPermissionsByRole(Role role);
+    List<Permission> getPermissionsByRole(Role role) throws NotFoundException;
 }

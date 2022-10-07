@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
-//    Optional<List<Permission>> findAllByRoles(List<Role> roles);
-//    Optional<List<Permission>> findAllByFkRoleId
+    Optional<Permission> findByName(String name);
+    Optional<List<Permission>> findAllByRoles(Role role);
 }
