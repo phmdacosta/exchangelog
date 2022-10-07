@@ -11,15 +11,14 @@ import java.util.Objects;
 public class Person implements Cloneable {
 
     @Id
-    @SequenceGenerator( name = "user_person_seq",
-            sequenceName = "user_person_seq",
+    @SequenceGenerator( name = "USER_PERSON_SEQ",
+            sequenceName = "USER_PERSON_SEQ",
             allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_person_seq")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_PERSON_SEQ")
     private long id;
-    @Column(name = "first_name")
+    @Column(name = "FIRST_NAME")
     private String firstName;
-    @Column(name = "last_name")
+    @Column(name = "LAST_NAME")
     private String lastName;
     private LocalDateTime birthday;
 

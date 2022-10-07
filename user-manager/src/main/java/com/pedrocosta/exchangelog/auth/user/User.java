@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
+@Table(name = "USER")
 public class User extends Person implements UserDetails, Cloneable {
     private String username;
     private String password;
@@ -25,6 +26,10 @@ public class User extends Person implements UserDetails, Cloneable {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Client client;
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "USER_ROLES",
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
+    )
     private Set<Role> roles;
 
     public User() {
