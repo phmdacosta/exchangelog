@@ -9,6 +9,7 @@ import com.pedrocosta.exchangelog.auth.role.RoleService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.utils.TokenProperties;
+import com.pedrocosta.exchangelog.exceptions.ExternalServiceException;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.springutils.output.Log;
 import com.pedrocosta.springutils.output.Messages;
@@ -23,8 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -49,6 +53,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(User user) throws SaveDataException {
+        user.setRoles(new HashSet<>(handleRoles(user.getRoles())));
         User saved = userRepository.save(user);
         if (saved.getId() == 0) {
             throw new SaveDataException(Messages.get("error.not.saved",
@@ -157,7 +162,12 @@ public class UserServiceImpl implements UserService {
         notificationRequest.setBody(body);
         Log.info(this, "Sending message to notification server: " + notificationRequest);
 
-        return notifRestService.post("pushNotification", notificationRequest, String.class);
+        try {
+            return notifRestService.post("pushNotification", notificationRequest, String.class);
+        } catch (ExternalServiceException e) {
+            Log.error(this, e);
+            throw new SaveDataException(e);
+        }
     }
 
     @Override
@@ -201,5 +211,20 @@ public class UserServiceImpl implements UserService {
                 .addParameter("confirmationLink", link)
                 .addParameter("expireMinutes", env.getProperty(TokenProperties.EXPIRATION_TIME))
                 .read();
+    }
+
+    /**
+     * Get roles data from database
+     * @param roles Roles to be found.
+     * @return
+     */
+    private Collection<Role> handleRoles(Collection<Role> roles) {
+        return roles.stream().map(old -> {
+            try {
+                return roleService.findByName(old.getName());
+            } catch (NotFoundException e) {
+                return old;
+            }
+        }).collect(Collectors.toList());
     }
 }
