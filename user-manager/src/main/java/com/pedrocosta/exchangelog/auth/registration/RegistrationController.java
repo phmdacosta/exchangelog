@@ -50,9 +50,6 @@ public class RegistrationController {
         } catch (IllegalArgumentException e) {
             Log.error(this, e);
             response = ResponseEntity.badRequest().body(e.getMessage());
-        } catch (SaveDataException e) {
-            Log.error(this, e);
-            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         return response;
@@ -66,9 +63,6 @@ public class RegistrationController {
         } catch (IllegalArgumentException e) {
             Log.error(this, e);
             response = ResponseEntity.badRequest().body(e.getMessage());
-        } catch (SaveDataException e) {
-            Log.error(this, e);
-            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return response;
     }
