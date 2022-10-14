@@ -1,15 +1,8 @@
 package com.pedrocosta.exchangelog.auth.user;
 
-import com.pedrocosta.exchangelog.annotation.View;
-import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
-import com.pedrocosta.exchangelog.auth.utils.ContactType;
-import com.pedrocosta.exchangelog.auth.utils.Route;
-import com.pedrocosta.exchangelog.auth.validation.EmailValidator;
-import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.springutils.output.Log;
 import com.pedrocosta.springutils.viewmapper.ViewMapper;
 import javassist.NotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = Route.API)
 public class UserController {
     private final UserService service;
     private final ViewMapper mapper;
@@ -28,7 +20,7 @@ public class UserController {
         this.mapper = mapper;
     }
 
-    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "${route.users.list}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserDto>> getUsers() {
         List<User> users = service.findAll();
         List<UserDto> userViews = new ArrayList<>();
@@ -39,7 +31,7 @@ public class UserController {
         return ResponseEntity.ok(userViews);
     }
 
-    @GetMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "${route.get.user}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> getUser(@RequestParam String username) {
         if (username == null || username.isBlank()) {
             return ResponseEntity.badRequest().build();

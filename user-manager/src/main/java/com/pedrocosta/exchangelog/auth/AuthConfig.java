@@ -5,10 +5,13 @@ import com.pedrocosta.utils.mailsender.Email;
 import com.pedrocosta.utils.mailsender.MimeEmailSender;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 
 @Configuration
+@PropertySource("classpath:routes.properties")
 public class AuthConfig extends BaseConfig {
 //    @Bean
 //    public MimeEmailSender mimeEmailSender(JavaMailSender javaMailSender, Environment environment) {
@@ -16,4 +19,9 @@ public class AuthConfig extends BaseConfig {
 //        email.setFrom(environment.getProperty("mail.default.address"));
 //        return new MimeEmailSender(javaMailSender, email);
 //    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfig() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 }

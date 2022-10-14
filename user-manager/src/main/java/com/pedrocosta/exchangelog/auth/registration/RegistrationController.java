@@ -6,17 +6,13 @@ import com.pedrocosta.exchangelog.auth.user.UserCreationDto;
 import com.pedrocosta.exchangelog.auth.user.UserService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.utils.ContactType;
-import com.pedrocosta.exchangelog.auth.utils.Route;
 import com.pedrocosta.exchangelog.auth.validation.EmailValidator;
-import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.springutils.output.Log;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = Route.API + Route.REGISTRATION)
 public class RegistrationController {
     private final UserService userService;
     private final EmailValidator emailValidator;
@@ -26,7 +22,7 @@ public class RegistrationController {
         this.emailValidator = emailValidator;
     }
 
-    @PostMapping(
+    @PostMapping(value = "${route.registration}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> register(@RequestBody @View(UserCreationDto.class) User user) {
@@ -55,7 +51,7 @@ public class RegistrationController {
         return response;
     }
 
-    @PostMapping(value = "/confirm", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "${route.registration.confirm}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> confirmToken(@RequestParam String token) {
         ResponseEntity<String> response = ResponseEntity.ok("confirmed");
         try {
