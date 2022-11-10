@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.registration.token.confirmation;
+package com.pedrocosta.exchangelog.auth.security.token.confirmation;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

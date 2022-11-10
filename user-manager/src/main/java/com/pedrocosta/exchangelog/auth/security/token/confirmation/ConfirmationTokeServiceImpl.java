@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.registration.token.confirmation;
+package com.pedrocosta.exchangelog.auth.security.token.confirmation;
 
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.springutils.output.Log;

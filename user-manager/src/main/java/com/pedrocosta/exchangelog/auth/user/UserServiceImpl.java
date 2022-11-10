@@ -2,8 +2,8 @@ package com.pedrocosta.exchangelog.auth.user;
 
 import com.pedrocosta.exchangelog.auth.api.NotificationRestService;
 import com.pedrocosta.exchangelog.auth.registration.NotificationRequest;
-import com.pedrocosta.exchangelog.auth.registration.token.confirmation.ConfirmationToken;
-import com.pedrocosta.exchangelog.auth.registration.token.confirmation.ConfirmationTokenService;
+import com.pedrocosta.exchangelog.auth.security.token.confirmation.ConfirmationToken;
+import com.pedrocosta.exchangelog.auth.security.token.confirmation.ConfirmationTokenService;
 import com.pedrocosta.exchangelog.auth.role.Role;
 import com.pedrocosta.exchangelog.auth.role.RoleService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
