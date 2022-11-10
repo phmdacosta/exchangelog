@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.registration.token;
+package com.pedrocosta.exchangelog.auth.registration.token.confirmation;
 
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import javassist.NotFoundException;
