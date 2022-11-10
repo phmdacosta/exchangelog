@@ -19,9 +19,4 @@ public class AuthConfig extends BaseConfig {
 //        email.setFrom(environment.getProperty("mail.default.address"));
 //        return new MimeEmailSender(javaMailSender, email);
 //    }
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyConfig() {
-        return new PropertySourcesPlaceholderConfigurer();
-    }
 }
