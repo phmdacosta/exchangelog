@@ -1,9 +1,8 @@
 package com.pedrocosta.exchangelog.auth;
 
 import com.pedrocosta.exchangelog.auth.permission.Permission;
-import com.pedrocosta.exchangelog.auth.permission.PermissionService;
 import com.pedrocosta.exchangelog.auth.role.Role;
-import com.pedrocosta.exchangelog.auth.role.RoleService;
+import com.pedrocosta.exchangelog.auth.role.service.RoleService;
 import com.pedrocosta.exchangelog.auth.utils.Permissions;
 import com.pedrocosta.exchangelog.auth.utils.Roles;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;

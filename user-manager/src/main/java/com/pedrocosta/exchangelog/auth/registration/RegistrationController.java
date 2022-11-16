@@ -2,11 +2,11 @@ package com.pedrocosta.exchangelog.auth.registration;
 
 import com.pedrocosta.exchangelog.annotation.View;
 import com.pedrocosta.exchangelog.auth.user.User;
-import com.pedrocosta.exchangelog.auth.user.UserCreationDto;
-import com.pedrocosta.exchangelog.auth.user.UserService;
+import com.pedrocosta.exchangelog.auth.user.dto.UserCreationDto;
+import com.pedrocosta.exchangelog.auth.user.service.UserService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.utils.ContactType;
-import com.pedrocosta.exchangelog.auth.validation.EmailValidator;
+import com.pedrocosta.exchangelog.auth.user.contacts.validation.EmailValidator;
 import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
 import com.pedrocosta.springutils.output.Log;
 import org.springframework.http.MediaType;
