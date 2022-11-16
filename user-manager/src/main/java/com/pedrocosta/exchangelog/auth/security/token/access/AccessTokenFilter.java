@@ -33,10 +33,13 @@ public class AccessTokenFilter extends OncePerRequestFilter {
             if (accessToken.isPresent() && jwtHandler.validateAccessToken(accessToken.get())) {
                 String userId = jwtHandler.getUserIdFromAccessToken(accessToken.get());
                 User user = userService.find(Long.parseLong(userId));
-                UsernamePasswordAuthenticationToken userNamePassAuthToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                userNamePassAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                SecurityContextHolder.getContext().setAuthentication(userNamePassAuthToken);
+                if (!user.isLocked() && !user.isExpired()) {
+                    UsernamePasswordAuthenticationToken userNamePassAuthToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    userNamePassAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                    SecurityContextHolder.getContext().setAuthentication(userNamePassAuthToken);
+                }
             }
+
         } catch (Exception e) {
             Log.error(this, e);
         }

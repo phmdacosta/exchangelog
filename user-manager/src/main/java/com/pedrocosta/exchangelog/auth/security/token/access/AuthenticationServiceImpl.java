@@ -1,8 +1,11 @@
 package com.pedrocosta.exchangelog.auth.security.token.access;
 
+import com.pedrocosta.exchangelog.auth.exception.UnauthorizedException;
 import com.pedrocosta.exchangelog.auth.security.token.access.dto.TokenDto;
 import com.pedrocosta.exchangelog.auth.user.User;
 import com.pedrocosta.exchangelog.auth.user.UserService;
+import com.pedrocosta.springutils.output.Log;
+import com.pedrocosta.springutils.output.Messages;
 import javassist.NotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,20 +27,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public TokenDto authenticate(String username, String password) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        User user = (User) authentication.getPrincipal();
+    public TokenDto authenticate(String username, String password) throws IllegalArgumentException, UnauthorizedException {
+        try {
+            User user = userService.find(username);
 
-        String accessToken = jwtHandler.generateAccessToken(user);
-        String refreshTokenString = jwtHandler.generateRefreshToken(user, "");
-        return new TokenDto(user.getId(), accessToken, refreshTokenString);
+            if (user.isLocked()) {
+                throw new UnauthorizedException(Messages.get("user.locked"));
+            }
+
+            if (user.isExpired()) {
+                throw new UnauthorizedException(Messages.get("user.expired"));
+            }
+
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String accessToken = jwtHandler.generateAccessToken(user);
+            String refreshTokenString = generateRefreshToken(user);
+            return new TokenDto(accessToken, refreshTokenString);
+
+        } catch (NotFoundException e) {
+            Log.error(this, e);
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
     public void logout(String token) {
         if (jwtHandler.validateRefreshToken(token)) {
-            // logout
+            SecurityContextHolder.getContext().setAuthentication(null);
         }
     }
 
@@ -51,7 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new IllegalArgumentException(e);
             }
         }
-        throw new IllegalArgumentException("Refresh token invalid.");
+        throw new IllegalArgumentException(Messages.get("token.refresh.invalid"));
     }
 
     @Override
@@ -60,12 +78,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             try {
                 User user = userService.find(jwtHandler.getUserIdFromRefreshToken(refreshToken));
                 String accessToken = jwtHandler.generateAccessToken(user);
-                String newRefreshToken = jwtHandler.generateRefreshToken(user, "");
-                return new TokenDto(user.getId(), accessToken, newRefreshToken);
+                String newRefreshToken = generateRefreshToken(user);
+                return new TokenDto(accessToken, newRefreshToken);
             } catch (NotFoundException e) {
                 throw new IllegalArgumentException(e);
             }
         }
-        throw new IllegalArgumentException("Refresh token invalid.");
+        throw new IllegalArgumentException(Messages.get("token.refresh.invalid"));
+    }
+
+    protected String generateRefreshToken(User user) {
+        return jwtHandler.generateRefreshToken(user);
     }
 }

@@ -50,12 +50,16 @@ public class JwtHandler {
                 .sign(accessTokenAlgorithm);
     }
 
+    public String generateRefreshToken(User user) {
+        return generateRefreshToken(user, null);
+    }
+
     public String generateRefreshToken(User user, String tokenId) {
         Instant now = Instant.now();
         return JWT.create()
                 .withIssuer(issuer)
                 .withSubject(String.valueOf(user.getId()))
-//                .withClaim("tokenId", tokenId)
+                .withClaim("tokenId", tokenId)
                 .withIssuedAt(now)
                 .withExpiresAt(now.plus(accessRefreshExpirationMinutes, ChronoUnit.MINUTES))
                 .sign(refreshTokenAlgorithm);
