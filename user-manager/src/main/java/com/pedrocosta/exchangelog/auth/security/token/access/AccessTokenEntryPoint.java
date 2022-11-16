@@ -10,6 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Class to handle an HTTP response in case of unauthorized request.
+ *
+ * @author Pedro H M da Costa
+ * @since 1.0
+ */
 @Component
 public class AccessTokenEntryPoint implements AuthenticationEntryPoint {
     @Override

@@ -12,6 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Authentication controller to handle all route points involving user authentication.
+ *
+ * @author Pedro H M da Costa
+ * @since 1.0
+ */
 @Controller
 public class AuthenticationController {
 

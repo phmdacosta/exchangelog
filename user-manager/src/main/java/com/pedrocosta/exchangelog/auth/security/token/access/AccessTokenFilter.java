@@ -16,6 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
+/**
+ * Filter request to validate tokens.
+ *
+ * @author Pedro H M da Costa
+ * @since 1.0
+ */
 public class AccessTokenFilter extends OncePerRequestFilter {
 
     private final JwtHandler jwtHandler;

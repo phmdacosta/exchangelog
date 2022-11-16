@@ -11,11 +11,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Optional;
 
+/**
+ * Class to handle access and refresh tokens
+ * @author Pedro H M da Costa
+ * @since 1.0
+ */
 @Component
 public class JwtHandler {
 
@@ -40,6 +44,12 @@ public class JwtHandler {
         this.refreshTokenVerifier = JWT.require(refreshTokenAlgorithm).withIssuer(issuer).build();
     }
 
+    /**
+     * Generate a new access token based on user information.
+     *
+     * @param user  Usr information
+     * @return  New access token
+     */
     public String generateAccessToken(User user) {
         Instant now = Instant.now();
         return JWT.create()
@@ -50,10 +60,23 @@ public class JwtHandler {
                 .sign(accessTokenAlgorithm);
     }
 
+    /**
+     * Generate a new refresh token based on user information.
+     *
+     * @param user  Usr information
+     * @return  New refresh token
+     */
     public String generateRefreshToken(User user) {
         return generateRefreshToken(user, null);
     }
 
+    /**
+     * Generate a new refresh token based on user information.
+     *
+     * @param user      User information
+     * @param tokenId   Token ID (optional)
+     * @return  New refresh token
+     */
     public String generateRefreshToken(User user, String tokenId) {
         Instant now = Instant.now();
         return JWT.create()
@@ -65,18 +88,42 @@ public class JwtHandler {
                 .sign(refreshTokenAlgorithm);
     }
 
+    /**
+     * Check if access token is valid.
+     *
+     * @param token Token to verify
+     * @return  True if token is valid, false otherwise
+     */
     public boolean validateAccessToken(String token) {
         return decodeAccessToken(token).isPresent();
     }
 
+    /**
+     * Check if refresh token is valid.
+     *
+     * @param token Token to verify
+     * @return  True if token is valid, false otherwise
+     */
     public boolean validateRefreshToken(String token) {
         return decodeRefreshToken(token).isPresent();
     }
 
+    /**
+     * Get user id from access token.
+     *
+     * @param token Access token
+     * @return  User ID
+     */
     public String getUserIdFromAccessToken(String token) {
         return decodeAccessToken(token).get().getSubject();
     }
 
+    /**
+     * Get user id from refresh token.
+     *
+     * @param token Refresh token
+     * @return  User ID
+     */
     public String getUserIdFromRefreshToken(String token) {
         return decodeRefreshToken(token).get().getSubject();
     }
