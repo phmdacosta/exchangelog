@@ -30,6 +30,6 @@ public class RestResponseAdapter extends WriteTypeAdapter<RestResponse<?>> {
             }
             writer.add("message", msg);
         }
-        writer.addJson("info", this.getJsonUtils().toJson(obj.getObject()));
+        writer.addJson("data", this.getJsonUtils().toJson(obj.getObject()));
     }
 }

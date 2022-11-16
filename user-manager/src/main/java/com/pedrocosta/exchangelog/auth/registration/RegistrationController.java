@@ -7,6 +7,7 @@ import com.pedrocosta.exchangelog.auth.user.UserService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.validation.EmailValidator;
+import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
 import com.pedrocosta.springutils.output.Log;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,9 @@ public class RegistrationController {
     @PostMapping(value = "${route.registration}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> register(@RequestBody @View(UserCreationDto.class) User user) {
+    public ResponseEntity<?> register(@RequestBody @View(UserCreationDto.class) User user) {
         if (user == null) {
-            return ResponseEntity.badRequest().build();
+            return RestResponseEntity.badRequest("");
         }
 
         if (!user.getContacts().isEmpty()) {
@@ -39,26 +40,26 @@ public class RegistrationController {
             }
         }
 
-        ResponseEntity<String> response;
+        ResponseEntity<?> response;
         try {
             String token = userService.register(user);
             response = ResponseEntity.ok(token);
         } catch (IllegalArgumentException e) {
             Log.error(this, e);
-            response = ResponseEntity.badRequest().body(e.getMessage());
+            response = RestResponseEntity.badRequest(e.getMessage());
         }
 
         return response;
     }
 
     @PostMapping(value = "${route.registration.confirm}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> confirmToken(@RequestParam String token) {
-        ResponseEntity<String> response = ResponseEntity.ok("confirmed");
+    public ResponseEntity<?> confirmToken(@RequestParam String token) {
+        ResponseEntity<?> response = RestResponseEntity.ok("confirmed");
         try {
             userService.confirmToken(token);
         } catch (IllegalArgumentException e) {
             Log.error(this, e);
-            response = ResponseEntity.badRequest().body(e.getMessage());
+            response = RestResponseEntity.badRequest(e.getMessage());
         }
         return response;
     }

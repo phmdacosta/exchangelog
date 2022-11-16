@@ -1,6 +1,8 @@
 package com.pedrocosta.exchangelog.auth.user;
 
+import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
 import com.pedrocosta.springutils.output.Log;
+import com.pedrocosta.springutils.output.Messages;
 import com.pedrocosta.springutils.viewmapper.ViewMapper;
 import javassist.NotFoundException;
 import org.springframework.http.MediaType;
@@ -21,30 +23,30 @@ public class UserController {
     }
 
     @GetMapping(value = "${route.users.list}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserDto>> getUsers() {
+    public ResponseEntity<?> getUsers() {
         List<User> users = service.findAll();
         List<UserDto> userViews = new ArrayList<>();
         for (User user : users) {
             UserDto dto = mapper.map(user, UserDto.class);
             userViews.add(dto);
         }
-        return ResponseEntity.ok(userViews);
+        return RestResponseEntity.ok(userViews);
     }
 
     @GetMapping(value = "${route.get.user}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> getUser(@RequestParam String username) {
+    public ResponseEntity<?> getUser(@RequestParam String username) {
         if (username == null || username.isBlank()) {
-            return ResponseEntity.badRequest().build();
+            return RestResponseEntity.badRequest(Messages.get("user.username.invalid"));
         }
 
-        ResponseEntity<UserDto> response;
+        ResponseEntity<?> response;
         try {
             User user = service.find(username);
             UserDto dto = mapper.map(user, UserDto.class);
-            response = ResponseEntity.ok(dto);
+            response = RestResponseEntity.ok(dto);
         } catch (NotFoundException e) {
             Log.error(this, e);
-            response = ResponseEntity.notFound().build();
+            response = RestResponseEntity.notFound(Messages.get("user.not.found", username));
         }
 
         return response;

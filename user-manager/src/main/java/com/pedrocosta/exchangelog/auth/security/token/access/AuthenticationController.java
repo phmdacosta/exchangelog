@@ -1,7 +1,10 @@
 package com.pedrocosta.exchangelog.auth.security.token.access;
 
+import com.pedrocosta.exchangelog.auth.exception.UnauthorizedException;
 import com.pedrocosta.exchangelog.auth.security.token.access.dto.LoginDto;
 import com.pedrocosta.exchangelog.auth.security.token.access.dto.TokenDto;
+import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
+import com.pedrocosta.springutils.output.Messages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +25,16 @@ public class AuthenticationController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
-        TokenDto tokenDto = authenticationService.authenticate(loginDto.getUsername(), loginDto.getPassword());
-        return ResponseEntity.ok(tokenDto);
+        ResponseEntity<?> result;
+        try {
+            TokenDto tokenDto = authenticationService.authenticate(loginDto.getUsername(), loginDto.getPassword());
+            result = RestResponseEntity.ok(tokenDto);
+        } catch (UnauthorizedException e) {
+            result = RestResponseEntity.error(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            result = RestResponseEntity.error(HttpStatus.BAD_REQUEST, Messages.get("user.info.wrong"));
+        }
+        return result;
     }
 
     @PostMapping(value = "${route.auth.logout}",
@@ -31,7 +42,7 @@ public class AuthenticationController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> logout(@RequestBody TokenDto tokenDto) {
         authenticationService.logout(tokenDto.getRefreshToken());
-        return ResponseEntity.ok("");
+        return RestResponseEntity.ok("");
     }
 
     @PostMapping(value = "${route.auth.accessToken}",
@@ -41,9 +52,9 @@ public class AuthenticationController {
         ResponseEntity<?> result;
         try {
             String accessToken = authenticationService.renewAccessToken(tokenDto.getRefreshToken());
-            result = ResponseEntity.ok(new TokenDto(tokenDto.getUserId(), accessToken, tokenDto.getRefreshToken()));
+            result = RestResponseEntity.ok(new TokenDto(accessToken, tokenDto.getRefreshToken()));
         } catch (IllegalArgumentException e) {
-            result = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            result = RestResponseEntity.error(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
         return result;
     }
