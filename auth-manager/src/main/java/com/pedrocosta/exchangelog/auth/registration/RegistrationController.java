@@ -5,7 +5,7 @@ import com.pedrocosta.exchangelog.auth.user.User;
 import com.pedrocosta.exchangelog.auth.user.dto.UserCreationDto;
 import com.pedrocosta.exchangelog.auth.user.service.UserService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
-import com.pedrocosta.exchangelog.auth.utils.ContactType;
+import com.pedrocosta.exchangelog.auth.user.contacts.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.user.contacts.validation.EmailValidator;
 import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
 import com.pedrocosta.springutils.output.Log;

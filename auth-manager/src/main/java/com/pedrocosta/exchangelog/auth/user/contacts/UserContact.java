@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog.auth.user.contacts;
 
 import com.pedrocosta.exchangelog.auth.user.User;
-import com.pedrocosta.exchangelog.auth.utils.ContactType;
+import com.pedrocosta.exchangelog.auth.user.contacts.utils.ContactType;
 
 import javax.persistence.*;
 import java.util.Objects;

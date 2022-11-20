@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.utils;
+package com.pedrocosta.exchangelog.auth.user.contacts.utils;
 
 /**
  * @author Pedro H M da Costa

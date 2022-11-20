@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.auth.utils;
+package com.pedrocosta.exchangelog.auth.permission.utils;
 
 import com.pedrocosta.exchangelog.auth.permission.Permission;
 

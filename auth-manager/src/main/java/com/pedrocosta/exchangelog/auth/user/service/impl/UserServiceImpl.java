@@ -10,7 +10,7 @@ import com.pedrocosta.exchangelog.auth.user.User;
 import com.pedrocosta.exchangelog.auth.user.repository.UserRepository;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.user.service.UserService;
-import com.pedrocosta.exchangelog.auth.utils.ContactType;
+import com.pedrocosta.exchangelog.auth.user.contacts.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.utils.TokenProperties;
 import com.pedrocosta.exchangelog.exceptions.ExternalServiceException;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
