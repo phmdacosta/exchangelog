@@ -11,7 +11,6 @@ import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.user.contacts.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.user.repository.UserRepository;
 import com.pedrocosta.exchangelog.auth.user.service.UserService;
-import com.pedrocosta.exchangelog.auth.utils.TokenProperties;
 import com.pedrocosta.exchangelog.exceptions.ExternalServiceException;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.springutils.output.Log;
@@ -145,7 +144,7 @@ public class UserServiceImpl implements UserService {
         LocalDateTime creationTime = LocalDateTime.now();
         confirmationToken.setCreatedTime(creationTime);
 
-        String propExpirationTime = env.getProperty(TokenProperties.EXPIRATION_TIME);
+        String propExpirationTime = env.getProperty("token.confirm.expire.minutes");
         if (propExpirationTime != null) {
             LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(Long.parseLong(propExpirationTime));
             confirmationToken.setExpiredTime(expirationTime);
@@ -212,7 +211,7 @@ public class UserServiceImpl implements UserService {
         return new HtmlFileParser(FileParser.class.getClassLoader().getResourceAsStream("page/emailBody.html"))
                 .addParameter("personName", name)
                 .addParameter("confirmationLink", link)
-                .addParameter("expireMinutes", env.getProperty(TokenProperties.EXPIRATION_TIME))
+                .addParameter("expireMinutes", env.getProperty("token.confirm.expire.minutes"))
                 .read();
     }
 

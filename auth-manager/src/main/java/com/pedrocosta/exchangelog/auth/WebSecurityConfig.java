@@ -4,7 +4,6 @@ import com.pedrocosta.exchangelog.auth.token.access.JwtHandler;
 import com.pedrocosta.exchangelog.auth.token.access.filter.AccessTokenEntryPoint;
 import com.pedrocosta.exchangelog.auth.token.access.filter.AccessTokenFilter;
 import com.pedrocosta.exchangelog.auth.user.service.UserService;
-import com.pedrocosta.exchangelog.auth.utils.Route;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +32,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${token.access.enabled}")
     private boolean accessTokenEnabled;
     @Value("${route.auth.login}")
-    private String routeLogin;
+    private String loginRoute;
+    @Value("${route.registration}")
+    private String registrationRoute;
     private final ApplicationContext context;
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -101,9 +102,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     protected String[] getPermitAllRoutes() {
         Set<String> permitAllRoutes = new HashSet<>();
-        permitAllRoutes.add(Route.API + Route.REGISTRATION + "/**");
+        permitAllRoutes.add(registrationRoute + "/**");
         if (accessTokenEnabled) {
-            permitAllRoutes.add(routeLogin + "/**");
+            permitAllRoutes.add(loginRoute + "/**");
         }
         return permitAllRoutes.toArray(new String[0]);
     }
