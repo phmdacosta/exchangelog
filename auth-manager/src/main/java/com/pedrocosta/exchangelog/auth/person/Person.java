@@ -1,7 +1,5 @@
 package com.pedrocosta.exchangelog.auth.person;
 
-import com.pedrocosta.exchangelog.auth.user.User;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;

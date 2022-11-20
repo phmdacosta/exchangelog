@@ -1,8 +1,8 @@
 package com.pedrocosta.exchangelog.auth;
 
+import com.pedrocosta.exchangelog.auth.token.access.JwtHandler;
 import com.pedrocosta.exchangelog.auth.token.access.filter.AccessTokenEntryPoint;
 import com.pedrocosta.exchangelog.auth.token.access.filter.AccessTokenFilter;
-import com.pedrocosta.exchangelog.auth.token.access.JwtHandler;
 import com.pedrocosta.exchangelog.auth.user.service.UserService;
 import com.pedrocosta.exchangelog.auth.utils.Route;
 import org.springframework.beans.factory.annotation.Value;

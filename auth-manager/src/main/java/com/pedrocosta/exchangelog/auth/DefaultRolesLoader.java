@@ -1,9 +1,9 @@
 package com.pedrocosta.exchangelog.auth;
 
 import com.pedrocosta.exchangelog.auth.permission.Permission;
+import com.pedrocosta.exchangelog.auth.permission.utils.Permissions;
 import com.pedrocosta.exchangelog.auth.role.Role;
 import com.pedrocosta.exchangelog.auth.role.service.RoleService;
-import com.pedrocosta.exchangelog.auth.permission.utils.Permissions;
 import com.pedrocosta.exchangelog.auth.role.utils.Roles;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.springutils.output.Log;

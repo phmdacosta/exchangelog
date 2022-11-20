@@ -1,8 +1,8 @@
 package com.pedrocosta.exchangelog.auth.user;
 
-import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.person.Person;
 import com.pedrocosta.exchangelog.auth.role.Role;
+import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

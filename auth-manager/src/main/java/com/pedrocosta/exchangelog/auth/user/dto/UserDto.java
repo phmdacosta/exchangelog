@@ -1,7 +1,7 @@
 package com.pedrocosta.exchangelog.auth.user.dto;
 
-import com.pedrocosta.exchangelog.auth.user.contacts.dto.UserContactDto;
 import com.pedrocosta.exchangelog.auth.role.dto.RoleDto;
+import com.pedrocosta.exchangelog.auth.user.contacts.dto.UserContactDto;
 import com.pedrocosta.springutils.viewmapper.annotation.MappingCollection;
 import com.pedrocosta.springutils.viewmapper.annotation.MappingField;
 import com.pedrocosta.springutils.viewmapper.annotation.View;

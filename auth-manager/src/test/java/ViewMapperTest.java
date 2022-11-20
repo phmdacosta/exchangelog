@@ -1,9 +1,9 @@
+import com.pedrocosta.exchangelog.auth.role.Role;
+import com.pedrocosta.exchangelog.auth.role.dto.RoleDto;
 import com.pedrocosta.exchangelog.auth.user.User;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.user.contacts.dto.UserContactDto;
 import com.pedrocosta.exchangelog.auth.user.dto.UserDto;
-import com.pedrocosta.exchangelog.auth.role.Role;
-import com.pedrocosta.exchangelog.auth.role.dto.RoleDto;
 import com.pedrocosta.springutils.viewmapper.ViewMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

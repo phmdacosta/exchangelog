@@ -1,17 +1,20 @@
 package com.pedrocosta.exchangelog.auth.registration;
 
 import com.pedrocosta.exchangelog.annotation.View;
+import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
 import com.pedrocosta.exchangelog.auth.user.User;
-import com.pedrocosta.exchangelog.auth.user.dto.UserCreationDto;
-import com.pedrocosta.exchangelog.auth.user.service.UserService;
 import com.pedrocosta.exchangelog.auth.user.contacts.UserContact;
 import com.pedrocosta.exchangelog.auth.user.contacts.utils.ContactType;
 import com.pedrocosta.exchangelog.auth.user.contacts.validation.EmailValidator;
-import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
+import com.pedrocosta.exchangelog.auth.user.dto.UserCreationDto;
+import com.pedrocosta.exchangelog.auth.user.service.UserService;
 import com.pedrocosta.springutils.output.Log;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RegistrationController {

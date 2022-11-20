@@ -1,10 +1,10 @@
 package com.pedrocosta.exchangelog.auth.token.access.controller;
 
+import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
 import com.pedrocosta.exchangelog.auth.exception.UnauthorizedException;
-import com.pedrocosta.exchangelog.auth.token.access.service.AuthenticationService;
 import com.pedrocosta.exchangelog.auth.token.access.dto.LoginDto;
 import com.pedrocosta.exchangelog.auth.token.access.dto.TokenDto;
-import com.pedrocosta.exchangelog.api.response.RestResponseEntity;
+import com.pedrocosta.exchangelog.auth.token.access.service.AuthenticationService;
 import com.pedrocosta.springutils.output.Messages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
