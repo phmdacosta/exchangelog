@@ -21,7 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(locations="classpath:application-test.properties")
+@TestPropertySource(
+        locations={"classpath:application-test.properties"}
+)
 public class NotificationControllerTest {
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
             MediaType.APPLICATION_JSON.getType(),
@@ -62,7 +64,7 @@ public class NotificationControllerTest {
                     "\"body\":\"This is a test notification\"" +
                 "}";
 
-        this.mockMvc.perform(post("/pushNotification?mean=e-mail")
+        this.mockMvc.perform(post("/pushNotification")
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(requestBody))
                 .andDo(print())
@@ -81,6 +83,46 @@ public class NotificationControllerTest {
                 "}";
 
         this.mockMvc.perform(post("/pushNotification")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(requestBody))
+                .andDo(print())
+                .andExpect(status().is(400))
+                .andExpect(content().string(
+                        containsString("Request body JSON wrong format.")));
+    }
+
+    @Test
+    public void test_pushNotification_error_badRequest_ptBR() throws Exception {
+        String requestBody = "{" +
+                "\"mean\":\"EMAIL\"" +
+                "\"from\":\"from@test.com\"," +
+                "\"to\":[\"to_01@test.com\",\"to_02@test.com\",\"to_03@test.com\"]," +
+                "\"subject\":\"Test subject\"," +
+                "\"body\":\"This is a test notification\"" +
+                "}";
+
+        this.mockMvc.perform(post("/pushNotification")
+                        .header("Accept-Language", "pt-BR")
+                        .contentType(APPLICATION_JSON_UTF8)
+                        .content(requestBody))
+                .andDo(print())
+                .andExpect(status().is(400))
+                .andExpect(content().string(
+                        containsString("Corpo da requisição JSON está mal formatado.")));
+    }
+
+    @Test
+    public void test_pushNotification_error_badRequest_notSupportedLocale() throws Exception {
+        String requestBody = "{" +
+                "\"mean\":\"EMAIL\"" +
+                "\"from\":\"from@test.com\"," +
+                "\"to\":[\"to_01@test.com\",\"to_02@test.com\",\"to_03@test.com\"]," +
+                "\"subject\":\"Test subject\"," +
+                "\"body\":\"This is a test notification\"" +
+                "}";
+
+        this.mockMvc.perform(post("/pushNotification")
+                        .header("Accept-Language", "es-US")
                         .contentType(APPLICATION_JSON_UTF8)
                         .content(requestBody))
                 .andDo(print())
