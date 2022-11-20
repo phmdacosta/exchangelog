@@ -16,7 +16,7 @@
         <module>batch</module>
         <module>notification</module>
 		<module>core</module>
-        <module>user-manager</module>
+        <module>auth-manager</module>
 	</modules>
 
     <parent>
