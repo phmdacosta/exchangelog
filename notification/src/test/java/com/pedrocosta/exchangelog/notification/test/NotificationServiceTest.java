@@ -6,6 +6,7 @@ import com.pedrocosta.exchangelog.notification.persistence.NotificationRepositor
 import com.pedrocosta.exchangelog.notification.NotificationService;
 import com.pedrocosta.exchangelog.notification.impl.NotificationServiceImpl;
 import com.pedrocosta.exchangelog.notification.sender.NotificationSenderFactory;
+import javassist.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -116,7 +117,7 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void testGetNotification_success() {
+    public void testGetNotification_success() throws NotFoundException {
         when(repository.getOne(1L)).thenReturn(notification);
         Notification gotNotif = service.find(1L);
         verify(repository).getOne(1L);
