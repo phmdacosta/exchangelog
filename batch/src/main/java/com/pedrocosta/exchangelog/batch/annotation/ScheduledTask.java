@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.batch.annotations;
+package com.pedrocosta.exchangelog.batch.annotation;
 
 import java.lang.annotation.*;
 

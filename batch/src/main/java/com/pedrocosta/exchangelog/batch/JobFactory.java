@@ -55,7 +55,7 @@ public class JobFactory<T extends ScheduledTask<?,?>> {
 
         ClassPathScanningCandidateComponentProvider scanner =
                 new ClassPathScanningCandidateComponentProvider(false);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(com.pedrocosta.exchangelog.batch.annotations.ScheduledTask.class));
+        scanner.addIncludeFilter(new AnnotationTypeFilter(com.pedrocosta.exchangelog.batch.annotation.ScheduledTask.class));
 
         for (BeanDefinition bd : scanner.findCandidateComponents(getPackageName())) {
             if (bd.getBeanClassName() == null) {
@@ -64,7 +64,7 @@ public class JobFactory<T extends ScheduledTask<?,?>> {
 
             try {
                 Class<?> clazz = Class.forName(bd.getBeanClassName());
-                String taskName = clazz.getAnnotation(com.pedrocosta.exchangelog.batch.annotations.ScheduledTask.class).value();
+                String taskName = clazz.getAnnotation(com.pedrocosta.exchangelog.batch.annotation.ScheduledTask.class).value();
                 if (taskName != null && (taskName.equals(name) || clazz.getSimpleName().replace("Task", "").equalsIgnoreCase(name))) {
                     scheduler = create((Class<T>) clazz);
                 }

@@ -1,6 +1,9 @@
-package com.pedrocosta.exchangelog.batch;
+package com.pedrocosta.exchangelog.batch.service;
 
 import com.pedrocosta.exchangelog.RepositoryService;
+import com.pedrocosta.exchangelog.batch.ScheduledTask;
+import com.pedrocosta.exchangelog.batch.TaskChain;
+import com.pedrocosta.exchangelog.batch.ScheduledJob;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.sun.istack.Nullable;
 

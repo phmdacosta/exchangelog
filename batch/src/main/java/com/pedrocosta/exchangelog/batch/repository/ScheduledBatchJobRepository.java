@@ -1,5 +1,6 @@
-package com.pedrocosta.exchangelog.batch;
+package com.pedrocosta.exchangelog.batch.repository;
 
+import com.pedrocosta.exchangelog.batch.ScheduledJob;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

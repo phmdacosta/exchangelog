@@ -1,6 +1,7 @@
 package com.pedrocosta.exchangelog.batch;
 
-import com.pedrocosta.exchangelog.batch.annotations.ScheduledTask;
+import com.pedrocosta.exchangelog.batch.annotation.ScheduledTask;
+import com.pedrocosta.exchangelog.batch.service.ScheduledBatchJobService;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
 import com.pedrocosta.springutils.PackageUtils;
@@ -105,7 +106,7 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
     private void configureImplementedJobsFromProject(@NotNull final ScheduledTaskRegistrar taskRegistrar, @NotNull final String packageName) {
         ClassPathScanningCandidateComponentProvider scanner =
                 new ClassPathScanningCandidateComponentProvider(false);
-        scanner.addIncludeFilter(new AnnotationTypeFilter(com.pedrocosta.exchangelog.batch.annotations.ScheduledTask.class));
+        scanner.addIncludeFilter(new AnnotationTypeFilter(com.pedrocosta.exchangelog.batch.annotation.ScheduledTask.class));
 
         for (BeanDefinition bd : scanner.findCandidateComponents(packageName)) {
             if (bd.getBeanClassName() == null) {
