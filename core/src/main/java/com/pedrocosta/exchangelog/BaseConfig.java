@@ -1,6 +1,5 @@
 package com.pedrocosta.exchangelog;
 
-import com.pedrocosta.exchangelog.api.RestResponse;
 import com.pedrocosta.exchangelog.utils.JsonUtils;
 import com.pedrocosta.springutils.jsonmanager.adapter.AdapterFinder;
 import com.pedrocosta.springutils.jsonmanager.adapter.UtilsTypeAdapter;
