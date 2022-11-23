@@ -1,10 +1,12 @@
 package com.pedrocosta.exchangelog.batch;
 
-import com.pedrocosta.exchangelog.ServiceFactory;
+import com.pedrocosta.exchangelog.batch.annotations.ScheduledTask;
+import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.utils.PropertyNames;
+import com.pedrocosta.springutils.PackageUtils;
 import com.pedrocosta.springutils.output.Log;
 import com.pedrocosta.springutils.output.Messages;
-import com.sun.istack.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -15,15 +17,22 @@ import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,17 +50,20 @@ import java.util.concurrent.Executors;
 @Configuration
 @EnableBatchProcessing
 @EnableScheduling
+@EnableJpaRepositories
+@ComponentScan
+@EntityScan
 public class BatchSchedulerConfig implements SchedulingConfigurer {
 
     private final ApplicationContext context;
-    private final ServiceFactory serviceFactory;
+    private final ScheduledBatchJobService scheduledJobService;
     private final JobExplorer jobExplorer;
 
     public BatchSchedulerConfig(ApplicationContext context,
-                                ServiceFactory serviceFactory,
+                                ScheduledBatchJobService scheduledJobService,
                                 JobExplorer jobExplorer) {
         this.context = context;
-        this.serviceFactory = serviceFactory;
+        this.scheduledJobService = scheduledJobService;
         this.jobExplorer = jobExplorer;
         cancelUndoneTasks();
     }
@@ -67,42 +79,92 @@ public class BatchSchedulerConfig implements SchedulingConfigurer {
      * @param taskRegistrar {@link ScheduledTaskRegistrar} object.
      */
     @Override
-    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+    public void configureTasks(@NotNull ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.setScheduler(taskExecutor());
-        ScheduledBatchJobService service = serviceFactory.create(ScheduledBatchJobService.class);
-        List<String> jobNames = service.findAllJobNames();
 
-        for (String jobName : jobNames) {
-            ScheduledJob batchJob = service.findBatchJob(jobName);
-
-            // Ignore any disabled job
-            if (batchJob == null || !batchJob.isEnabled()) {
-                continue;
-            }
-
-            Log.info(this, Messages.get(
-                    "task.config.execution", batchJob.getName()));
-
-            String jobCron = buildCron(batchJob, context.getEnvironment());
-            // Ignore jobs with invalid cron
-            if (!isValidCron(jobCron)) {
-                Log.warn(this, Messages.get(
-                        "task.cron.invalid", batchJob.getName()));
-                continue;
-            }
-
-            taskRegistrar.addTriggerTask(
-                    () -> executeAll(service, jobName),
-                    new CronTrigger(jobCron)
-            );
+        try {
+            String projPackageStr = PackageUtils.getProjectPackage(context).getName();
+            configureImplementedJobsFromProject(taskRegistrar, projPackageStr);
+        } catch (ClassNotFoundException e) {
+            Log.error(this, e);
+            configureSavedJobs(taskRegistrar);
         }
     }
 
-    private void executeAll(ScheduledBatchJobService service, String jobName) {
+    private void configureSavedJobs(final ScheduledTaskRegistrar taskRegistrar) {
+        List<String> jobNameList = scheduledJobService.findAllJobNames();
+
+        for (String jobName : jobNameList) {
+            ScheduledJob batchJob = scheduledJobService.findBatchJob(jobName);
+            if (batchJob != null) {
+                registerScheduledJob(taskRegistrar, batchJob);
+            }
+        }
+    }
+
+    private void configureImplementedJobsFromProject(@NotNull final ScheduledTaskRegistrar taskRegistrar, @NotNull final String packageName) {
+        ClassPathScanningCandidateComponentProvider scanner =
+                new ClassPathScanningCandidateComponentProvider(false);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(com.pedrocosta.exchangelog.batch.annotations.ScheduledTask.class));
+
+        for (BeanDefinition bd : scanner.findCandidateComponents(packageName)) {
+            if (bd.getBeanClassName() == null) {
+                continue;
+            }
+
+            try {
+                Class<?> clazz = Class.forName(bd.getBeanClassName());
+                if (clazz.getAnnotation(ScheduledTask.class) != null) {
+                    String jobName = clazz.getAnnotation(ScheduledTask.class).value();
+                    if (StringUtils.isEmpty(jobName)) {
+                        jobName = bd.getBeanClassName()
+                                .substring(bd.getBeanClassName().lastIndexOf(".") + 1)
+                                .replace("Task", "");
+                    }
+
+                    ScheduledJob batchJob = scheduledJobService.findBatchJob(jobName);
+                    if (batchJob == null) {
+                        batchJob = new ScheduledJob();
+                        batchJob.setName(jobName);
+                        try {
+                            batchJob = scheduledJobService.save(batchJob);
+                            registerScheduledJob(taskRegistrar, batchJob);
+                        } catch (SaveDataException e) {
+                            Log.error(this, e);
+                        }
+                    }
+                }
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+    }
+
+    private void registerScheduledJob(final ScheduledTaskRegistrar taskRegistrar, final ScheduledJob batchJob) {
+        if (!batchJob.isEnabled()) {
+            return;
+        }
+
+        Log.info(this, Messages.get(
+                "task.config.execution", batchJob.getName()));
+
+        String jobCron = buildCron(batchJob, context.getEnvironment());
+        // Ignore jobs with invalid cron
+        if (!isValidCron(jobCron)) {
+            Log.warn(this, Messages.get(
+                    "task.cron.invalid", batchJob.getName()));
+            return;
+        }
+
+        taskRegistrar.addTriggerTask(
+                () -> executeAll(batchJob.getName()),
+                new CronTrigger(jobCron)
+        );
+    }
+
+    private void executeAll(String jobName) {
         try {
-            TaskChain taskChain = service.findScheduledChain(jobName);
-            if (!taskChain.isEmpty())
-                taskChain.executeAll();
+            TaskChain taskChain = scheduledJobService.findScheduledChain(jobName);
+            BatchLauncher.launch(taskChain);
 
         } catch (JobExecutionAlreadyRunningException
                  | JobRestartException
