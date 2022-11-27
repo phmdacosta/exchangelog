@@ -19,7 +19,7 @@ public class Notification implements Serializable, Cloneable {
     private String from;
     @ElementCollection
     @CollectionTable(name = "recipients", joinColumns = @JoinColumn(name = "notification_id"))
-    @Column(name = "mail_address")
+    @Column(name = "address")
     private Set<String> to;
     private String subject;
     //TODO: body may be big, must be saved as BLOB
