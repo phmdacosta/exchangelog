@@ -1,10 +1,12 @@
-package com.pedrocosta.exchangelog.notification;
+package com.pedrocosta.exchangelog.notification.controller;
 
 import com.pedrocosta.exchangelog.ServiceFactory;
 import com.pedrocosta.exchangelog.api.RestResponse;
 import com.pedrocosta.exchangelog.controller.BaseController;
 import com.pedrocosta.exchangelog.api.exceptions.RestApiException;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
+import com.pedrocosta.exchangelog.notification.Mean;
+import com.pedrocosta.exchangelog.notification.Notification;
 import com.pedrocosta.exchangelog.notification.service.NotificationService;
 import com.pedrocosta.exchangelog.utils.JsonUtils;
 import com.pedrocosta.springutils.output.Log;
