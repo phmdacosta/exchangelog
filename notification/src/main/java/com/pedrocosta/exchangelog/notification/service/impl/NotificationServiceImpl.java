@@ -1,8 +1,8 @@
-package com.pedrocosta.exchangelog.notification.impl;
+package com.pedrocosta.exchangelog.notification.service.impl;
 
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.exchangelog.notification.Notification;
-import com.pedrocosta.exchangelog.notification.NotificationService;
+import com.pedrocosta.exchangelog.notification.service.NotificationService;
 import com.pedrocosta.exchangelog.notification.persistence.NotificationRepository;
 import com.pedrocosta.exchangelog.notification.sender.NotificationSender;
 import com.pedrocosta.exchangelog.notification.sender.NotificationSenderFactory;

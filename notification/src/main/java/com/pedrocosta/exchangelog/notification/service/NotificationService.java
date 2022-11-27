@@ -1,4 +1,4 @@
-package com.pedrocosta.exchangelog.notification;
+package com.pedrocosta.exchangelog.notification.service;
 
 import com.pedrocosta.exchangelog.RepositoryService;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
