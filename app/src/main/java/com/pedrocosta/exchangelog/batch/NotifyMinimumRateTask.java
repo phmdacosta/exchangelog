@@ -1,0 +1,138 @@
+package com.pedrocosta.exchangelog.batch;
+
+import com.pedrocosta.exchangelog.exchange.Exchange;
+import com.pedrocosta.exchangelog.exchange.ExchangeService;
+import com.pedrocosta.exchangelog.notification.NotificationMessage;
+import com.pedrocosta.exchangelog.notification.NotificationRequest;
+import com.pedrocosta.exchangelog.notification.QuoteNotificationRequest;
+import com.pedrocosta.exchangelog.notification.services.QuoteNotificationRequestService;
+import com.pedrocosta.exchangelog.notification.utils.NotificationSender;
+import com.pedrocosta.exchangelog.notification.utils.NotificationSenderFactory;
+import com.pedrocosta.exchangelog.services.api.utils.ValueLogical;
+import com.pedrocosta.exchangelog.user.UserContact;
+import com.pedrocosta.springutils.DateUtils;
+import com.pedrocosta.springutils.output.Log;
+import com.pedrocosta.springutils.output.Messages;
+import org.springframework.batch.item.NonTransientResourceException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.UnexpectedInputException;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * @author Pedro H M da Costa
+ * @version 1.0
+ */
+public class NotifyMinimumRateTask extends ScheduledTask<List<QuoteNotificationRequest>, List<NotificationMessage>> {
+
+    @Override
+    public List<QuoteNotificationRequest> doRead() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+        QuoteNotificationRequestService service = getServiceFactory()
+                .create(QuoteNotificationRequestService.class);
+        return service.findAllByLogicalOperator(ValueLogical.MINIMUM.getOperator());
+    }
+
+    @Override
+    public List<NotificationMessage> doProcess(List<QuoteNotificationRequest> notificationRequests) throws Exception {
+        List<NotificationMessage> notifToSend = new ArrayList<>();
+
+        if (!notificationRequests.isEmpty()) {
+            notificationRequests.forEach(notifReq -> {
+                ExchangeService exchService = getServiceFactory().create(ExchangeService.class);
+
+                Date endDate = new Date();
+                // Getting start date
+                int period = notifReq.getPeriod() * -1; //Backward
+                Date startDate = DateUtils.addPeriod(endDate,
+                        notifReq.getPeriodType(), period);
+
+                if (startDate != null) {
+                    if (notifReq.getExchange().getBaseCurrency() == null
+                            || notifReq.getExchange().getQuoteCurrency() == null) {
+                        Log.warn(this, (Messages.get("error.ccy.not.set",
+                                "Base or quote", "notification request")));
+                        return;
+                    }
+
+//                    ServiceResponse<Exchange> respLastExch = exchService.findLast(
+//                            notifReq.getExchange().getBaseCurrency(),
+//                            notifReq.getExchange().getQuoteCurrency());
+//                    if (!respLastExch.isSuccess()) {
+//                        Log.warn(this, respLastExch.getMessage());
+//                        return;
+//                    }
+//
+//                    Exchange lastExchange = respLastExch.getObject();
+//
+//                    ServiceResponse<Exchange> respMinRateExch = exchService.findWithMinRate(
+//                            startDate, endDate);
+//                    if (!respLastExch.isSuccess()) {
+//                        Log.warn(this, respLastExch.getMessage());
+//                        return;
+//                    }
+
+                    Exchange lastExchange = exchService.findLast(
+                            notifReq.getExchange().getBaseCurrency(),
+                            notifReq.getExchange().getQuoteCurrency());
+
+                    Exchange minRateExch = exchService.findWithMinRate(startDate, endDate);
+
+                    if (lastExchange != null
+                            && lastExchange.equals(minRateExch)) {
+
+                        NotificationMessage notifMsg = new NotificationMessage(notifReq);
+
+                        notifMsg.setMessage(Messages.get("notify.min.value",
+                                notifReq.getExchange().getBaseCurrency().getCode(),
+                                String.valueOf(minRateExch.getRate()),
+                                notifReq.getExchange().getQuoteCurrency().getCode(),
+                                String.valueOf(notifReq.getExchStartDate())));
+                        notifToSend.add(notifMsg);
+                    }
+                }
+            });
+        }
+
+        return notifToSend;
+    }
+
+    @Override
+    public void doWrite(List<NotificationMessage> list) throws Exception {
+        Log.info(this, Messages.get("notify.total.to.send", String.valueOf(list.size())));
+        List<String> errorMsgs = new ArrayList<>();
+        AtomicInteger countSent = new AtomicInteger();
+
+        list.forEach(notifMessage -> { // For each
+            NotificationRequest notifRequest = notifMessage.getNotificationRequest();
+            UserContact contact = notifRequest.getUser().getContacts()
+                    .stream().filter(userContact ->
+                            notifRequest.getMeans().equals(userContact.getType().getMeans())
+                    ).findFirst().orElse(null);
+
+            if (contact != null) {
+                NotificationSender sender = NotificationSenderFactory.create(
+                        getContext(), notifRequest.getMeans());
+
+                sender.setTo(contact.getValue());
+                sender.setSubject(Messages.get("notify.quote.title"));
+                sender.setBody(Messages.get("notify.target.value",
+                        notifMessage.getMessage()));
+                sender.send();
+                countSent.getAndIncrement();
+            } else {
+                errorMsgs.add(Messages.get("error.contact.not.exists",
+                        notifRequest.getMeans().name(),
+                        String.valueOf(notifRequest.getUser().getId())));
+            }
+        });
+
+        Log.info(this, Messages.get("notify.total.sent", countSent.toString()));
+
+        if (!errorMsgs.isEmpty())
+            Log.warn(this, Messages.get("error.list.notify.send",
+                    errorMsgs.toString()));
+    }
+}

@@ -50,7 +50,7 @@ public class EmailSenderTest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<String> response = this.testRestTemplate.postForEntity("/pushNotification", request, String.class);
+        ResponseEntity<String> response = this.testRestTemplate.postForEntity("/api/notification/push", request, String.class);
 
         assertEquals(200, response.getStatusCodeValue());
 

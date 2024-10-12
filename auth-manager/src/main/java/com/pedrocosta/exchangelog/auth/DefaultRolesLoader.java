@@ -8,6 +8,7 @@ import com.pedrocosta.exchangelog.auth.role.utils.Roles;
 import com.pedrocosta.exchangelog.exceptions.SaveDataException;
 import com.pedrocosta.springutils.output.Log;
 import javassist.NotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,8 @@ import java.util.List;
 @Component
 public class DefaultRolesLoader implements ApplicationRunner {
 
+    @Value("${route.api}")
+    private String defaultRoute;
     private final RoleService roleService;
 
     public DefaultRolesLoader(RoleService roleService) {
@@ -41,11 +44,11 @@ public class DefaultRolesLoader implements ApplicationRunner {
 
         Role newRole = new Role();
         newRole.setName(roleEnum.name());
-        Permissions permissionEnum = Permissions.NONE;
         //By default, ADMIN has all permissions
         if (roleEnum == Roles.ADMIN) {
-            permissionEnum = Permissions.ALL;
-            Permission permission = permissionEnum.getObject();
+            Permission permission = new Permission();
+            permission.setName("all");
+            permission.setRoute(defaultRoute);
             newRole.setPermissions(List.of(permission));
         }
 

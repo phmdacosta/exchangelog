@@ -1,12 +1,15 @@
 package com.pedrocosta.exchangelog.auth.permission.utils;
 
 import com.pedrocosta.exchangelog.auth.permission.Permission;
+import org.springframework.beans.factory.annotation.Value;
 
 public enum Permissions {
 
-    ALL("all", Route.API),
+    ALL("all", "route.api"),
     NONE("none", "none");
 
+    @Value("${}")
+    private final String allRoute;
     private final Permission object;
 
     private Permissions(String name, String target) {
